@@ -1,54 +1,56 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Bot, ChevronDown } from "lucide-react";
-import { navLinks } from "@/data/siteData";
-import MagneticButton from "@/components/MagneticButton";
+import { Menu, X, Bot, ChevronDown, CreditCard } from "lucide-react";
+import { navLinks, siteConfig } from "@/data/siteData";
+import { images } from "@/data/images";
+
+const serviceSubLinks = [
+  "Web Development",
+  "Cloud Solutions",
+  "Cyber Security",
+  "Digital Marketing",
+];
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  const linkClass = (isActive: boolean) =>
+    `relative whitespace-nowrap rounded-md px-2 py-1.5 text-[13px] font-semibold tracking-wide transition-all duration-300 lg:px-2.5 lg:text-sm ${
+      isActive ? "text-brand" : "text-foreground/75 hover:text-foreground"
+    }`;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="group flex items-center gap-1">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="flex flex-col leading-none"
-          >
-            <span className="text-xl font-bold tracking-tight">
-              <span className="text-brand">Tasma</span>
-              <span className="text-white">Five</span>
-            </span>
-            <span className="text-[10px] font-medium tracking-[0.2em] text-brand uppercase">
-              Solutions
-            </span>
+    <header className="site-header border-b border-white/60 bg-gradient-to-r from-sky-100/90 via-white/85 to-pink-100/90 backdrop-blur-xl shadow-sm max-lg:pt-[env(safe-area-inset-top,0px)]">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 py-1.5 pl-2 pr-3 sm:gap-3 sm:pl-3 sm:pr-4 lg:py-2 lg:pl-4 lg:pr-5">
+        <Link href="/" className="group shrink-0">
+          <motion.div whileHover={{ scale: 1.02 }} className="flex items-center">
+            <Image
+              src={images.logo}
+              alt="TasmaFive Solutions"
+              width={160}
+              height={52}
+              priority
+              className="h-9 w-auto sm:h-10 md:h-11 lg:h-12"
+            />
           </motion.div>
         </Link>
 
-        {/* Buzzworthy-style center tagline — desktop only */}
-        <div className="hidden items-center gap-2 lg:flex">
-          <span className="text-xs font-bold uppercase tracking-widest text-white/40">
-            WE
-          </span>
-          <motion.span
-            animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="inline-block h-2 w-2 rounded-full bg-brand shadow-[0_0_12px_rgba(249,115,22,0.8)]"
-          />
-          <span className="text-xs font-bold uppercase tracking-widest text-white/60">
-            Unlock Potential
-          </span>
-        </div>
-
-        {/* Desktop Nav — hidden on smaller, shown on xl */}
-        <nav className="hidden items-center gap-1 xl:flex">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex xl:gap-1">
           {navLinks.map((link) => {
             const isActive =
               link.href === "/"
@@ -63,14 +65,7 @@ export default function Header() {
                   onMouseEnter={() => setServicesOpen(true)}
                   onMouseLeave={() => setServicesOpen(false)}
                 >
-                  <Link
-                    href={link.href}
-                    className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ${
-                      isActive
-                        ? "text-brand"
-                        : "text-white/70 hover:text-white"
-                    }`}
-                  >
+                  <Link href={link.href} className={`flex items-center gap-1 ${linkClass(isActive)}`}>
                     {link.label}
                     <ChevronDown
                       className={`h-3.5 w-3.5 transition-transform duration-300 ${
@@ -85,18 +80,13 @@ export default function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 mt-1 w-52 rounded-xl border border-white/10 bg-surface-light p-2 shadow-2xl"
+                        className="absolute top-full left-0 mt-1 w-48 rounded-xl border border-border bg-white p-2 shadow-xl"
                       >
-                        {[
-                          "Web Development",
-                          "Cloud Solutions",
-                          "Cyber Security",
-                          "Digital Marketing",
-                        ].map((item) => (
+                        {serviceSubLinks.map((item) => (
                           <Link
                             key={item}
                             href="/services"
-                            className="block rounded-lg px-3 py-2 text-sm text-white/70 transition hover:bg-white/5 hover:text-brand"
+                            className="block rounded-lg px-3 py-2 text-sm text-muted transition hover:bg-surface hover:text-brand"
                           >
                             {item}
                           </Link>
@@ -109,13 +99,7 @@ export default function Header() {
             }
 
             return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`relative rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ${
-                  isActive ? "text-brand" : "text-white/70 hover:text-white"
-                }`}
-              >
+              <Link key={link.href} href={link.href} className={linkClass(isActive)}>
                 {link.label}
                 {isActive && (
                   <motion.span
@@ -128,64 +112,134 @@ export default function Header() {
           })}
         </nav>
 
-        {/* Lusion-style pill buttons */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             title="AI Chatbot — Coming Soon"
-            className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-brand sm:flex"
+            className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-white/80 text-brand md:flex"
           >
-            <Bot className="h-5 w-5" />
+            <Bot className="h-4 w-4" />
           </motion.button>
 
-          <div className="hidden sm:block">
-            <MagneticButton href="/contact" variant="pill-dark" className="!px-5 !py-2 !text-xs !font-bold !uppercase !tracking-wider">
-              Let&apos;s Talk •
-            </MagneticButton>
-          </div>
+          <Link
+            href={siteConfig.payNowUrl}
+            className="hidden items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-brand-dark sm:flex lg:px-5 lg:text-xs"
+          >
+            <CreditCard className="h-3.5 w-3.5" />
+            Pay Now
+          </Link>
+
+          <Link
+            href="/contact"
+            className="hidden rounded-full border border-border bg-white/70 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground transition hover:border-brand/40 hover:text-brand xl:inline-flex"
+          >
+            Let&apos;s Talk
+          </Link>
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-black lg:hidden"
+            className="flex min-h-[44px] items-center gap-1.5 rounded-full border border-border bg-white/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground lg:hidden"
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? "Close" : "Menu"}
-            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            {mobileOpen ? <X className="h-3.5 w-3.5" /> : <Menu className="h-3.5 w-3.5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Nav */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-white/5 bg-black/95 xl:hidden"
+            className="overflow-hidden border-t border-border bg-white lg:hidden"
           >
-            <nav className="flex flex-col gap-1 p-4">
+            <nav className="flex max-h-[calc(100dvh-4rem)] flex-col gap-1 overflow-y-auto p-4">
               {navLinks.map((link) => {
                 const isActive =
                   link.href === "/"
                     ? pathname === "/"
                     : pathname.startsWith(link.href);
+
+                if (link.label === "Services") {
+                  return (
+                    <div key={link.href}>
+                      <button
+                        type="button"
+                        onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
+                        className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition ${
+                          isActive
+                            ? "bg-brand/10 text-brand"
+                            : "text-muted hover:bg-surface hover:text-foreground"
+                        }`}
+                      >
+                        Services
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform ${
+                            mobileServicesOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      <AnimatePresence>
+                        {mobileServicesOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden pl-2"
+                          >
+                            {serviceSubLinks.map((item) => (
+                              <Link
+                                key={item}
+                                href="/services"
+                                onClick={() => setMobileOpen(false)}
+                                className="block rounded-lg px-4 py-2.5 text-sm text-muted transition hover:bg-surface hover:text-brand"
+                              >
+                                {item}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`rounded-lg px-4 py-3 text-sm font-medium transition ${
+                    className={`rounded-lg px-4 py-3 text-sm font-semibold transition ${
                       isActive
                         ? "bg-brand/10 text-brand"
-                        : "text-white/70 hover:bg-white/5 hover:text-white"
+                        : "text-muted hover:bg-surface hover:text-foreground"
                     }`}
                   >
                     {link.label}
                   </Link>
                 );
               })}
+
+              <Link
+                href="/contact"
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 flex items-center justify-center rounded-full border border-border px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-foreground transition hover:border-brand/40 hover:text-brand"
+              >
+                Let&apos;s Talk
+              </Link>
+
+              <Link
+                href={siteConfig.payNowUrl}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 rounded-full bg-brand px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-lg"
+              >
+                <CreditCard className="h-4 w-4" />
+                Pay Now
+              </Link>
             </nav>
           </motion.div>
         )}

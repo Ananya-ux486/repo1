@@ -6,18 +6,20 @@ interface SplitHeadingProps {
   text: string;
   highlightWords?: string[];
   className?: string;
+  variant?: "default" | "hero";
 }
 
 export default function SplitHeading({
   text,
   highlightWords = [],
   className = "",
+  variant = "default",
 }: SplitHeadingProps) {
   const words = text.split(" ");
 
   return (
     <motion.h1
-      className={`${className}`}
+      className={className}
       initial="hidden"
       animate="visible"
       variants={{
@@ -28,6 +30,15 @@ export default function SplitHeading({
       {words.map((word, i) => {
         const clean = word.replace(/[^a-zA-Z-]/g, "");
         const isHighlight = highlightWords.includes(clean);
+
+        const wordClass =
+          variant === "hero"
+            ? isHighlight
+              ? "hero-highlight-text"
+              : "hero-title-text"
+            : isHighlight
+              ? "iridescent-text"
+              : "";
 
         return (
           <motion.span
@@ -41,7 +52,7 @@ export default function SplitHeading({
                 transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
               },
             }}
-            className={`inline-block mr-[0.25em] ${isHighlight ? "iridescent-text" : ""}`}
+            className={`inline-block mr-[0.25em] ${wordClass}`}
             style={{ transformOrigin: "bottom center" }}
           >
             {word}

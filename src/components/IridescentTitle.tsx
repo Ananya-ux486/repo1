@@ -22,9 +22,9 @@ export default function IridescentTitle({
   const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
   const sizes = {
-    sm: "text-2xl md:text-3xl",
-    lg: "text-4xl md:text-6xl",
-    xl: "text-5xl md:text-8xl",
+    sm: "text-2xl lg:text-3xl",
+    lg: "text-4xl lg:text-6xl",
+    xl: "text-5xl lg:text-8xl",
   };
 
   return (

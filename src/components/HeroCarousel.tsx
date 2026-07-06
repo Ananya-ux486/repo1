@@ -28,7 +28,7 @@ export default function HeroCarousel() {
   const slide = heroSlides[activeIndex];
 
   return (
-    <section className="relative h-screen min-h-[600px] w-full overflow-hidden">
+    <section className="relative h-[calc(100svh-3.5rem)] min-h-[420px] w-full overflow-hidden -mt-px lg:h-[88vh] lg:min-h-[500px]">
       <Swiper
         modules={[EffectFade, Autoplay, Pagination, Navigation]}
         effect="fade"
@@ -98,71 +98,80 @@ export default function HeroCarousel() {
         </div>
       </div>
 
-      {/* Content overlay — outside swiper for smooth text transitions */}
-      <div className="pointer-events-none absolute inset-0 z-[5] flex items-center">
+      {/* Content overlay */}
+      <div className="pointer-events-none absolute inset-0 z-[5] flex items-center max-lg:items-end max-lg:pb-20">
         <div className="pointer-events-auto mx-auto w-full max-w-7xl px-4 lg:px-8">
-          <motion.span
-            key={`badge-${activeIndex}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-4 inline-block rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-brand backdrop-blur-sm"
-          >
-            TasmaFive Solutions
-          </motion.span>
+          <div className="hero-content-panel max-lg:mx-0">
+            <motion.span
+              key={`badge-${activeIndex}`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-4 inline-block rounded-full border border-brand/50 bg-brand px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-md"
+            >
+              TasmaFive Solutions
+            </motion.span>
 
-          <SplitHeading
-            key={`heading-${activeIndex}`}
-            text={slide.heading}
-            highlightWords={highlightMap[slide.id] || []}
-            className="text-4xl font-black leading-[1.05] tracking-tight text-white md:text-5xl lg:text-7xl"
-          />
+            <SplitHeading
+              key={`heading-${activeIndex}`}
+              text={slide.heading}
+              highlightWords={highlightMap[slide.id] || []}
+              variant="hero"
+              className="text-3xl font-black leading-[1.1] tracking-tight lg:text-[2.75rem]"
+            />
 
-          <motion.p
-            key={`sub-${activeIndex}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg"
-          >
-            {slide.subheading}
-          </motion.p>
+            <motion.p
+              key={`sub-${activeIndex}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="hero-subtext mt-4 max-w-xl text-sm leading-relaxed md:text-base"
+            >
+              {slide.subheading}
+            </motion.p>
 
-          <motion.div
-            key={`cta-${activeIndex}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-8 flex flex-wrap gap-4"
-          >
-            <MagneticButton href="/contact" variant="primary">
-              {slide.ctaPrimary}
-              <ArrowRight className="h-4 w-4" />
-            </MagneticButton>
-            <MagneticButton href="/services" variant="outline">
-              {slide.ctaSecondary}
-            </MagneticButton>
-          </motion.div>
+            <motion.div
+              key={`cta-${activeIndex}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="mt-5 flex flex-wrap gap-3"
+            >
+              {slide.ctaPrimary ? (
+                <MagneticButton href="/contact" variant="primary">
+                  {slide.ctaPrimary}
+                  <ArrowRight className="h-4 w-4" />
+                </MagneticButton>
+              ) : null}
+              <MagneticButton
+                href="/services"
+                variant="outline"
+                className="!border-white/30 !text-white hover:!bg-white/15 hover:!text-white"
+              >
+                {slide.ctaSecondary}
+              </MagneticButton>
+            </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Navigation */}
       <button
         ref={prevRef}
-        className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white backdrop-blur-sm transition hover:border-brand/50 hover:bg-brand/20 lg:left-8"
+        className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white backdrop-blur-sm transition hover:border-brand/50 hover:bg-brand/20 sm:left-4 sm:h-12 sm:w-12 lg:left-8"
         aria-label="Previous slide"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         ref={nextRef}
-        className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white backdrop-blur-sm transition hover:border-brand/50 hover:bg-brand/20 lg:right-8"
+        className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white backdrop-blur-sm transition hover:border-brand/50 hover:bg-brand/20 sm:right-4 sm:h-12 sm:w-12 lg:right-8"
         aria-label="Next slide"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
 
-      <div className="hero-pagination absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 gap-2" />
+      <div className="hero-pagination absolute bottom-20 left-1/2 z-10 flex -translate-x-1/2 gap-2 lg:bottom-8" />
 
       {/* Lusion-style scroll explore — bottom right */}
       <motion.div

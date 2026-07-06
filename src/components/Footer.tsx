@@ -1,50 +1,49 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { siteConfig, navLinks } from "@/data/siteData";
+import { images } from "@/data/images";
 import {
   InstagramIcon,
   LinkedinIcon,
   FacebookIcon,
-  TwitterIcon,
-  YoutubeIcon,
   Mail,
   Phone,
   MapPin,
 } from "@/components/SocialIcons";
-import { siteConfig, navLinks } from "@/data/siteData";
 
 const socialIcons = [
   { icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
   { icon: LinkedinIcon, href: siteConfig.social.linkedin, label: "LinkedIn" },
   { icon: FacebookIcon, href: siteConfig.social.facebook, label: "Facebook" },
-  { icon: TwitterIcon, href: siteConfig.social.twitter, label: "Twitter" },
-  { icon: YoutubeIcon, href: siteConfig.social.youtube, label: "YouTube" },
 ];
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-white/5 bg-surface">
+    <footer className="relative border-t border-white/50 bg-gradient-to-b from-transparent via-sky-50/40 to-pink-50/50">
       <div className="section-glow absolute inset-0 pointer-events-none" />
-      <div className="relative mx-auto max-w-7xl px-4 py-16 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 py-12 pb-[calc(3rem+env(safe-area-inset-bottom))] lg:px-8 lg:py-16 lg:pb-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
           <div>
             <Link href="/" className="inline-block">
-              <span className="text-2xl font-bold">
-                <span className="text-brand">Tasma</span>
-                <span className="text-white">Five</span>
-              </span>
-              <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-brand uppercase">
-                Solutions
-              </p>
+              <Image
+                src={images.logo}
+                alt="TasmaFive Solutions"
+                width={180}
+                height={58}
+                className="h-14 w-auto"
+              />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-muted">
               Professional IT company providing website development, software
               solutions, digital marketing, and government project services.
             </p>
             <div className="mt-6 flex gap-3">
-              {socialIcons.map(({ icon: Icon, href, label }) => (
+              {socialIcons
+                .filter(({ href }) => href)
+                .map(({ icon: Icon, href, label }) => (
                 <motion.a
                   key={label}
                   href={href || "#"}
@@ -53,7 +52,7 @@ export default function Footer() {
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   title={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/60 transition hover:border-brand/50 hover:bg-brand/10 hover:text-brand"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-muted transition hover:border-brand/50 hover:bg-brand/10 hover:text-brand"
                 >
                   <Icon className="h-4 w-4" />
                 </motion.a>
@@ -61,18 +60,14 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
               Quick Links
             </h3>
             <ul className="space-y-2">
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted transition hover:text-brand"
-                  >
+                  <Link href={link.href} className="text-sm text-muted transition hover:text-brand">
                     {link.label}
                   </Link>
                 </li>
@@ -80,9 +75,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
               Our Services
             </h3>
             <ul className="space-y-2 text-sm text-muted">
@@ -103,13 +97,12 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
               Contact Us
             </h3>
             <ul className="space-y-3 text-sm text-muted">
-              <li className="flex items-start gap-2">
+              <li className="flex items-start gap-2 max-lg:break-words">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                 {siteConfig.address}
               </li>
@@ -123,10 +116,7 @@ export default function Footer() {
               ))}
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-brand" />
-                <a
-                  href={`mailto:${siteConfig.email}`}
-                  className="hover:text-brand"
-                >
+                <a href={`mailto:${siteConfig.email}`} className="hover:text-brand">
                   {siteConfig.email}
                 </a>
               </li>
@@ -134,11 +124,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-center sm:flex-row sm:text-left">
           <p className="text-xs text-muted">
             © {new Date().getFullYear()} TasmaFive Solutions. All rights reserved.
           </p>
-          <p className="text-xs text-muted">
+          <p className="max-w-xs text-xs text-muted sm:max-w-none">
             Top IT Company in Kanpur | Digital Solutions Across India & Worldwide
           </p>
         </div>

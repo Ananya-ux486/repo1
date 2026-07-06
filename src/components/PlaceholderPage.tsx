@@ -14,7 +14,7 @@ export default function PlaceholderPage({
   description,
 }: PlaceholderPageProps) {
   return (
-    <section className="relative flex min-h-[80vh] items-center justify-center section-glow">
+    <section className="relative flex min-h-[80vh] items-center justify-center section-glow pt-20 lg:pt-24">
       <div className="mx-auto max-w-lg px-4 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -24,9 +24,9 @@ export default function PlaceholderPage({
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand/10 text-brand">
             <Construction className="h-10 w-10" />
           </div>
-          <h1 className="text-3xl font-bold text-white md:text-4xl">{title}</h1>
+          <h1 className="text-3xl font-bold text-foreground md:text-4xl">{title}</h1>
           <p className="mt-4 text-muted">{description}</p>
-          <p className="mt-2 text-sm text-white/40">
+          <p className="mt-2 text-sm text-muted/70">
             This page is under development. Coming soon!
           </p>
           <Link

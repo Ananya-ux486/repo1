@@ -1,94 +1,136 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { indiaPresence, internationalPresence } from "@/data/siteData";
+
+function IndiaCard({
+  city,
+  landmark,
+  image,
+  index,
+}: {
+  city: string;
+  landmark: string;
+  image: string;
+  index: number;
+}) {
+  return (
+    <div className="group w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-white shadow-sm sm:w-[260px]">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <Image
+          src={image}
+          alt={`${landmark}, ${city}`}
+          fill
+          className="object-cover transition duration-500 group-hover:scale-110"
+          sizes="260px"
+          priority={index < 3}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          <p className="text-sm font-semibold text-white">{city}</p>
+          <p className="text-[10px] text-white/50">{landmark}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FlagCard({ country, image }: { country: string; image: string }) {
+  return (
+    <div className="group flex w-[180px] shrink-0 flex-col items-center justify-center rounded-2xl border border-border bg-white p-6 shadow-sm transition hover:border-brand/30 sm:w-[220px]">
+      <div className="relative mb-3 h-16 w-24 overflow-hidden rounded-lg shadow-lg">
+        <Image
+          src={image}
+          alt={`${country}`}
+          fill
+          className="object-cover"
+          sizes="96px"
+        />
+      </div>
+      <p className="text-sm font-semibold text-foreground">{country}</p>
+    </div>
+  );
+}
+
+function AutoMarqueeRow({
+  children,
+  duration = 45,
+  direction = "right",
+  className = "",
+}: {
+  children: React.ReactNode[];
+  duration?: number;
+  direction?: "left" | "right";
+  className?: string;
+}) {
+  const loop = [...children, ...children];
+  const animateX =
+    direction === "right" ? ["-50%", "0%"] : ["0%", "-50%"];
+
+  return (
+    <div className={`overflow-hidden ${className}`}>
+      <motion.div
+        animate={{ x: animateX }}
+        transition={{ duration, repeat: Infinity, ease: "linear" }}
+        className="flex w-max gap-4 py-2"
+      >
+        {loop.map((child, i) => (
+          <div key={i} className="shrink-0">
+            {child}
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
 
 export default function PresenceSection() {
   return (
-    <section className="relative py-24 bg-surface">
-      <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        {/* India */}
-        <motion.div
+    <section className="relative overflow-hidden py-16 pastel-section lg:py-24">
+      {/* India */}
+      <div className="mx-auto mb-12 max-w-7xl px-4 text-center lg:px-8">
+        <motion.span
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 text-center"
+          className="text-xs font-semibold uppercase tracking-[0.3em] text-brand"
         >
-          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
-            Nationwide Reach
-          </span>
-          <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
-            Our Presence in India
-          </h2>
-        </motion.div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {indiaPresence.map((city, i) => (
-            <motion.div
-              key={city.city}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              whileHover={{ y: -6, scale: 1.02 }}
-              className="group overflow-hidden rounded-2xl border border-white/5 bg-surface-light"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={city.image}
-                  alt={`${city.landmark}, ${city.city}`}
-                  fill
-                  className="object-cover transition duration-500 group-hover:scale-110"
-                  sizes="(max-width: 640px) 50vw, 16vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <p className="text-sm font-semibold text-white">{city.city}</p>
-                  <p className="text-[10px] text-white/50">{city.landmark}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* International */}
-        <motion.div
+          Nationwide Reach
+        </motion.span>
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 mt-20 text-center"
+          className="mt-3 text-3xl font-bold text-foreground md:text-4xl"
         >
-          <h2 className="text-3xl font-bold text-white md:text-4xl">
-            Our Presence in International
-          </h2>
-        </motion.div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {internationalPresence.map((loc, i) => (
-            <motion.div
-              key={loc.country}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              whileHover={{ y: -6 }}
-              className="group flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-surface-light p-6 transition hover:border-brand/30"
-            >
-              <div className="relative mb-3 h-16 w-24 overflow-hidden rounded-lg shadow-lg">
-                <Image
-                  src={`https://flagcdn.com/w320/${loc.code}.png`}
-                  alt={`${loc.country} flag`}
-                  fill
-                  className="object-cover"
-                  sizes="96px"
-                />
-              </div>
-              <p className="text-sm font-semibold text-white">{loc.country}</p>
-            </motion.div>
-          ))}
-        </div>
+          Our Presence in India
+        </motion.h2>
       </div>
+
+      <AutoMarqueeRow duration={50} direction="right" className="mb-12 lg:mb-20">
+        {indiaPresence.map((city, i) => (
+          <IndiaCard key={city.city} {...city} index={i} />
+        ))}
+      </AutoMarqueeRow>
+
+      {/* International */}
+      <div className="mx-auto mb-12 max-w-7xl px-4 text-center lg:px-8">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-3xl font-bold text-foreground md:text-4xl"
+        >
+          Our Presence in International
+        </motion.h2>
+      </div>
+
+      <AutoMarqueeRow duration={42} direction="left">
+        {internationalPresence.map((loc) => (
+          <FlagCard key={loc.country} {...loc} />
+        ))}
+      </AutoMarqueeRow>
     </section>
   );
 }

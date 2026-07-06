@@ -125,7 +125,7 @@ export default function ParticleField() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+      className="pointer-events-none absolute inset-0 hidden h-full w-full opacity-70 lg:block"
       aria-hidden
     />
   );

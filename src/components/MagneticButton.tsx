@@ -20,13 +20,13 @@ export default function MagneticButton({
   const ref = useRef<HTMLAnchorElement>(null);
 
   const variants = {
-    primary: "bg-brand text-black hover:bg-brand-dark",
+    primary: "bg-brand text-white hover:bg-brand-dark",
     outline:
-      "border border-white/20 text-white hover:border-brand/50 hover:bg-white/5",
+      "border border-border text-foreground hover:border-brand/50 hover:bg-surface",
     "pill-dark":
-      "border border-white/20 bg-black/60 text-white backdrop-blur-sm hover:bg-white hover:text-black",
+      "border border-border bg-white text-foreground shadow-sm hover:bg-brand hover:text-white",
     "pill-light":
-      "bg-white text-black hover:bg-white/90",
+      "bg-brand text-white hover:bg-brand-dark",
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -51,7 +51,7 @@ export default function MagneticButton({
         href={href}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className={`inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold transition-all duration-300 ${variants[variant]} ${className}`}
+        className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${variants[variant]} ${className}`}
         style={{ transition: "transform 0.15s ease-out" }}
       >
         {children}

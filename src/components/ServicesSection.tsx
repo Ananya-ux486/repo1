@@ -75,7 +75,7 @@ const fadeUp = {
 
 export default function ServicesSection() {
   return (
-    <section className="relative py-24 section-glow">
+    <section className="relative py-16 pastel-section section-glow lg:py-24">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -106,23 +106,24 @@ export default function ServicesSection() {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
-                  className="group glass-card relative h-full overflow-hidden rounded-2xl p-6 transition-all duration-500 hover:border-brand/30"
+                  className="group glass-card relative h-full overflow-hidden rounded-2xl p-6 transition-all duration-500 hover:border-brand/40"
                 >
-                <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-brand/5 transition group-hover:bg-brand/10" />
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand transition group-hover:bg-brand group-hover:text-black">
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand/0 via-brand/0 to-brand/0 opacity-0 transition-opacity duration-500 group-hover:from-brand/15 group-hover:via-orange-400/10 group-hover:to-brand/20 group-hover:opacity-100" />
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[inset_0_0_40px_rgba(249,115,22,0.18)] transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="relative z-[1] mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand transition group-hover:bg-brand group-hover:text-black">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="relative z-[1] text-lg font-semibold text-foreground">
                   {service.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
+                <p className="relative z-[1] mt-2 text-sm leading-relaxed text-muted">
                   {service.description}
                 </p>
-                <ul className="mt-4 space-y-1.5">
+                <ul className="relative z-[1] mt-4 space-y-1.5">
                   {service.features.map((f) => (
                     <li
                       key={f}
-                      className="flex items-center gap-2 text-xs text-white/50"
+                      className="flex items-center gap-2 text-xs text-muted"
                     >
                       <span className="h-1 w-1 rounded-full bg-brand" />
                       {f}
@@ -131,7 +132,7 @@ export default function ServicesSection() {
                 </ul>
                 <Link
                   href={service.href}
-                  className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-brand opacity-0 transition group-hover:opacity-100"
+                  className="relative z-[1] mt-5 inline-flex items-center gap-1 text-sm font-medium text-brand opacity-100 transition lg:opacity-0 lg:group-hover:opacity-100"
                 >
                   Explore <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
@@ -156,7 +157,7 @@ export default function ServicesSection() {
             <Link
               key={label}
               href="/services"
-              className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm text-white/70 transition hover:border-brand/40 hover:text-brand"
+              className="flex items-center gap-2 rounded-full border border-border bg-white px-5 py-2.5 text-sm text-muted transition hover:border-brand/40 hover:text-brand"
             >
               <Icon className="h-4 w-4" />
               {label}

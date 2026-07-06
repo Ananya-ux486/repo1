@@ -1,14 +1,11 @@
-import PlaceholderPage from "@/components/PlaceholderPage";
+import ProjectsPageContent from "@/components/ProjectsPageContent";
 
 export const metadata = {
   title: "Projects | TasmaFive Solutions",
+  description:
+    "Explore our portfolio of web development, e-commerce, enterprise software, and digital marketing projects.",
 };
 
 export default function ProjectsPage() {
-  return (
-    <PlaceholderPage
-      title="Our Projects"
-      description="Explore our portfolio of successful web development, software, and digital marketing projects across industries."
-    />
-  );
+  return <ProjectsPageContent />;
 }
