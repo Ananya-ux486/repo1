@@ -8,7 +8,7 @@ export default function MotionProvider({
   children: React.ReactNode;
 }) {
   return (
-    <LazyMotion features={domAnimation} strict>
+    <LazyMotion features={domAnimation}>
       <MotionConfig
         reducedMotion="never"
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
