@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "description": "All static website images — commit this folder to Git for GitHub clone and Hostinger deploy.",
+  "basePath": "/images",
+  "categories": {
+    "brand": ["brand/tasmafive-logo.svg", "brand/tab-icon-source.png"],
+    "hero": ["hero/slide-1.jpg", "hero/slide-2.jpg", "hero/slide-3.jpg", "hero/slide-4.jpg"],
+    "projects": [
+      "projects/business-website.png",
+      "projects/corporate-website.png",
+      "projects/ecommerce.png",
+      "projects/portfolio.png",
+      "projects/landing-page.png",
+      "projects/government.png"
+    ],
+    "industries": [
+      "industries/seo-360.webp",
+      "industries/real-estate.webp",
+      "industries/education.webp",
+      "industries/healthcare.webp",
+      "industries/travel.webp",
+      "industries/ecommerce.webp",
+      "industries/manufacturing.webp",
+      "industries/gym-fitness.webp",
+      "industries/logistics.webp",
+      "industries/automobile.webp",
+      "industries/it-software.webp",
+      "industries/hotel-restaurants.webp",
+      "industries/fashion.webp"
+    ],
+    "expertise": [
+      "expertise/custom-development.jpg",
+      "expertise/secure-infrastructure.jpg",
+      "expertise/agile-execution.jpg",
+      "expertise/tech-support.jpg",
+      "expertise/scalable-solutions.jpg",
+      "expertise/performance-driven.jpg"
+    ],
+    "blog": [
+      "blog/ai-web-development.jpg",
+      "blog/mobile-first-design.jpg",
+      "blog/website-security-2026.jpg"
+    ],
+    "instagram": [
+      "instagram/post-1-digital-transform.jpg",
+      "instagram/post-2-ecommerce.jpg",
+      "instagram/post-3-ai-trends.jpg",
+      "instagram/post-4-security.jpg",
+      "instagram/post-5-corporate.jpg",
+      "instagram/post-6-mobile-first.jpg"
+    ],
+    "presenceIndia": [
+      "presence/india/kanpur.jpg",
+      "presence/india/noida-dlf-mall.jpg",
+      "presence/india/gurgaon.jpg",
+      "presence/india/delhi-ncr.jpg",
+      "presence/india/haryana.jpg"
+    ],
+    "presenceFlags": "flags/lang/*.png (shared with language switcher — no duplicate folder)",
+    "languageFlags": "flags/lang/*.png"
+  },
+  "registry": "src/data/images.ts"
+}

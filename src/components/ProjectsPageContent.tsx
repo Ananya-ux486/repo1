@@ -5,12 +5,19 @@ import {
   AnimatedPortfolioCard,
   PortfolioSectionHeader,
 } from "@/components/AnimatedPortfolioCard";
+import { useScrollReplay } from "@/lib/useScrollReplay";
 
 export default function ProjectsPageContent() {
+  const { ref, replayKey } = useScrollReplay(0.12);
+
   return (
-    <div className="relative overflow-hidden pb-16 pt-20 pastel-section section-glow lg:pb-24 lg:pt-8">
+    <div
+      ref={ref}
+      className="relative overflow-hidden pb-16 pt-6 pastel-section section-glow max-lg:pt-4 lg:pb-24 lg:pt-8"
+    >
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <PortfolioSectionHeader
+          replayKey={replayKey}
           eyebrow="Projects"
           title="Recent"
           titleAccent="Work."
@@ -25,6 +32,7 @@ export default function ProjectsPageContent() {
               index={i}
               tall={i === 0 || i === 3}
               showDetails
+              replayKey={replayKey}
             />
           ))}
         </div>

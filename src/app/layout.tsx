@@ -2,21 +2,27 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import FloatingWidgets from "@/components/FloatingWidgets";
 import SmoothScroll from "@/components/SmoothScroll";
-import CursorGlow from "@/components/CursorGlow";
-import ScrollLock from "@/components/ScrollLock";
+import MotionProvider from "@/components/MotionProvider";
 import PageLoader from "@/components/PageLoader";
+import ScrollLock from "@/components/ScrollLock";
+import {
+  DeferredAiChatbot,
+  DeferredCursorGlow,
+  DeferredFloatingWidgets,
+} from "@/components/DeferredClient";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const viewport = {
@@ -37,6 +43,10 @@ export const metadata: Metadata = {
     "digital marketing",
     "cloud solutions",
   ],
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -47,20 +57,28 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} min-h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://translate.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://translate.google.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://translate.google.com" />
+      </head>
       <body className="textured-bg min-h-screen flex flex-col text-foreground">
-        <ScrollLock />
         <PageLoader />
+        <ScrollLock />
         <Header />
-        <div id="app-root" className="flex flex-1 flex-col">
-          <SmoothScroll>
-            <CursorGlow />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </SmoothScroll>
+        <div id="app-root" className="flex min-h-0 flex-1 flex-col max-lg:block max-lg:min-h-0 max-lg:flex-none">
+          <MotionProvider>
+            <SmoothScroll>
+              <DeferredCursorGlow />
+              <main className="max-lg:block lg:flex-1">{children}</main>
+              <Footer />
+            </SmoothScroll>
+          </MotionProvider>
         </div>
-        <FloatingWidgets />
+        <DeferredFloatingWidgets />
+        <DeferredAiChatbot />
       </body>
     </html>
   );

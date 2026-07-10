@@ -5,16 +5,12 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Bot, ChevronDown, CreditCard } from "lucide-react";
+import { Menu, X, ChevronDown, CreditCard } from "lucide-react";
 import { navLinks, siteConfig } from "@/data/siteData";
 import { images } from "@/data/images";
-
-const serviceSubLinks = [
-  "Web Development",
-  "Cloud Solutions",
-  "Cyber Security",
-  "Digital Marketing",
-];
+import ChatbotTrigger from "@/components/ChatbotTrigger";
+import ServicesNavDropdown from "@/components/ServicesNavDropdown";
+import { lockPageScroll, unlockPageScroll, releaseDocumentScroll } from "@/lib/scrollLock";
 
 export default function Header() {
   const pathname = usePathname();
@@ -23,9 +19,19 @@ export default function Header() {
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    setMobileOpen(false);
+    setMobileServicesOpen(false);
+    releaseDocumentScroll();
+  }, [pathname]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      lockPageScroll();
+    } else {
+      unlockPageScroll();
+    }
     return () => {
-      document.body.style.overflow = "";
+      if (mobileOpen) unlockPageScroll();
     };
   }, [mobileOpen]);
 
@@ -80,17 +86,11 @@ export default function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 mt-1 w-48 rounded-xl border border-border bg-white p-2 shadow-xl"
+                        className="absolute top-full left-0 z-50 pt-1"
                       >
-                        {serviceSubLinks.map((item) => (
-                          <Link
-                            key={item}
-                            href="/services"
-                            className="block rounded-lg px-3 py-2 text-sm text-muted transition hover:bg-surface hover:text-brand"
-                          >
-                            {item}
-                          </Link>
-                        ))}
+                        <div className="w-56 overflow-hidden rounded-xl border border-border bg-white shadow-xl">
+                          <ServicesNavDropdown />
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -113,14 +113,7 @@ export default function Header() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            title="AI Chatbot — Coming Soon"
-            className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-white/80 text-brand md:flex"
-          >
-            <Bot className="h-4 w-4" />
-          </motion.button>
+          <ChatbotTrigger className="shrink-0" />
 
           <Link
             href={siteConfig.payNowUrl}
@@ -157,7 +150,7 @@ export default function Header() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden border-t border-border bg-white lg:hidden"
           >
-            <nav className="flex max-h-[calc(100dvh-4rem)] flex-col gap-1 overflow-y-auto p-4">
+            <nav className="flex max-h-[calc(100dvh-var(--tf-header-height)-0.5rem)] flex-col gap-1 overflow-y-auto overscroll-contain p-4">
               {navLinks.map((link) => {
                 const isActive =
                   link.href === "/"
@@ -191,16 +184,7 @@ export default function Header() {
                             exit={{ opacity: 0, height: 0 }}
                             className="overflow-hidden pl-2"
                           >
-                            {serviceSubLinks.map((item) => (
-                              <Link
-                                key={item}
-                                href="/services"
-                                onClick={() => setMobileOpen(false)}
-                                className="block rounded-lg px-4 py-2.5 text-sm text-muted transition hover:bg-surface hover:text-brand"
-                              >
-                                {item}
-                              </Link>
-                            ))}
+                            <ServicesNavDropdown onNavigate={() => setMobileOpen(false)} />
                           </motion.div>
                         )}
                       </AnimatePresence>

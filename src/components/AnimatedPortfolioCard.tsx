@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { IMAGE_BLUR } from "@/lib/motion";
+import { FloatBlock, FloatLine } from "@/components/FloatReveal";
+import { useScrollReplay } from "@/lib/useScrollReplay";
 
 export type PortfolioCardItem = {
   title: string;
@@ -13,44 +15,61 @@ export type PortfolioCardItem = {
   details?: string;
 };
 
+const cardEase = [0.22, 1, 0.36, 1] as const;
+
+const cardEnter = {
+  initial: { opacity: 0, y: -120, scale: 0.92 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+};
+
 export function AnimatedPortfolioCard({
   item,
   index,
   tall = false,
   showDetails = false,
+  replayKey: sectionReplayKey,
 }: {
   item: PortfolioCardItem;
   index: number;
   tall?: boolean;
   showDetails?: boolean;
+  replayKey?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: false, margin: "-15% 0px -10% 0px" });
+  const cardReplay = useScrollReplay(0.12);
+  const cardClass = `group overflow-hidden rounded-3xl border border-border bg-white shadow-md ${
+    tall ? "lg:row-span-2" : ""
+  }`;
+
+  // Section replay syncs all cards; fallback = per-card replay when section key is 0
+  const playKey =
+    sectionReplayKey !== undefined && sectionReplayKey > 0
+      ? `section-${sectionReplayKey}-${index}`
+      : `card-${cardReplay.replayKey}-${index}`;
+
+  const attachRef = sectionReplayKey !== undefined ? undefined : cardReplay.ref;
+
+  const motionProps = {
+    ref: attachRef,
+    key: playKey,
+    ...cardEnter,
+    transition: {
+      duration: 0.85,
+      delay: index * 0.1,
+      ease: cardEase,
+    },
+  };
 
   if (showDetails) {
     return (
-      <motion.article
-        ref={ref}
-        initial={{ opacity: 0, y: -160, scale: 0.92 }}
-        animate={
-          isInView
-            ? { opacity: 1, y: 0, scale: 1 }
-            : { opacity: 0, y: -160, scale: 0.92 }
-        }
-        transition={{
-          duration: 0.85,
-          delay: index * 0.12,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        className={`group overflow-hidden rounded-3xl border border-border bg-white shadow-md ${
-          tall ? "lg:row-span-2" : ""
-        }`}
-      >
+      <motion.article {...motionProps} className={cardClass}>
         <div className={`relative overflow-hidden ${tall ? "aspect-[4/5]" : "aspect-[4/3]"}`}>
           <Image
             src={item.image}
             alt={item.title}
             fill
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR}
             className="object-cover transition duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 50vw"
           />
@@ -84,23 +103,7 @@ export function AnimatedPortfolioCard({
   }
 
   return (
-    <motion.article
-      ref={ref}
-      initial={{ opacity: 0, y: -160, scale: 0.92 }}
-      animate={
-        isInView
-          ? { opacity: 1, y: 0, scale: 1 }
-          : { opacity: 0, y: -160, scale: 0.92 }
-      }
-      transition={{
-        duration: 0.85,
-        delay: index * 0.12,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className={`group relative overflow-hidden rounded-3xl border border-border bg-white shadow-md ${
-        tall ? "lg:row-span-2" : ""
-      }`}
-    >
+    <motion.article {...motionProps} className={`${cardClass} relative`}>
       <div
         className={`relative overflow-hidden ${
           tall ? "aspect-[3/4] lg:aspect-auto lg:h-full lg:min-h-[480px]" : "aspect-[4/3]"
@@ -110,6 +113,9 @@ export function AnimatedPortfolioCard({
           src={item.image}
           alt={item.title}
           fill
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR}
           className="object-cover transition duration-700 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, 50vw"
         />
@@ -151,48 +157,57 @@ export function PortfolioSectionHeader({
   title,
   titleAccent,
   description,
+  replayKey: sectionReplayKey,
 }: {
   eyebrow: string;
   title: string;
   titleAccent?: string;
   description: string;
+  replayKey?: number;
 }) {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const headerInView = useInView(headerRef, { once: false, margin: "-10%" });
+  const internal = useScrollReplay(0.12);
+  const replayKey =
+    sectionReplayKey !== undefined && sectionReplayKey > 0
+      ? sectionReplayKey
+      : internal.replayKey;
+  const ref =
+    sectionReplayKey !== undefined && sectionReplayKey > 0 ? undefined : internal.ref;
 
   return (
-    <div className="mb-10 grid gap-6 lg:mb-16 lg:grid-cols-2 lg:items-end lg:gap-10">
-      <motion.div
-        ref={headerRef}
-        initial={{ opacity: 0, x: -40 }}
-        animate={headerInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -40 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="mb-4 flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-brand" />
-          <span className="text-xs font-bold uppercase tracking-[0.4em] text-muted">
-            {eyebrow}
-          </span>
-        </div>
-        <h2 className="text-[clamp(2rem,7vw,5rem)] font-black uppercase leading-[0.95] tracking-tighter text-foreground lg:text-[clamp(2.5rem,8vw,5rem)]">
-          {title}
-          {titleAccent ? (
-            <>
-              <br />
-              <span className="iridescent-text">{titleAccent}</span>
-            </>
-          ) : null}
-        </h2>
-      </motion.div>
+    <div
+      ref={ref}
+      className="mb-10 grid gap-6 lg:mb-16 lg:grid-cols-2 lg:items-end lg:gap-10"
+    >
+      <div>
+        <FloatLine replayKey={replayKey} delay={0}>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-brand" />
+            <span className="text-xs font-bold uppercase tracking-[0.4em] text-muted">
+              {eyebrow}
+            </span>
+          </div>
+        </FloatLine>
+        <FloatLine replayKey={replayKey} delay={0.08} duration={0.85}>
+          <h2 className="text-[clamp(2rem,7vw,5rem)] font-black uppercase leading-[0.95] tracking-tighter text-foreground lg:text-[clamp(2.5rem,8vw,5rem)]">
+            {title}
+            {titleAccent ? (
+              <>
+                <br />
+                <span className="iridescent-text">{titleAccent}</span>
+              </>
+            ) : null}
+          </h2>
+        </FloatLine>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-        transition={{ duration: 0.6, delay: 0.15 }}
+      <FloatBlock
+        replayKey={replayKey}
+        scroll={false}
+        index={1}
         className="flex flex-col items-start justify-end gap-4 lg:items-end lg:text-right"
       >
         <p className="max-w-md text-sm leading-relaxed text-muted">{description}</p>
-      </motion.div>
+      </FloatBlock>
     </div>
   );
 }

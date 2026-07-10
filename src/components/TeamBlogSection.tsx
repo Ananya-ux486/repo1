@@ -3,100 +3,66 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Calendar, MessageSquare } from "lucide-react";
-import { team, blogPosts } from "@/data/siteData";
+import { blogPosts } from "@/data/siteData";
+import { IMAGE_BLUR } from "@/lib/motion";
+import { floatEase, floatStagger } from "@/lib/floatMotion";
+import { FloatImageWrap, FloatLine } from "@/components/FloatReveal";
+import { useScrollReplay } from "@/lib/useScrollReplay";
 
 export default function TeamBlogSection() {
+  const blogReplay = useScrollReplay(0.18);
+
   return (
     <>
-      {/* Team */}
-      <section className="relative bg-transparent py-16 lg:py-24">
+      <section ref={blogReplay.ref} className="relative bg-transparent py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 text-center"
-          >
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
-              Leadership
-            </span>
-            <h2 className="mt-3 text-3xl font-bold text-foreground md:text-4xl">
-              Our Team
-            </h2>
-            <p className="mt-3 text-muted">
-              Meet our experienced professionals behind success.
-            </p>
-          </motion.div>
-
-          <div className="mx-auto grid max-w-full gap-6 sm:grid-cols-2 sm:max-w-2xl lg:max-w-lg lg:gap-8">
-            {team.map((member, i) => (
-              <motion.div
-                key={member.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                whileHover={{ y: -6 }}
-                className="glass-card rounded-2xl p-6 text-center"
-              >
-                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark text-2xl font-bold text-black">
-                  {member.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {member.name}
-                </h3>
-                <p className="text-sm text-brand">{member.role}</p>
-              </motion.div>
-            ))}
+          <div className="mb-12 text-center">
+            <FloatLine replayKey={blogReplay.replayKey}>
+              <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
+                Insights
+              </span>
+            </FloatLine>
+            <FloatLine replayKey={blogReplay.replayKey} delay={0.08} className="mt-3">
+              <h2 className="text-3xl font-bold text-foreground md:text-4xl">
+                Latest Articles & Insights
+              </h2>
+            </FloatLine>
           </div>
-        </div>
-      </section>
-
-      {/* Blog */}
-      <section className="relative bg-transparent py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 text-center"
-          >
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
-              Insights
-            </span>
-            <h2 className="mt-3 text-3xl font-bold text-foreground md:text-4xl">
-              Latest Articles & Insights
-            </h2>
-          </motion.div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {blogPosts.map((post, i) => (
               <motion.article
                 key={post.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 80 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                viewport={{ once: false, amount: 0.2, margin: "0px 0px -40px 0px" }}
+                transition={{
+                  duration: 0.8,
+                  delay: floatStagger(i, 0.1),
+                  ease: floatEase,
+                }}
                 whileHover={{ y: -4 }}
                 className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm"
               >
-                <div className="relative aspect-video overflow-hidden">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    className="object-cover transition duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
+                <FloatImageWrap scroll={false} replayKey={blogReplay.replayKey} className="aspect-video">
+                  <div className="relative h-full w-full overflow-hidden">
+                    <Image
+                      src={post.image}
+                      alt={post.title}
+                      fill
+                      loading="lazy"
+                      placeholder="blur"
+                      blurDataURL={IMAGE_BLUR}
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  </div>
+                </FloatImageWrap>
                 <div className="p-5">
                   <span className="text-xs font-medium text-brand">
                     {post.category}
                   </span>
-                  <h3 className="mt-2 text-base font-semibold text-foreground group-hover:text-brand transition">
+                  <h3 className="mt-2 text-base font-semibold text-foreground transition group-hover:text-brand">
                     {post.title}
                   </h3>
                   <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">

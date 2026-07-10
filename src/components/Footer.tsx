@@ -24,7 +24,7 @@ export default function Footer() {
   return (
     <footer className="relative border-t border-white/50 bg-gradient-to-b from-transparent via-sky-50/40 to-pink-50/50">
       <div className="section-glow absolute inset-0 pointer-events-none" />
-      <div className="relative mx-auto max-w-7xl px-4 py-12 pb-[calc(3rem+env(safe-area-inset-bottom))] lg:px-8 lg:py-16 lg:pb-16">
+      <div className="relative mx-auto max-w-7xl px-4 py-12 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:px-8 lg:py-16 lg:pb-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link href="/" className="inline-block">
@@ -81,12 +81,12 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-sm text-muted">
               {[
-                "Web Development",
-                "Cloud Solutions",
+                "Static Websites",
+                "Landing Pages",
+                "Dynamic Websites",
+                "E-Commerce Solutions",
                 "Cyber Security",
                 "Data Analytics",
-                "Digital Marketing",
-                "Government Projects",
               ].map((s) => (
                 <li key={s}>
                   <Link href="/services" className="transition hover:text-brand">

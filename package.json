@@ -6,6 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "preview": "npm run build && npm run start",
+    "clean:cache": "node scripts/clean-image-cache.mjs",
+    "favicon": "python scripts/generate-favicon.py",
+    "assets:flags": "powershell -ExecutionPolicy Bypass -File scripts/download-language-flags.ps1",
     "lint": "eslint"
   },
   "dependencies": {

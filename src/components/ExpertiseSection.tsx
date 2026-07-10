@@ -5,12 +5,19 @@ import {
   AnimatedPortfolioCard,
   PortfolioSectionHeader,
 } from "@/components/AnimatedPortfolioCard";
+import { useScrollReplay } from "@/lib/useScrollReplay";
 
 export default function ExpertiseSection() {
+  const { ref, replayKey } = useScrollReplay(0.12);
+
   return (
-    <section className="relative overflow-hidden py-16 pastel-section section-glow lg:py-24">
+    <section
+      ref={ref}
+      className="relative overflow-hidden py-16 pastel-section section-glow lg:py-24"
+    >
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <PortfolioSectionHeader
+          replayKey={replayKey}
           eyebrow="Capabilities"
           title="Expertise &"
           titleAccent="Capabilities."
@@ -24,6 +31,7 @@ export default function ExpertiseSection() {
               item={item}
               index={i}
               tall={i === 0 || i === 3}
+              replayKey={replayKey}
             />
           ))}
         </div>

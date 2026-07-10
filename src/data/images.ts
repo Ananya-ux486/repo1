@@ -4,14 +4,24 @@
  */
 const IMG = "/images";
 
+/** Local language-switcher flag (bundled under public/images/flags/lang/) */
+export function languageFlag(code: string): string {
+  const normalized = code
+    .replace(/^gb-(sct|wls)$/i, "gb")
+    .replace(/^eu$/i, "eu");
+  return `${IMG}/flags/lang/${normalized}.png`;
+}
+
+export const DEFAULT_LANGUAGE_FLAG = `${IMG}/flags/lang/us.png`;
+
 export const images = {
-  logo: `${IMG}/tasmafive-logo.svg`,
+  logo: `${IMG}/brand/tasmafive-logo.svg`,
 
   hero: {
-    slide1: `${IMG}/hero/slide-1.png`,
-    slide2: `${IMG}/hero/slide-2.png`,
-    slide3: `${IMG}/hero/slide-3.png`,
-    slide4: `${IMG}/hero/slide-4.png`,
+    slide1: `${IMG}/hero/slide-1.jpg`,
+    slide2: `${IMG}/hero/slide-2.jpg`,
+    slide3: `${IMG}/hero/slide-3.jpg`,
+    slide4: `${IMG}/hero/slide-4.jpg`,
   },
 
   projects: {
@@ -49,27 +59,40 @@ export const images = {
   },
 
   blog: {
-    webDevTrends: `${IMG}/blog/web-dev-trends.png`,
-    cloudSolutions: `${IMG}/blog/cloud-solutions.png`,
-    cyberSecurity: `${IMG}/blog/cyber-security.png`,
+    aiWebDev: `${IMG}/blog/ai-web-development.jpg`,
+    mobileFirst: `${IMG}/blog/mobile-first-design.jpg`,
+    websiteSecurity: `${IMG}/blog/website-security-2026.jpg`,
+  },
+
+  /** Dedicated Instagram feed images — never shared with expertise or blog */
+  instagram: {
+    digitalTransform: `${IMG}/instagram/post-1-digital-transform.jpg`,
+    ecommerce: `${IMG}/instagram/post-2-ecommerce.jpg`,
+    aiTrends: `${IMG}/instagram/post-3-ai-trends.jpg`,
+    security: `${IMG}/instagram/post-4-security.jpg`,
+    corporate: `${IMG}/instagram/post-5-corporate.jpg`,
+    mobileFirst: `${IMG}/instagram/post-6-mobile-first.jpg`,
   },
 
   presence: {
     india: {
-      bangalore: `${IMG}/presence/india/bangalore.webp`,
-      delhi: `${IMG}/presence/india/delhi.webp`,
-      pune: `${IMG}/presence/india/pune.webp`,
-      chandigarh: `${IMG}/presence/india/chandigarh.png`,
-      hyderabad: `${IMG}/presence/india/hyderabad.png`,
-      jaipur: `${IMG}/presence/india/jaipur.webp`,
+      kanpur: `${IMG}/presence/india/kanpur.jpg`,
+      noida: `${IMG}/presence/india/noida-dlf-mall.jpg`,
+      gurgaon: `${IMG}/presence/india/gurgaon.jpg`,
+      delhiNcr: `${IMG}/presence/india/delhi-ncr.jpg`,
+      haryana: `${IMG}/presence/india/haryana.jpg`,
     },
     international: {
-      dubai: `${IMG}/presence/international/dubai.png`,
-      bangladesh: `${IMG}/presence/international/bangladesh.png`,
-      malaysia: `${IMG}/presence/international/malaysia.png`,
-      australia: `${IMG}/presence/international/australia.png`,
-      usa: `${IMG}/presence/international/usa.png`,
-      nepal: `${IMG}/presence/international/nepal.png`,
+      belgium: `${IMG}/flags/lang/be.png`,
+      uk: `${IMG}/flags/lang/gb.png`,
+      germany: `${IMG}/flags/lang/de.png`,
+      dubai: `${IMG}/flags/lang/ae.png`,
+      australia: `${IMG}/flags/lang/au.png`,
+      lebanon: `${IMG}/flags/lang/lb.png`,
+      egypt: `${IMG}/flags/lang/eg.png`,
+      dominicanRepublic: `${IMG}/flags/lang/do.png`,
+      pakistan: `${IMG}/flags/lang/pk.png`,
+      ghana: `${IMG}/flags/lang/gh.png`,
     },
   },
 } as const;

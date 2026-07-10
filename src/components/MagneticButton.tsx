@@ -18,6 +18,8 @@ export default function MagneticButton({
   className = "",
 }: MagneticButtonProps) {
   const ref = useRef<HTMLAnchorElement>(null);
+  const rafId = useRef(0);
+  const offset = useRef({ x: 0, y: 0 });
 
   const variants = {
     primary: "bg-brand text-white hover:bg-brand-dark",
@@ -29,19 +31,27 @@ export default function MagneticButton({
       "bg-brand text-white hover:bg-brand-dark",
   };
 
+  const paint = () => {
+    rafId.current = 0;
+    const el = ref.current;
+    if (!el) return;
+    el.style.transform = `translate3d(${offset.current.x}px, ${offset.current.y}px, 0)`;
+  };
+
   const handleMouseMove = (e: React.MouseEvent) => {
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    el.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+    offset.current = {
+      x: (e.clientX - rect.left - rect.width / 2) * 0.2,
+      y: (e.clientY - rect.top - rect.height / 2) * 0.2,
+    };
+    if (!rafId.current) rafId.current = requestAnimationFrame(paint);
   };
 
   const handleMouseLeave = () => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.transform = "translate(0, 0)";
+    offset.current = { x: 0, y: 0 };
+    if (!rafId.current) rafId.current = requestAnimationFrame(paint);
   };
 
   return (
@@ -51,8 +61,7 @@ export default function MagneticButton({
         href={href}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${variants[variant]} ${className}`}
-        style={{ transition: "transform 0.15s ease-out" }}
+        className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${variants[variant]} ${className}`}
       >
         {children}
       </Link>

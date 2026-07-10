@@ -8,6 +8,14 @@ export const siteConfig = {
   whatsapp: "916307558730",
   payNowUrl: "/contact",
   address: "60/43 Nayaganj Kanpur Nagar (UP) 208001",
+  googleBusiness: {
+    rating: 5.0,
+    reviewCount: 3,
+    mapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=TasmaFive+Solutions+Nayaganj+Kanpur+208001",
+    writeReviewUrl:
+      "https://www.google.com/maps/search/?api=1&query=TasmaFive+Solutions+Nayaganj+Kanpur+208001",
+  },
   social: {
     instagram: "https://www.instagram.com/tasmafivesolutions?utm_source=qr&igsh=MWtocGlhdjI3OXp6YQ==",
     linkedin: "https://www.linkedin.com/company/tasmafive-solution-llp/",
@@ -31,69 +39,124 @@ export const heroSlides = [
   {
     id: 1,
     image: images.hero.slide1,
-    heading: "Transforming Ideas Into Powerful Digital Solutions",
+    objectPosition: "65% center",
+    heading: "Engineering Digital Products That Drive Real Growth",
     subheading:
-      "We build scalable websites, mobile applications, enterprise software, cloud solutions, and AI-powered digital experiences that help businesses grow faster.",
-    ctaPrimary: "",
-    ctaSecondary: "Learn More",
+      "We design and develop high-performance websites, mobile apps, and enterprise software — built to scale, stay secure, and deliver measurable business results.",
+    ctaPrimary: "Get a Free Quote",
+    ctaSecondary: "Explore Services",
+    ctaSecondaryHref: "/services",
   },
   {
     id: 2,
     image: images.hero.slide2,
-    heading: "Your Trusted Partner for Digital Growth",
+    objectPosition: "center center",
+    heading: "Technology That Connects Your Business to the World",
     subheading:
-      "We help startups, businesses, and organizations achieve success through innovative technology and result-driven strategies.",
-    ctaPrimary: "Get Started Today",
-    ctaSecondary: "View Projects",
+      "From startups to established brands, we craft cloud-ready digital platforms that expand your reach, strengthen credibility, and accelerate online growth.",
+    ctaPrimary: "Start Your Project",
+    ctaSecondary: "View Our Work",
+    ctaSecondaryHref: "/projects",
   },
   {
     id: 3,
     image: images.hero.slide3,
-    heading: "AI-Powered Solutions for Tomorrow's Business",
+    objectPosition: "center 40%",
+    heading: "Intelligent Software for a Smarter Tomorrow",
     subheading:
-      "Harness artificial intelligence and cutting-edge technology to automate processes, innovate faster, and stay ahead of the competition.",
-    ctaPrimary: "Explore AI Services",
-    ctaSecondary: "Our Services",
+      "Harness AI, automation, and cutting-edge frameworks to streamline workflows, unlock data-driven insights, and stay ahead in a fast-moving digital landscape.",
+    ctaPrimary: "Discover AI Solutions",
+    ctaSecondary: "Talk to Experts",
+    ctaSecondaryHref: "/contact",
   },
   {
     id: 4,
     image: images.hero.slide4,
-    heading: "Smart IT Solutions. Full Control. Real Results.",
+    objectPosition: "55% center",
+    heading: "Reliable IT Infrastructure You Can Count On",
     subheading:
-      "At Tasmafive Solutions, we bring the latest tech stacks (MERN, Laravel) and dedicated focus to every partner we work with.",
-    ctaPrimary: "Start Your Journey",
-    ctaSecondary: "Contact Us",
+      "Secure architecture, optimized performance, and dedicated support — we build the digital backbone your business needs to run smoothly around the clock.",
+    ctaPrimary: "Contact Us Today",
+    ctaSecondary: "Learn More",
+    ctaSecondaryHref: "/about",
+  },
+];
+
+export const webDevelopmentServices = [
+  {
+    slug: "static-websites",
+    title: "Static Websites",
+    description:
+      "Clean, fast-loading brochure websites perfect for businesses that need a professional online presence.",
+    features: ["Fast Performance", "Mobile Responsive", "SEO Ready"],
+    details:
+      "We build lightweight static websites using modern HTML, CSS, and JavaScript — ideal for portfolios, business profiles, and informational sites. Every page is optimized for speed, mobile devices, and search engines so your brand looks professional and loads instantly.",
+    href: "/services/web-development#static-websites",
+  },
+  {
+    slug: "landing-pages",
+    title: "Landing Pages",
+    description:
+      "High-converting single-page designs built to capture leads and drive campaign results.",
+    features: ["Conversion Focused", "A/B Test Ready", "Analytics Integrated"],
+    details:
+      "Purpose-built landing pages designed to turn visitors into leads and customers. We focus on clear messaging, strong CTAs, fast load times, and integration with your analytics and marketing tools for measurable campaign results.",
+    href: "/services/web-development#landing-pages",
+  },
+  {
+    slug: "dynamic-websites",
+    title: "Dynamic Websites",
+    description:
+      "Interactive websites with admin panels, databases, and real-time content management.",
+    features: ["CMS Integration", "User Authentication", "Custom Backend"],
+    details:
+      "Full-featured dynamic websites with custom backends, admin dashboards, and database-driven content. Perfect for businesses that need to update content regularly, manage users, or run interactive web applications.",
+    href: "/services/web-development#dynamic-websites",
+  },
+  {
+    slug: "e-commerce-solutions",
+    title: "E-Commerce Solutions",
+    description:
+      "Full online stores with payment gateways, inventory management, and order tracking.",
+    features: ["Payment Gateway", "Product Catalog", "Order Management"],
+    details:
+      "Complete e-commerce platforms with secure payment processing, product catalogs, inventory tracking, and order management. We build scalable online stores that grow with your business and deliver a smooth shopping experience.",
+    href: "/services/web-development#e-commerce-solutions",
   },
 ];
 
 export const services = [
   {
+    slug: "web-development",
     title: "Web Development",
     description:
       "We create fast, responsive, and scalable websites that enhance your online presence and drive business growth.",
     features: ["Frontend & Backend Development", "Mobile-Friendly & Responsive Design"],
-    href: "/services",
+    href: "/services/web-development",
   },
   {
+    slug: "cloud-solutions",
     title: "Cloud Solutions",
     description:
       "Secure, scalable, and cost-effective cloud solutions to store, manage, and access data seamlessly from anywhere.",
     features: ["Cloud Migration & Deployment", "Cloud Infrastructure Management"],
-    href: "/services",
+    href: "/services#cloud-solutions",
   },
   {
+    slug: "cyber-security",
     title: "Cyber Security",
     description:
       "Advanced cybersecurity solutions to protect your business from threats, ensuring complete data security.",
     features: ["Website Security & Protection", "Data Encryption & Privacy"],
-    href: "/services",
+    href: "/services#cyber-security",
   },
   {
+    slug: "data-analytics",
     title: "Data Analytics",
     description:
       "Turn your data into valuable insights that help you make smarter decisions and grow your business.",
     features: ["Data Analysis & Reporting", "Data Visualization & Insights"],
-    href: "/services",
+    href: "/services#data-analytics",
   },
 ];
 
@@ -198,22 +261,34 @@ export const testimonials = [
     name: "Ankit",
     role: "CEO",
     date: "Jan 12, 2026  4:20 PM",
+    timeAgo: "2 months ago",
     quote:
       "Tasmafive Solutions delivered exactly what we needed — a fast, professional website that helped us grow our online presence significantly.",
+    avatarColor: "#4285F4",
+    reviewUrl:
+      "https://www.google.com/maps/search/TasmaFive+Solutions+Kanpur+review+Ankit+CEO",
   },
   {
     name: "Sakshi",
     role: "Pan India Sales Head",
     date: "Dec 28, 2025  2:15 PM",
+    timeAgo: "3 months ago",
     quote:
       "Their team understood our requirements perfectly and delivered a scalable software solution on time. Highly recommended!",
+    avatarColor: "#EA4335",
+    reviewUrl:
+      "https://www.google.com/maps/search/TasmaFive+Solutions+Kanpur+review+Sakshi",
   },
   {
     name: "Mohit",
     role: "Salon Owner",
     date: "May 9, 2023  10:30 PM",
+    timeAgo: "2 years ago",
     quote:
       "From web development to digital marketing, Tasmafive has been our go-to partner. Professional, reliable, and results-driven.",
+    avatarColor: "#34A853",
+    reviewUrl:
+      "https://www.google.com/maps/search/TasmaFive+Solutions+Kanpur+review+Mohit+salon",
   },
 ];
 
@@ -224,68 +299,71 @@ export const team = [
 
 export const blogPosts = [
   {
-    title: "Top 5 Web Development Trends You Should Know in 2026",
+    title: "How AI Is Transforming Web Development in 2026",
     category: "Web Development",
-    date: "Jan 10, 2026",
+    date: "Mar 12, 2026",
+    comments: 5,
+    image: images.blog.aiWebDev,
+  },
+  {
+    title: "Why Mobile-First Websites Convert More Customers",
+    category: "UI/UX Design",
+    date: "Mar 08, 2026",
     comments: 3,
-    image: images.blog.webDevTrends,
+    image: images.blog.mobileFirst,
   },
   {
-    title: "Why Cloud Solutions Are Essential for Modern Businesses",
-    category: "Cloud Solutions",
-    date: "Jan 08, 2026",
-    comments: 2,
-    image: images.blog.cloudSolutions,
-  },
-  {
-    title: "How to Protect Your Business from Cyber Threats in 2026",
+    title: "7 Security Must-Haves for Every Business Website",
     category: "Cyber Security",
-    date: "Feb 05, 2026",
-    comments: 4,
-    image: images.blog.cyberSecurity,
+    date: "Mar 01, 2026",
+    comments: 6,
+    image: images.blog.websiteSecurity,
   },
 ];
 
 export const indiaPresence = [
   {
-    city: "Bangalore",
-    landmark: "Vidhana Soudha",
-    image: images.presence.india.bangalore,
+    city: "Kanpur",
+    landmark: "JK Temple (Radhakrishna Mandir)",
+    image: images.presence.india.kanpur,
   },
   {
-    city: "Delhi",
-    landmark: "Red Fort",
-    image: images.presence.india.delhi,
+    city: "Noida",
+    landmark: "DLF Mall of India",
+    image: images.presence.india.noida,
   },
   {
-    city: "Pune",
-    landmark: "Shaniwar Wada",
-    image: images.presence.india.pune,
+    city: "Gurgaon",
+    landmark: "Gurugram Skyline & Cyber City",
+    image: images.presence.india.gurgaon,
   },
   {
-    city: "Chandigarh",
-    landmark: "Rock Garden",
-    image: images.presence.india.chandigarh,
+    city: "Delhi NCR",
+    landmark: "India Gate & Kartavya Path",
+    image: images.presence.india.delhiNcr,
   },
   {
-    city: "Hyderabad",
-    landmark: "Charminar",
-    image: images.presence.india.hyderabad,
-  },
-  {
-    city: "Jaipur",
-    landmark: "Hawa Mahal",
-    image: images.presence.india.jaipur,
+    city: "Haryana",
+    landmark: "Pinjore Gardens (Yadavindra Gardens)",
+    image: images.presence.india.haryana,
   },
 ];
 
 export const internationalPresence = [
-  { country: "Dubai", flag: "🇦🇪", code: "ae", image: images.presence.international.dubai },
-  { country: "Bangladesh", flag: "🇧🇩", code: "bd", image: images.presence.international.bangladesh },
-  { country: "Malaysia", flag: "🇲🇾", code: "my", image: images.presence.international.malaysia },
-  { country: "Australia", flag: "🇦🇺", code: "au", image: images.presence.international.australia },
-  { country: "USA", flag: "🇺🇸", code: "us", image: images.presence.international.usa },
-  { country: "Nepal", flag: "🇳🇵", code: "np", image: images.presence.international.nepal },
+  { country: "Belgium", code: "be", image: images.presence.international.belgium },
+  { country: "UK", code: "gb", image: images.presence.international.uk },
+  { country: "Germany", code: "de", image: images.presence.international.germany },
+  { country: "Dubai", code: "ae", image: images.presence.international.dubai },
+  { country: "Australia", code: "au", image: images.presence.international.australia },
+  { country: "Lebanon", code: "lb", image: images.presence.international.lebanon },
+  { country: "Egypt", code: "eg", image: images.presence.international.egypt },
+  {
+    country: "Dominican Republic",
+    code: "do",
+    image: images.presence.international.dominicanRepublic,
+  },
+  { country: "Pakistan", code: "pk", image: images.presence.international.pakistan },
+  { country: "Ghana", code: "gh", image: images.presence.international.ghana },
 ];
 
 export const expertise = [
