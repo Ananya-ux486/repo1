@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronDown, Languages, Search } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import {
   getLanguageByCode,
   LANGUAGE_CODES,
   readStoredLanguage,
   SITE_LANGUAGES,
+  writeStoredLanguage,
 } from "@/data/languages";
 import { languageFlag, DEFAULT_LANGUAGE_FLAG } from "@/data/images";
 
@@ -31,7 +32,7 @@ declare global {
 
 function setTranslateCookie(lang: string) {
   const hostname = window.location.hostname;
-  const clear = "googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  const clear = "googtrans=;path=/;max-age=0";
 
   document.cookie = clear;
   document.cookie = `${clear};domain=${hostname}`;
@@ -42,22 +43,15 @@ function setTranslateCookie(lang: string) {
   if (lang === "en") return;
 
   const value = `/en/${lang}`;
-  document.cookie = `googtrans=${value};path=/`;
-  document.cookie = `googtrans=${value};path=/;domain=${hostname}`;
+  document.cookie = `googtrans=${value};path=/;max-age=31536000`;
+  document.cookie = `googtrans=${value};path=/;domain=${hostname};max-age=31536000`;
   if (hostname.includes(".")) {
-    document.cookie = `googtrans=${value};path=/;domain=.${hostname}`;
+    document.cookie = `googtrans=${value};path=/;domain=.${hostname};max-age=31536000`;
   }
 }
 
 function getTranslateCombo(): HTMLSelectElement | null {
   return document.querySelector(".goog-te-combo");
-}
-
-function flashSwitching() {
-  document.documentElement.classList.add("gt-switching");
-  window.setTimeout(() => {
-    document.documentElement.classList.remove("gt-switching");
-  }, 900);
 }
 
 function triggerTranslate(lang: string): boolean {
@@ -68,33 +62,89 @@ function triggerTranslate(lang: string): boolean {
     (opt) => opt.value === lang || opt.value === lang.replace("-", "_")
   );
 
-  combo.value = option?.value ?? lang;
+  const next = option?.value ?? lang;
+  if (combo.value === next) {
+    combo.dispatchEvent(new Event("change"));
+    return true;
+  }
+
+  combo.value = next;
   combo.dispatchEvent(new Event("change"));
   return true;
 }
 
-function loadGoogleTranslateScript() {
-  if (document.getElementById("google-translate-script")) return;
+let scriptPromise: Promise<void> | null = null;
 
-  window.googleTranslateElementInit = () => {
-    if (!window.google?.translate) return;
-    new window.google.translate.TranslateElement(
-      {
-        pageLanguage: "en",
-        autoDisplay: false,
-        includedLanguages: LANGUAGE_CODES,
-        layout: 0,
-      },
-      "google_translate_element"
-    );
-  };
+function loadGoogleTranslateScript(): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (getTranslateCombo()) return Promise.resolve();
 
-  const script = document.createElement("script");
-  script.id = "google-translate-script";
-  script.src =
-    "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-  script.async = true;
-  document.body.appendChild(script);
+  if (scriptPromise) return scriptPromise;
+
+  scriptPromise = new Promise((resolve) => {
+    const finish = () => {
+      // Widget may need a tick after init callback
+      window.setTimeout(() => resolve(), 0);
+    };
+
+    window.googleTranslateElementInit = () => {
+      if (!window.google?.translate) {
+        finish();
+        return;
+      }
+      try {
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+            includedLanguages: LANGUAGE_CODES,
+            layout: 0,
+          },
+          "google_translate_element"
+        );
+      } catch {
+        /* already initialized */
+      }
+      finish();
+    };
+
+    const existing = document.getElementById("google-translate-script");
+    if (existing) {
+      if (window.google?.translate) {
+        window.googleTranslateElementInit();
+      }
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "google-translate-script";
+    script.src =
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.async = true;
+    script.onerror = () => resolve();
+    document.body.appendChild(script);
+  });
+
+  return scriptPromise;
+}
+
+function waitForCombo(timeoutMs = 4000): Promise<HTMLSelectElement | null> {
+  return new Promise((resolve) => {
+    const start = Date.now();
+    const tick = () => {
+      const combo = getTranslateCombo();
+      if (combo && combo.options.length > 1) {
+        resolve(combo);
+        return;
+      }
+      if (Date.now() - start > timeoutMs) {
+        resolve(null);
+        return;
+      }
+      window.setTimeout(tick, 40);
+    };
+    tick();
+  });
 }
 
 export default function LanguageSwitcher() {
@@ -116,8 +166,15 @@ export default function LanguageSwitcher() {
     );
   });
 
+  const ensureTranslator = useCallback(async () => {
+    await loadGoogleTranslateScript();
+    const combo = await waitForCombo();
+    setReady(Boolean(combo));
+    return combo;
+  }, []);
+
   const applyLanguage = useCallback(
-    (lang: string) => {
+    async (lang: string) => {
       if (switching || lang === currentCode) {
         setOpen(false);
         return;
@@ -126,22 +183,11 @@ export default function LanguageSwitcher() {
       setSwitching(true);
       setOpen(false);
       setQuery("");
-      flashSwitching();
-
+      writeStoredLanguage(lang);
       setTranslateCookie(lang);
 
-      if (lang === "en") {
-        window.location.reload();
-        return;
-      }
-
-      const applied = triggerTranslate(lang);
-      if (applied) {
-        setCurrentCode(lang);
-        setSwitching(false);
-      } else {
-        window.location.reload();
-      }
+      // Cookie + reload is the fastest reliable Google Translate path
+      window.location.reload();
     },
     [currentCode, switching]
   );
@@ -150,43 +196,38 @@ export default function LanguageSwitcher() {
     setCurrentCode(readStoredLanguage());
   }, []);
 
+  // Only boot Google Translate when a non-English language is already selected.
+  // English users never pay the translator cost until they open the dropdown.
   useEffect(() => {
     const stored = readStoredLanguage();
     if (stored === "en") return;
 
-    const boot = () => loadGoogleTranslateScript();
-    if (document.body.dataset.tfLoading === "done") {
-      boot();
-    } else {
-      window.addEventListener("tf-loader-done", boot, { once: true });
-    }
-    return () => window.removeEventListener("tf-loader-done", boot);
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-
-    loadGoogleTranslateScript();
-
-    let attempts = 0;
-    const timer = window.setInterval(() => {
-      attempts += 1;
-      const combo = getTranslateCombo();
-      if (combo) {
-        setReady(true);
-        const stored = readStoredLanguage();
-        if (stored !== "en") {
+    const boot = () => {
+      void ensureTranslator().then((combo) => {
+        if (combo) {
           triggerTranslate(stored);
           setCurrentCode(stored);
         }
-        window.clearInterval(timer);
-      } else if (attempts > 40) {
-        window.clearInterval(timer);
-      }
-    }, 250);
+      });
+    };
 
-    return () => window.clearInterval(timer);
-  }, [open]);
+    if (document.body.dataset.tfLoading === "done") {
+      if (typeof window.requestIdleCallback === "function") {
+        const id = window.requestIdleCallback(boot, { timeout: 1800 });
+        return () => window.cancelIdleCallback(id);
+      }
+      const t = window.setTimeout(boot, 600);
+      return () => window.clearTimeout(t);
+    }
+
+    window.addEventListener("tf-loader-done", boot, { once: true });
+    return () => window.removeEventListener("tf-loader-done", boot);
+  }, [ensureTranslator]);
+
+  useEffect(() => {
+    if (!open) return;
+    void ensureTranslator();
+  }, [open, ensureTranslator]);
 
   useEffect(() => {
     if (!open) return;
@@ -286,13 +327,14 @@ export default function LanguageSwitcher() {
                           ? "bg-accent/15 text-accent"
                           : "text-foreground"
                       }`}
-                      onClick={() => applyLanguage(lang.code)}
+                      onClick={() => void applyLanguage(lang.code)}
                     >
                       <img
                         src={languageFlag(lang.flag)}
                         alt=""
                         width={18}
                         height={18}
+                        loading="lazy"
                         className="h-[18px] w-[18px] shrink-0 rounded-full object-cover"
                         onError={(e) => {
                           e.currentTarget.src = DEFAULT_LANGUAGE_FLAG;
@@ -304,10 +346,14 @@ export default function LanguageSwitcher() {
                 ))
               )}
             </ul>
-            {!ready && (
+            {switching && (
               <p className="border-t border-border px-3 py-1.5 text-[10px] text-muted">
-                <Languages className="mr-1 inline h-3 w-3" />
-                Translator loading…
+                Switching…
+              </p>
+            )}
+            {!ready && !switching && (
+              <p className="border-t border-border px-3 py-1.5 text-[10px] text-muted">
+                Preparing translator…
               </p>
             )}
           </div>

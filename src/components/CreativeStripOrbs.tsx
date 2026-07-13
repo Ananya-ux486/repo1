@@ -1,15 +1,29 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+
+/** Same animations as before — only run while the orb is on (or near) screen. */
+function useOrbActive() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: "120px 0px", amount: 0.01 });
+  return { ref, active: inView };
+}
 
 /** Hex mesh orb — sits to the right of CREATIVE */
 export function CreativeHexOrb() {
+  const { ref, active } = useOrbActive();
+
   return (
-    <div className="creative-orb creative-orb-hex pointer-events-none" aria-hidden>
+    <div ref={ref} className="creative-orb creative-orb-hex pointer-events-none" aria-hidden>
       <motion.div
         className="creative-orb-inner"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+        animate={active ? { rotate: 360 } : { rotate: 0 }}
+        transition={
+          active
+            ? { duration: 28, repeat: Infinity, ease: "linear" }
+            : { duration: 0 }
+        }
       >
         <svg viewBox="0 0 200 200" className="h-full w-full">
           <defs>
@@ -46,8 +60,16 @@ export function CreativeHexOrb() {
       </motion.div>
       <motion.div
         className="creative-orb-glow creative-orb-glow-orange"
-        animate={{ scale: [1, 1.18, 1], opacity: [0.55, 0.85, 0.55] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        animate={
+          active
+            ? { scale: [1, 1.18, 1], opacity: [0.55, 0.85, 0.55] }
+            : { scale: 1, opacity: 0.55 }
+        }
+        transition={
+          active
+            ? { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0 }
+        }
       />
     </div>
   );
@@ -55,12 +77,18 @@ export function CreativeHexOrb() {
 
 /** Ring wave orb — sits to the left of SOLUTIONS */
 export function CreativeRingOrb() {
+  const { ref, active } = useOrbActive();
+
   return (
-    <div className="creative-orb creative-orb-ring pointer-events-none" aria-hidden>
+    <div ref={ref} className="creative-orb creative-orb-ring pointer-events-none" aria-hidden>
       <motion.div
         className="creative-orb-inner"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+        animate={active ? { rotate: -360 } : { rotate: 0 }}
+        transition={
+          active
+            ? { duration: 22, repeat: Infinity, ease: "linear" }
+            : { duration: 0 }
+        }
       >
         <svg viewBox="0 0 200 200" className="h-full w-full">
           <defs>
@@ -106,13 +134,29 @@ export function CreativeRingOrb() {
       </motion.div>
       <motion.div
         className="creative-orb-pulse"
-        animate={{ scale: [0.85, 1.12, 0.85], opacity: [0.45, 0.75, 0.45] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+        animate={
+          active
+            ? { scale: [0.85, 1.12, 0.85], opacity: [0.45, 0.75, 0.45] }
+            : { scale: 0.85, opacity: 0.45 }
+        }
+        transition={
+          active
+            ? { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0 }
+        }
       />
       <motion.div
         className="creative-orb-glow creative-orb-glow-violet"
-        animate={{ scale: [1, 1.22, 1], opacity: [0.45, 0.7, 0.45] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        animate={
+          active
+            ? { scale: [1, 1.22, 1], opacity: [0.45, 0.7, 0.45] }
+            : { scale: 1, opacity: 0.45 }
+        }
+        transition={
+          active
+            ? { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+            : { duration: 0 }
+        }
       />
     </div>
   );
@@ -120,30 +164,39 @@ export function CreativeRingOrb() {
 
 /** Floating particles for extra depth */
 export function CreativeParticles({ variant }: { variant: "hex" | "ring" }) {
+  const { ref, active } = useOrbActive();
   const colors =
     variant === "hex"
       ? ["#c2410c", "#9a3412", "#1e3a8a"]
       : ["#7c3aed", "#be185d", "#0e7490"];
 
   return (
-    <div className="creative-particles pointer-events-none" aria-hidden>
+    <div ref={ref} className="creative-particles pointer-events-none" aria-hidden>
       {colors.map((color, i) => (
         <motion.span
           key={i}
           className="creative-particle"
           style={{ backgroundColor: color }}
-          animate={{
-            y: [0, -12 - i * 4, 0],
-            x: [0, i % 2 === 0 ? 8 : -8, 0],
-            opacity: [0.55, 1, 0.55],
-            scale: [1, 1.5, 1],
-          }}
-          transition={{
-            duration: 2.5 + i * 0.4,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.3,
-          }}
+          animate={
+            active
+              ? {
+                  y: [0, -12 - i * 4, 0],
+                  x: [0, i % 2 === 0 ? 8 : -8, 0],
+                  opacity: [0.55, 1, 0.55],
+                  scale: [1, 1.5, 1],
+                }
+              : { y: 0, x: 0, opacity: 0.55, scale: 1 }
+          }
+          transition={
+            active
+              ? {
+                  duration: 2.5 + i * 0.4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.3,
+                }
+              : { duration: 0 }
+          }
         />
       ))}
     </div>

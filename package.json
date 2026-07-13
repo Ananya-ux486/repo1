@@ -2,11 +2,15 @@
   "name": "tasmafive-website",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "preview": "npm run build && npm run start",
+    "optimize:images": "node scripts/optimize-images.mjs",
     "clean:cache": "node scripts/clean-image-cache.mjs",
     "favicon": "python scripts/generate-favicon.py",
     "assets:flags": "powershell -ExecutionPolicy Bypass -File scripts/download-language-flags.ps1",
@@ -14,11 +18,11 @@
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
-    "lenis": "^1.3.25",
     "lucide-react": "^1.23.0",
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "sharp": "^0.34.2",
     "swiper": "^14.0.1"
   },
   "devDependencies": {

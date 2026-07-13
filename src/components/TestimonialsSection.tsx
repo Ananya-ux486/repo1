@@ -55,6 +55,8 @@ function TestimonialCard({
   quote,
   avatarColor,
   reviewUrl,
+  isActive,
+  onSelect,
 }: {
   name: string;
   role: string;
@@ -62,17 +64,41 @@ function TestimonialCard({
   quote: string;
   avatarColor: string;
   reviewUrl: string;
+  isActive: boolean;
+  onSelect: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isLong = quote.length > 120;
 
+  useEffect(() => {
+    if (!isActive) setExpanded(false);
+  }, [isActive]);
+
   return (
-    <a
-      href={reviewUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Verify ${name}'s Google review`}
-      className="google-review-card group relative mx-auto block h-full max-w-md cursor-pointer rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#1a73e8]/35 hover:shadow-lg sm:p-6 lg:max-w-none"
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={isActive ? `${name}'s Google review` : `Show ${name}'s review`}
+      aria-pressed={isActive}
+      onClick={() => {
+        if (!isActive) {
+          onSelect();
+          return;
+        }
+        if (isLong) setExpanded((v) => !v);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (!isActive) onSelect();
+          else if (isLong) setExpanded((v) => !v);
+        }
+      }}
+      className={`google-review-card group relative mx-auto block h-full max-w-md cursor-pointer rounded-2xl border bg-white p-5 shadow-sm transition-all duration-300 sm:p-6 lg:max-w-none ${
+        isActive
+          ? "border-[#1a73e8]/40 shadow-lg ring-1 ring-[#1a73e8]/15"
+          : "border-border hover:-translate-y-1 hover:border-[#1a73e8]/35 hover:shadow-lg"
+      }`}
     >
       <div className="mb-4 flex items-start gap-3">
         <div className="relative shrink-0">
@@ -103,12 +129,14 @@ function TestimonialCard({
       </div>
 
       <p
-        className={`text-sm leading-relaxed text-foreground/85 ${!expanded && isLong ? "line-clamp-4" : ""}`}
+        className={`text-sm leading-relaxed text-foreground/85 ${
+          !expanded && isLong ? "line-clamp-4" : ""
+        }`}
       >
         {quote}
       </p>
 
-      {isLong && (
+      {isLong && isActive && (
         <button
           type="button"
           onClick={(e) => {
@@ -122,11 +150,17 @@ function TestimonialCard({
         </button>
       )}
 
-      <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-[#1a73e8] opacity-80 transition group-hover:opacity-100">
+      <a
+        href={reviewUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a73e8] opacity-80 transition hover:opacity-100 group-hover:opacity-100"
+      >
         Verify on Google
         <ExternalLink className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-      </p>
-    </a>
+      </a>
+    </div>
   );
 }
 
@@ -174,7 +208,7 @@ function GoogleReviewsHeader() {
             transition={{ ease: floatEase }}
             className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#1a73e8] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#1765cc]"
           >
-            Review us on Google
+            Write a review
           </motion.a>
         </div>
       </FloatLine>
@@ -187,6 +221,7 @@ export default function TestimonialsSection() {
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
   const loopSlides = [...testimonials, ...testimonials, ...testimonials];
 
   useEffect(() => {
@@ -209,6 +244,14 @@ export default function TestimonialsSection() {
     swiper.navigation.update();
   }, [isMobile]);
 
+  const focusReview = (slideIndex: number) => {
+    const swiper = swiperRef.current;
+    if (!swiper) return;
+    swiper.autoplay?.stop();
+    swiper.slideTo(slideIndex, 500);
+    window.setTimeout(() => swiper.autoplay?.start(), 4500);
+  };
+
   return (
     <section className="google-reviews-section relative py-8 lg:py-11">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -219,7 +262,9 @@ export default function TestimonialsSection() {
             modules={[Navigation, Pagination, Autoplay]}
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
+              setActiveSlide(swiper.activeIndex);
             }}
+            onSlideChange={(swiper) => setActiveSlide(swiper.activeIndex)}
             onBeforeInit={(swiper) => {
               if (typeof swiper.params.navigation !== "boolean") {
                 swiper.params.navigation!.prevEl = prevRef.current;
@@ -240,6 +285,8 @@ export default function TestimonialsSection() {
             speed={800}
             allowTouchMove={isMobile}
             simulateTouch={isMobile}
+            touchStartPreventDefault={false}
+            touchMoveStopPropagation={false}
             pagination={{
               clickable: true,
               el: ".google-review-pagination",
@@ -248,7 +295,7 @@ export default function TestimonialsSection() {
               640: { slidesPerView: 1.15, spaceBetween: 18 },
               1024: { slidesPerView: 3, spaceBetween: 24 },
             }}
-            className={`testimonial-swiper google-review-swiper !pb-2 !pt-2 ${isMobile ? "!overflow-hidden" : "!overflow-visible"}`}
+            className={`testimonial-swiper google-review-swiper tf-swiper-allow-page-scroll !pb-2 !pt-2 ${isMobile ? "!overflow-hidden" : "!overflow-visible"}`}
           >
             {loopSlides.map((t, i) => (
               <SwiperSlide key={`${t.name}-${i}`}>
@@ -259,6 +306,8 @@ export default function TestimonialsSection() {
                   quote={t.quote}
                   avatarColor={t.avatarColor}
                   reviewUrl={t.reviewUrl}
+                  isActive={activeSlide === i}
+                  onSelect={() => focusReview(i)}
                 />
               </SwiperSlide>
             ))}

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Bot, X, Send, MessageCircle } from "lucide-react";
+import { X, Send, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/data/siteData";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scrollLock";
+import ChatbotIcon from "@/components/ChatbotIcon";
 
 const quickReplies = [
   { label: "Web Development", href: "/services/web-development" },
@@ -54,9 +55,9 @@ export default function AiChatbot() {
             aria-label="AI Assistant"
           >
             {/* Header */}
-            <div className="flex shrink-0 items-center gap-3 bg-gradient-to-r from-brand via-orange-500 to-amber-400 px-4 py-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20">
-                <Bot className="h-4 w-4 text-white" />
+            <div className="flex shrink-0 items-center gap-3 bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 px-4 py-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20 shadow-inner">
+                <ChatbotIcon className="h-6 w-6" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-white">
@@ -80,8 +81,8 @@ export default function AiChatbot() {
             {/* Messages — scrollable */}
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-sky-50/50 to-white p-4">
               <div className="flex gap-2.5">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand/10">
-                  <Bot className="h-4 w-4 text-brand" />
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-100">
+                  <ChatbotIcon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 rounded-2xl rounded-tl-sm bg-white px-3.5 py-2.5 shadow-sm ring-1 ring-border">
                   <p className="text-sm leading-relaxed text-foreground">

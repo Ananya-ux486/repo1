@@ -25,6 +25,14 @@ npm run build
 npm run start
 ```
 
+For a production-like speed check after clone, always use `npm run build && npm run start` — `npm run dev` is slower by design.
+
+Optional (already-optimized assets ship in repo):
+
+```bash
+npm run optimize:images
+```
+
 ## Images
 
 All website images are **local** under `public/images/` (logo, hero, projects, industries, blog, about, Instagram, flags, live project screenshots).

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { getPageScrollTop, setPageScrollTop } from "@/lib/pageScroll";
 
 const HEADER_OFFSET = -112;
 
@@ -17,12 +18,8 @@ function scrollToHash(hash: string, retries = 12) {
     return;
   }
 
-  const lenis = window.__tfLenis;
-  if (lenis) {
-    lenis.scrollTo(el, { offset: HEADER_OFFSET });
-  } else {
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  const top = el.getBoundingClientRect().top + getPageScrollTop() + HEADER_OFFSET;
+  setPageScrollTop(Math.max(0, top), "smooth");
 }
 
 /** Scrolls to #hash targets after client navigations (footer / nav deep links). */

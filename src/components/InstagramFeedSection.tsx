@@ -523,8 +523,8 @@ export default function InstagramFeedSection() {
       aria-labelledby="instagram-feed-heading"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="instagram-feed-glow absolute -left-20 top-1/4 h-64 w-64 rounded-full bg-[#f58529]/15 blur-2xl" />
-        <div className="instagram-feed-glow absolute -right-16 bottom-1/4 h-72 w-72 rounded-full bg-[#8134af]/12 blur-2xl" />
+        <div className="instagram-feed-glow absolute -left-20 top-1/4 h-64 w-64 rounded-full bg-[#f58529]/12 blur-xl" />
+        <div className="instagram-feed-glow absolute -right-16 bottom-1/4 h-72 w-72 rounded-full bg-[#8134af]/10 blur-xl" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 lg:px-8">

@@ -18,9 +18,21 @@ export default function HomePage() {
     <>
       <HeroCarousel />
       <BrandMarquee />
-      <CreativeStrip />
-      <ServicesSection />
-      <ApproachSection />
+      <div className="perf-section">
+        <ViewportGate minHeight="280px">
+          <CreativeStrip />
+        </ViewportGate>
+      </div>
+      <div className="perf-section">
+        <ViewportGate minHeight="380px">
+          <ServicesSection />
+        </ViewportGate>
+      </div>
+      <div className="perf-section">
+        <ViewportGate minHeight="360px">
+          <ApproachSection />
+        </ViewportGate>
+      </div>
       <div className="perf-section">
         <ViewportGate minHeight="420px">
           <ExpertiseSection />

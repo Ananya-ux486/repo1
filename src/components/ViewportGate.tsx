@@ -16,7 +16,7 @@ type ViewportGateProps = {
 export default function ViewportGate({
   children,
   minHeight = "480px",
-  rootMargin = "280px 0px",
+  rootMargin = "120px 0px",
 }: ViewportGateProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [show, setShow] = useState(false);

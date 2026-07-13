@@ -57,7 +57,7 @@ body[data-tf-route="page"] main {
   --color-muted: var(--muted);
   --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 * {
@@ -68,8 +68,47 @@ html {
   scroll-behavior: auto;
   margin: 0;
   padding: 0;
+  height: 100%;
+  overflow: hidden !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  height: 100%;
+  overflow: hidden !important;
+  user-select: text;
+  -webkit-user-select: text;
+  top: 0 !important;
+}
+
+/**
+ * Page scrollport — identical model to the language dropdown list:
+ * a fixed-height box with overflow-y: auto. Trackpad two-finger scroll
+ * works here even when document/viewport scroll does not on this machine.
+ */
+.tf-page-scroll {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.hero-carousel-section,
+.hero-carousel-section .swiper,
+.hero-carousel-section .swiper-wrapper,
+.hero-carousel-section .swiper-slide,
+.tf-swiper-allow-page-scroll,
+.tf-swiper-allow-page-scroll .swiper-wrapper,
+.tf-swiper-allow-page-scroll .swiper-slide {
+  touch-action: pan-y !important;
 }
 
 /* Soft pastel textured background */
@@ -93,11 +132,11 @@ html {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* Soft washes only — no SVG feTurbulence (was costing continuous GPU paint) */
   background-image:
     radial-gradient(ellipse 80% 60% at 10% 20%, rgba(147, 197, 253, 0.45) 0%, transparent 55%),
     radial-gradient(ellipse 70% 50% at 90% 80%, rgba(249, 168, 212, 0.4) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(186, 230, 253, 0.25) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(186, 230, 253, 0.25) 0%, transparent 60%);
   opacity: 1;
 }
 
@@ -106,6 +145,12 @@ html {
 .textured-bg > #app-root {
   position: relative;
   z-index: 1;
+}
+
+#app-root,
+#app-root main {
+  /* visible on both axes — never create a nested scrollport */
+  overflow: visible;
 }
 
 .site-header {
@@ -124,18 +169,6 @@ html {
 
 .site-floating-widgets > * {
   pointer-events: auto;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-  overflow-x: hidden;
-  overscroll-behavior-y: none;
-  user-select: text;
-  -webkit-user-select: text;
-  top: 0 !important;
 }
 
 main,
@@ -760,9 +793,20 @@ html.lenis body {
   .orbital-node-8 > div { transform: translate(-50%, -50%) translateY(-132px) rotate(225deg); }
 }
 
-/* ── AI Chatbot FAB pulse ── */
+/* ── AI Chatbot FAB — 3D cyan/indigo orb ── */
+.ai-chat-3d {
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.95) 0%, transparent 42%),
+    linear-gradient(145deg, #67e8f9 0%, #38bdf8 42%, #6366f1 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 -3px 6px rgba(49, 46, 129, 0.35) inset,
+    0 8px 16px rgba(14, 165, 233, 0.45),
+    0 2px 4px rgba(15, 23, 42, 0.2);
+}
+
 .ai-chat-pulse {
-  background: rgba(249, 115, 22, 0.4);
+  background: rgba(56, 189, 248, 0.45);
   animation: chat-pulse 2s ease-out infinite;
 }
 
@@ -837,8 +881,8 @@ html.lenis body {
 .glass-card,
 .hero-content-panel,
 .site-header {
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 /* Faster taps on iOS Safari */
@@ -985,28 +1029,31 @@ html.gt-switching #app-root {
   transition: opacity 0.08s ease;
 }
 
-/* Testimonial carousel — center clear, sides blurred, auto cycle */
+/* Testimonial carousel — center clear, sides faded (no CSS blur — GPU killer) */
 .testimonial-swiper .swiper-slide {
-  opacity: 0.4;
-  filter: blur(4px);
-  transform: scale(0.9) translateZ(0);
-  transition: opacity 0.55s ease, filter 0.55s ease, transform 0.55s ease;
+  opacity: 0.45;
+  transform: scale(0.92) translateZ(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
   will-change: transform, opacity;
 }
 
 .testimonial-swiper .swiper-slide-active {
   opacity: 1;
-  filter: blur(0);
   transform: scale(1);
   z-index: 3;
 }
 
 .testimonial-swiper .swiper-slide-prev,
 .testimonial-swiper .swiper-slide-next {
-  opacity: 0.65;
-  filter: blur(2px);
+  opacity: 0.7;
   transform: scale(0.95);
   z-index: 2;
+  cursor: pointer;
+}
+
+.testimonial-swiper .swiper-slide-prev:hover,
+.testimonial-swiper .swiper-slide-next:hover {
+  opacity: 0.9;
 }
 
 .google-review-swiper .swiper-slide-active .google-review-card {
@@ -1039,25 +1086,40 @@ html.gt-switching #app-root {
   transform: translateY(-50%);
   border: 5px solid transparent;
   border-left-color: rgba(255, 255, 255, 0.95);
+  filter: drop-shadow(1px 0 0 rgba(34, 211, 238, 0.28));
+}
+
+@keyframes tf-route-progress {
+  0% {
+    transform: scaleX(0.08);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scaleX(0.65);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(0.92);
+    opacity: 0.95;
+  }
+}
+
+.tf-route-progress {
+  transform-origin: left center;
+  animation: tf-route-progress 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* ── Mobile & tablet only (desktop lg+ unchanged) ── */
 @media (max-width: 1023px) {
-  html {
-    height: auto;
-    overflow-x: clip;
-    overflow-y: auto;
-    overscroll-behavior-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
   body {
     display: block;
-    height: auto;
-    min-height: 100dvh;
-    overflow-x: clip;
-    overflow-y: visible;
-    overscroll-behavior-y: auto;
+    height: 100%;
+    overflow: hidden !important;
+  }
+
+  .tf-page-scroll {
+    height: 100%;
+    height: 100dvh;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -1071,17 +1133,13 @@ html.gt-switching #app-root {
 
   #app-root {
     display: block;
-    flex: none;
     min-height: 0;
     overflow: visible;
-    overflow-x: clip;
   }
 
   #app-root main {
     display: block;
-    flex: none;
     overflow: visible;
-    overflow-x: clip;
   }
 
   .hero-content-panel {
@@ -1102,8 +1160,7 @@ html.gt-switching #app-root {
   }
 
   .testimonial-swiper .swiper-slide:not(.swiper-slide-active) {
-    opacity: 0.55;
-    filter: blur(1px);
+    opacity: 0.6;
     transform: scale(0.96);
   }
 

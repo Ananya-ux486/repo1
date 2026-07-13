@@ -117,10 +117,28 @@ export function getLanguageByCode(code: string): SiteLanguage {
 }
 
 export function readStoredLanguage(): string {
+  if (typeof window === "undefined") return "en";
+
+  try {
+    const stored = window.localStorage.getItem("tf-lang");
+    if (stored) return stored === "en" ? "en" : stored;
+  } catch {
+    /* private mode */
+  }
+
   if (typeof document === "undefined") return "en";
   const match = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);
   if (!match) return "en";
   const parts = decodeURIComponent(match[1]).split("/");
   const lang = parts[parts.length - 1];
   return lang && lang !== "en" ? lang : "en";
+}
+
+export function writeStoredLanguage(code: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem("tf-lang", code);
+  } catch {
+    /* private mode */
+  }
 }

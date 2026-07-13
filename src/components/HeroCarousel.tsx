@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -55,6 +55,7 @@ function HeroSlideImage({
   active,
   animKey,
   objectPosition = "center center",
+  shouldLoad,
 }: {
   src: string;
   alt: string;
@@ -62,7 +63,12 @@ function HeroSlideImage({
   active: boolean;
   animKey: number;
   objectPosition?: string;
+  shouldLoad: boolean;
 }) {
+  if (!shouldLoad) {
+    return <div className="relative h-full w-full overflow-hidden bg-slate-900" />;
+  }
+
   return (
     <div className="relative h-full w-full overflow-hidden bg-slate-900">
       <motion.div
@@ -81,7 +87,7 @@ function HeroSlideImage({
           alt={alt}
           fill
           priority={priority}
-          quality={priority ? 70 : 55}
+          quality={priority ? 68 : 55}
           placeholder="blur"
           blurDataURL={IMAGE_BLUR}
           loading={priority ? "eager" : "lazy"}
@@ -100,6 +106,15 @@ export default function HeroCarousel() {
   const nextRef = useRef<HTMLButtonElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [animKey, setAnimKey] = useState(0);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none), (pointer: coarse)");
+    const update = () => setIsCoarsePointer(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const slide = heroSlides[activeIndex] ?? heroSlides[0];
   const primaryCta =
@@ -128,20 +143,33 @@ export default function HeroCarousel() {
           setAnimKey((k) => k + 1);
         }}
         loop
-        className="h-full w-full"
+        /* Desktop trackpad: never let Swiper steal pointer/wheel. Touch phones keep swipe. */
+        allowTouchMove={isCoarsePointer}
+        simulateTouch={isCoarsePointer}
+        touchStartPreventDefault={false}
+        touchMoveStopPropagation={false}
+        className="h-full w-full tf-swiper-allow-page-scroll"
       >
-        {heroSlides.map((s, idx) => (
-          <SwiperSlide key={s.id}>
-            <HeroSlideImage
-              src={s.image}
-              alt={s.heading}
-              priority={s.id === 1}
-              active={activeIndex === idx}
-              animKey={animKey}
-              objectPosition={s.objectPosition}
-            />
-          </SwiperSlide>
-        ))}
+        {heroSlides.map((s, idx) => {
+          const near =
+            idx === activeIndex ||
+            idx === (activeIndex + 1) % heroSlides.length ||
+            idx === (activeIndex - 1 + heroSlides.length) % heroSlides.length;
+
+          return (
+            <SwiperSlide key={s.id}>
+              <HeroSlideImage
+                src={s.image}
+                alt={s.heading}
+                priority={s.id === 1}
+                active={activeIndex === idx}
+                animKey={animKey}
+                objectPosition={s.objectPosition}
+                shouldLoad={near || s.id === 1}
+              />
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
 
       <div className="pointer-events-none absolute inset-0 z-[5] flex items-center max-lg:items-end max-lg:pb-[6.5rem]">

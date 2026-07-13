@@ -24,9 +24,9 @@ export function usePostLoaderReady(extraDelayMs = 0) {
       }
 
       if (typeof window.requestIdleCallback === "function") {
-        idleId = window.requestIdleCallback(run, { timeout: 1800 });
+        idleId = window.requestIdleCallback(run, { timeout: 600 });
       } else {
-        timeoutId = window.setTimeout(run, 600);
+        timeoutId = window.setTimeout(run, 120);
       }
     };
 

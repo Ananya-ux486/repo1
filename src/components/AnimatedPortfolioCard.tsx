@@ -52,8 +52,8 @@ export function AnimatedPortfolioCard({
     ref: attachRef,
     ...cardEnter,
     transition: {
-      duration: 0.85,
-      delay: index * 0.1,
+      duration: 0.45,
+      delay: Math.min(index * 0.05, 0.2),
       ease: cardEase,
     },
   };
@@ -67,10 +67,11 @@ export function AnimatedPortfolioCard({
             alt={item.title}
             fill
             loading="lazy"
+            quality={60}
             placeholder="blur"
             blurDataURL={IMAGE_BLUR}
-            className="object-cover object-[center_25%] transition duration-700 group-hover:scale-105 sm:object-center"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover object-[center_25%] transition duration-500 group-hover:scale-105 sm:object-center"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/50 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">
             {String(index + 1).padStart(2, "0")}
@@ -113,10 +114,11 @@ export function AnimatedPortfolioCard({
           alt={item.title}
           fill
           loading="lazy"
+          quality={60}
           placeholder="blur"
           blurDataURL={IMAGE_BLUR}
-          className="object-cover object-[center_25%] transition duration-700 group-hover:scale-105 sm:object-center"
-          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover object-[center_25%] transition duration-500 group-hover:scale-105 sm:object-center"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/50 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">

@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bot } from "lucide-react";
 import { openAiChatbot } from "@/components/AiChatbot";
+import ChatbotIcon from "@/components/ChatbotIcon";
 
 type ChatbotTriggerProps = {
   showNeedHelp?: boolean;
@@ -20,7 +20,7 @@ export default function ChatbotTrigger({
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="need-help-bubble hidden whitespace-nowrap rounded-full border border-brand/25 bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-brand shadow-sm backdrop-blur-sm sm:inline-flex lg:px-3 lg:text-[11px]"
+          className="need-help-bubble hidden whitespace-nowrap rounded-full border border-cyan-400/30 bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-sky-700 shadow-sm backdrop-blur-sm 2xl:inline-flex 2xl:px-3 2xl:text-[11px]"
         >
           <motion.span
             animate={{ opacity: [0.65, 1, 0.65] }}
@@ -38,13 +38,13 @@ export default function ChatbotTrigger({
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
-        className="ai-chat-fab relative flex h-9 w-9 items-center justify-center rounded-full shadow-lg sm:h-10 sm:w-10"
+        whileHover={{ scale: 1.1, rotate: -4 }}
+        whileTap={{ scale: 0.94 }}
+        className="ai-chat-fab relative flex h-9 w-9 items-center justify-center rounded-full xl:h-10 xl:w-10"
       >
         <span className="ai-chat-pulse absolute inset-0 rounded-full" aria-hidden />
-        <span className="relative flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-brand via-orange-500 to-amber-400">
-          <Bot className="h-4 w-4 text-white sm:h-[18px] sm:w-[18px]" />
+        <span className="ai-chat-3d relative flex h-full w-full items-center justify-center rounded-full">
+          <ChatbotIcon className="relative z-[1] h-5 w-5 drop-shadow-sm xl:h-[22px] xl:w-[22px]" />
         </span>
       </motion.button>
     </div>

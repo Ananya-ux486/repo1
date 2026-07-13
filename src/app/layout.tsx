@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -9,23 +9,19 @@ import PageLoader from "@/components/PageLoader";
 import ScrollLock from "@/components/ScrollLock";
 import {
   DeferredAiChatbot,
-  DeferredCursorGlow,
   DeferredFloatingWidgets,
 } from "@/components/DeferredClient";
 import AuditFormProviderGate from "@/components/AuditFormProviderGate";
 import RouteMark from "@/components/RouteMark";
+import RouteProgress from "@/components/RouteProgress";
+import NavPrefetch from "@/components/NavPrefetch";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
+  preload: true,
 });
 
 export const viewport = {
@@ -63,31 +59,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} min-h-full antialiased`}
-    >
-      <head>
-        <link rel="preconnect" href="https://translate.googleapis.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://translate.google.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://translate.google.com" />
-      </head>
-      <body className="textured-bg min-h-screen flex flex-col text-foreground">
+    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+      <body className="textured-bg h-full overflow-hidden text-foreground">
         <PageLoader />
+        <RouteProgress />
+        <NavPrefetch />
         <ScrollLock />
         <RouteMark />
         <Header />
-        <div id="app-root" className="flex min-h-0 flex-1 flex-col max-lg:block max-lg:min-h-0 max-lg:flex-none">
-          <MotionProvider>
-            <SmoothScroll>
-              <HashScroll />
-              <DeferredCursorGlow />
-              <AuditFormProviderGate>
-                <main className="max-lg:block lg:flex-1">{children}</main>
-                <Footer />
-              </AuditFormProviderGate>
-            </SmoothScroll>
-          </MotionProvider>
+        {/* Same scroll model as language dropdown: nested overflow-y:auto (trackpad works). */}
+        <div id="tf-page-scroll" className="tf-page-scroll">
+          <div id="app-root" className="block w-full">
+            <MotionProvider>
+              <SmoothScroll>
+                <HashScroll />
+                <AuditFormProviderGate>
+                  <main className="block w-full">{children}</main>
+                  <Footer />
+                </AuditFormProviderGate>
+              </SmoothScroll>
+            </MotionProvider>
+          </div>
         </div>
         <DeferredFloatingWidgets />
         <DeferredAiChatbot />
