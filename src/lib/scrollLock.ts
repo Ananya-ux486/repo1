@@ -50,11 +50,15 @@ export function releaseDocumentScroll() {
   const scroller =
     typeof document !== "undefined" ? document.getElementById("tf-page-scroll") : null;
   if (scroller) {
+    // Clear modal lock styles — CSS class restores overflow-y: scroll
     scroller.style.overflow = "";
+    scroller.style.overflowX = "";
+    scroller.style.overflowY = "";
     scroller.style.touchAction = "";
   }
-  document.documentElement.style.overflow = "";
-  document.body.style.overflow = "";
+  // Keep document itself non-scrolling; only #tf-page-scroll scrolls.
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
   document.body.style.position = "";
   document.body.style.top = "";
   document.body.style.left = "";

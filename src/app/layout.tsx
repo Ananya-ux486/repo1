@@ -60,7 +60,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="textured-bg h-full overflow-hidden text-foreground">
+      <body
+        className="textured-bg h-full overflow-hidden text-foreground"
+        data-tf-loading="true"
+      >
         <PageLoader />
         <RouteProgress />
         <NavPrefetch />

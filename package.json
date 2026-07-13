@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "preview": "npm run build && npm run start",
+    "fresh": "npm run build && npm run start",
     "optimize:images": "node scripts/optimize-images.mjs",
     "clean:cache": "node scripts/clean-image-cache.mjs",
     "favicon": "python scripts/generate-favicon.py",

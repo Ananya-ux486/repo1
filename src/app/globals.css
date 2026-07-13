@@ -85,20 +85,22 @@ body {
 }
 
 /**
- * Page scrollport — identical model to the language dropdown list:
- * a fixed-height box with overflow-y: auto. Trackpad two-finger scroll
- * works here even when document/viewport scroll does not on this machine.
+ * Page scrollport — fixed-height box with overflow-y: scroll.
+ * IMPORTANT: use overflow-x: clip (NOT hidden). Chromium breaks two-finger
+ * trackpad scrolling when overflow-x: hidden is on the same scroll root.
  */
 .tf-page-scroll {
   position: relative;
   z-index: 1;
   height: 100%;
+  height: 100dvh;
   width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: auto;
+  overflow-x: clip;
+  overflow-y: scroll;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+  scrollbar-gutter: stable;
 }
 
 .hero-carousel-section,
@@ -1217,24 +1219,206 @@ html.gt-switching #app-root {
   backface-visibility: hidden;
 }
 
-/* ── Page loader → smooth homepage reveal ── */
+/* ── Page loader (CSS-driven hex constellation) ── */
+.tf-loader {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #070b16;
+  opacity: 1;
+  visibility: visible !important;
+  pointer-events: auto;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tf-loader--out {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.tf-loader__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 45% at 50% 42%,
+    rgba(249, 115, 22, 0.16),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.tf-loader__stage {
+  position: relative;
+  width: min(88vw, 340px);
+  margin-bottom: 2.25rem;
+}
+
+.tf-loader__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tf-loader__lattice path {
+  stroke-dasharray: 280;
+  stroke-dashoffset: 280;
+  animation: tf-hex-draw 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tf-loader__lattice path:nth-child(1) { animation-delay: 0.05s; }
+.tf-loader__lattice path:nth-child(2) { animation-delay: 0.12s; }
+.tf-loader__lattice path:nth-child(3) { animation-delay: 0.18s; }
+.tf-loader__lattice path:nth-child(4) { animation-delay: 0.24s; }
+.tf-loader__lattice path:nth-child(5) { animation-delay: 0.3s; }
+.tf-loader__lattice path:nth-child(6) { animation-delay: 0.36s; }
+.tf-loader__lattice path:nth-child(7) { animation-delay: 0.42s; }
+
+.tf-loader__trace {
+  stroke-dasharray: 90 520;
+  stroke-dashoffset: 610;
+  animation: tf-hex-pulse 2.1s linear infinite;
+}
+
+.tf-loader__core {
+  transform-origin: 160px 155px;
+  animation: tf-hex-core 1.8s ease-in-out 0.4s infinite;
+}
+
+.tf-loader__ring {
+  transform-origin: 160px 155px;
+  stroke-opacity: 0.35;
+  animation: tf-hex-ring 1.8s ease-out 0.4s infinite;
+}
+
+.tf-loader__brand {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.55em;
+  text-indent: 0.55em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.95);
+  animation: tf-loader-fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.tf-loader__bar {
+  position: relative;
+  z-index: 1;
+  margin-top: 1rem;
+  width: 4rem;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tf-loader__bar span {
+  display: block;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #f97316, transparent);
+  animation: tf-loader-bar 1.6s ease-in-out infinite;
+}
+
+@keyframes tf-hex-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes tf-hex-pulse {
+  to {
+    stroke-dashoffset: -610;
+  }
+}
+
+@keyframes tf-hex-core {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes tf-hex-ring {
+  0% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+@keyframes tf-loader-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tf-loader-bar {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(240%);
+  }
+}
+
 body[data-tf-loading="true"] > :not(.tf-loader) {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
 
-body[data-tf-loading="revealing"] > :not(.tf-loader):not(#app-root) {
+body[data-tf-loading="true"] .tf-page-scroll {
+  overflow: hidden !important;
+}
+
+body[data-tf-loading="revealing"] .tf-page-scroll,
+body[data-tf-loading="done"] .tf-page-scroll {
+  overflow-x: clip !important;
+  overflow-y: scroll !important;
+}
+
+body[data-tf-loading="revealing"] > :not(.tf-loader):not(#tf-page-scroll) {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
 }
 
-body[data-tf-loading="revealing"] #app-root {
+body[data-tf-loading="revealing"] #tf-page-scroll {
   visibility: visible;
   pointer-events: auto;
+  opacity: 1;
   will-change: opacity, transform;
-  animation: tf-page-reveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: tf-page-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+body[data-tf-loading="revealing"] .site-header,
+body[data-tf-loading="revealing"] .site-floating-widgets {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  animation: tf-page-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 body[data-tf-loading="done"] > :not(.tf-loader) {
@@ -1244,6 +1428,7 @@ body[data-tf-loading="done"] > :not(.tf-loader) {
   will-change: auto;
 }
 
+body[data-tf-loading="done"] #tf-page-scroll,
 body[data-tf-loading="done"] #app-root {
   will-change: auto;
 }
@@ -1251,7 +1436,7 @@ body[data-tf-loading="done"] #app-root {
 @keyframes tf-page-reveal {
   0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px);
   }
   100% {
     opacity: 1;
@@ -1260,7 +1445,23 @@ body[data-tf-loading="done"] #app-root {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body[data-tf-loading="revealing"] > :not(.tf-loader) {
+  .tf-loader__lattice path,
+  .tf-loader__trace,
+  .tf-loader__core,
+  .tf-loader__ring,
+  .tf-loader__brand,
+  .tf-loader__bar span {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .tf-loader__lattice path {
+    stroke-dashoffset: 0;
+  }
+
+  body[data-tf-loading="revealing"] #tf-page-scroll,
+  body[data-tf-loading="revealing"] .site-header,
+  body[data-tf-loading="revealing"] .site-floating-widgets {
     animation: none;
     opacity: 1;
     transform: none;
