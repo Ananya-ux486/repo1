@@ -21,6 +21,7 @@ import {
   Monitor,
   UtensilsCrossed,
   Shirt,
+  ArrowRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -43,16 +44,13 @@ function OrbitalHub() {
   const orbitItems = industries.slice(0, 8);
 
   return (
-    <div className="orbital-hub relative mx-auto h-[280px] w-[280px] sm:h-[340px] sm:w-[340px] lg:h-[380px] lg:w-[380px]">
-      {/* Ambient glow */}
+    <div className="orbital-hub relative mx-auto h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] lg:h-[320px] lg:w-[320px]">
       <div className="absolute inset-8 rounded-full bg-gradient-to-br from-brand/20 via-orange-300/10 to-sky-300/20 blur-2xl" />
 
-      {/* Orbital rings — pure CSS, GPU-friendly */}
       <div className="orbital-ring orbital-ring-1" aria-hidden />
       <div className="orbital-ring orbital-ring-2" aria-hidden />
       <div className="orbital-ring orbital-ring-3" aria-hidden />
 
-      {/* Orbiting industry nodes */}
       {orbitItems.map((item, i) => {
         const Icon = industryIcons[item.name] || Monitor;
         return (
@@ -68,7 +66,6 @@ function OrbitalHub() {
         );
       })}
 
-      {/* Center core */}
       <div className="absolute left-1/2 top-1/2 z-10 flex h-[120px] w-[120px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-white/80 bg-gradient-to-br from-white via-sky-50 to-pink-50 text-center shadow-xl sm:h-[140px] sm:w-[140px]">
         <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-brand sm:text-xs">
           Industries
@@ -85,11 +82,15 @@ function IndustryCard({ name, image }: { name: string; image: string }) {
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, amount: 0.3 }}
+      viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.7, ease: floatEase }}
       className="flex w-[110px] shrink-0 flex-col items-center sm:w-[120px]"
     >
-      <FloatImageWrap scroll={false} replayKey={0} className="h-[72px] w-[72px] sm:h-[80px] sm:w-[80px]">
+      <FloatImageWrap
+        scroll={false}
+        replayKey={0}
+        className="h-[72px] w-[72px] sm:h-[80px] sm:w-[80px]"
+      >
         <div className="relative h-[72px] w-[72px] sm:h-[80px] sm:w-[80px]">
           <Image
             src={image}
@@ -115,18 +116,37 @@ export default function Industry360Section() {
   const { ref, replayKey } = useScrollReplay(0.15);
 
   return (
-    <section ref={ref} className="relative overflow-hidden py-14 pastel-section lg:py-20">
+    <section ref={ref} className="relative overflow-hidden py-8 pastel-section lg:py-11">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <FloatLine replayKey={replayKey} className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
-            Industries We Empower
-          </p>
-        </FloatLine>
+        <div className="mb-6 text-center lg:mb-7">
+          <FloatLine replayKey={replayKey}>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-brand sm:text-xs">
+              Across industries
+            </p>
+          </FloatLine>
+          <FloatLine replayKey={replayKey} delay={0.08} className="mt-2">
+            <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12]">
+              Industries We{" "}
+              <span className="iridescent-text">Empower</span>
+            </h2>
+          </FloatLine>
+          <FloatBlock
+            replayKey={replayKey}
+            scroll={false}
+            index={1}
+            className="mx-auto mt-2.5 max-w-2xl"
+          >
+            <p className="text-sm text-muted sm:text-[15px]">
+              From real estate to e-commerce — digital solutions tailored to your
+              industry&apos;s unique needs.
+            </p>
+          </FloatBlock>
+        </div>
 
-        <div className="flex flex-col items-center gap-10 lg:flex-row lg:gap-14">
+        <div className="flex flex-col items-center gap-6 lg:flex-row lg:gap-10">
           <OrbitalHub />
 
-          <div className="w-full flex-1 overflow-hidden">
+          <div className="relative z-10 w-full flex-1 overflow-hidden">
             <div className="marquee-track marquee-left flex w-max gap-5 py-2">
               {slides.map((industry, i) => (
                 <IndustryCard
@@ -136,18 +156,14 @@ export default function Industry360Section() {
                 />
               ))}
             </div>
-            <FloatBlock replayKey={replayKey} scroll={false} index={1} className="mt-6 text-center lg:text-left">
-              <p className="text-sm text-muted">
-                From real estate to e-commerce — we build digital solutions tailored
-                to your industry&apos;s unique needs.
-              </p>
-            </FloatBlock>
-            <div className="mt-4 flex justify-center lg:justify-start">
+
+            <div className="relative z-20 mt-6 flex justify-center lg:justify-start">
               <Link
                 href="/services"
-                className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark"
+                className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full bg-brand px-7 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-brand-dark hover:shadow-lg active:scale-[0.98]"
               >
                 Explore Services
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>

@@ -4,6 +4,12 @@ import type { InstagramPost } from "@/types/instagram";
 
 export const revalidate = 300;
 
+/**
+ * READ-ONLY Instagram media fetch.
+ * Permissions used: instagram_business_basic (or legacy instagram_basic)
+ * NEVER requests: content_publish, manage_comments, manage_messages
+ */
+
 type GraphMediaItem = {
   id: string;
   caption?: string;
@@ -12,8 +18,10 @@ type GraphMediaItem = {
   thumbnail_url?: string;
   permalink?: string;
   timestamp?: string;
-  like_count?: number;
-  comments_count?: number;
+};
+
+type GraphErrorBody = {
+  error?: { message?: string; code?: number; type?: string };
 };
 
 function mapGraphPost(item: GraphMediaItem): InstagramPost | null {
@@ -25,8 +33,8 @@ function mapGraphPost(item: GraphMediaItem): InstagramPost | null {
     image,
     permalink: item.permalink ?? "https://www.instagram.com/tasmafivesolutions/",
     caption: item.caption ?? "",
-    likes: item.like_count ?? 0,
-    comments: item.comments_count ?? 0,
+    likes: 0,
+    comments: 0,
     timestamp: item.timestamp,
     mediaType:
       item.media_type === "VIDEO"
@@ -37,52 +45,89 @@ function mapGraphPost(item: GraphMediaItem): InstagramPost | null {
   };
 }
 
-export async function GET() {
-  const token = process.env.INSTAGRAM_ACCESS_TOKEN;
-  const userId = process.env.INSTAGRAM_USER_ID;
+/** Only public media display fields — no insights, no write fields */
+const MEDIA_FIELDS = [
+  "id",
+  "caption",
+  "media_type",
+  "media_url",
+  "thumbnail_url",
+  "permalink",
+  "timestamp",
+].join(",");
 
-  if (!token || !userId) {
+async function fetchMedia(
+  url: string,
+): Promise<{ posts: InstagramPost[]; error?: string }> {
+  const res = await fetch(url, {
+    next: { revalidate: 300 },
+    headers: { Accept: "application/json" },
+  });
+
+  const json = (await res.json()) as {
+    data?: GraphMediaItem[];
+  } & GraphErrorBody;
+
+  if (!res.ok || json.error) {
+    return {
+      posts: [],
+      error: json.error?.message ?? `HTTP ${res.status}`,
+    };
+  }
+
+  const posts = (json.data ?? [])
+    .map(mapGraphPost)
+    .filter((post): post is InstagramPost => post !== null);
+
+  return { posts };
+}
+
+export async function GET() {
+  const token = process.env.INSTAGRAM_ACCESS_TOKEN?.trim();
+  const userId = process.env.INSTAGRAM_USER_ID?.trim() || "me";
+
+  if (!token) {
     return NextResponse.json({
       posts: fallbackInstagramPosts,
       source: "fallback" as const,
+      reason: "missing_token",
     });
   }
 
   try {
-    const fields = [
-      "id",
-      "caption",
-      "media_type",
-      "media_url",
-      "thumbnail_url",
-      "permalink",
-      "timestamp",
-      "like_count",
-      "comments_count",
-    ].join(",");
+    // 1) Instagram API with Instagram Login (preferred, read-only)
+    const igUrl =
+      `https://graph.instagram.com/v21.0/${encodeURIComponent(userId)}/media` +
+      `?fields=${MEDIA_FIELDS}&limit=12&access_token=${encodeURIComponent(token)}`;
 
-    const res = await fetch(
-      `https://graph.instagram.com/${userId}/media?fields=${fields}&limit=12&access_token=${token}`,
-      { next: { revalidate: 300 } },
-    );
+    let result = await fetchMedia(igUrl);
 
-    if (!res.ok) throw new Error("Instagram API request failed");
+    // 2) Fallback: Facebook Graph (Page-linked IG Business account)
+    if (result.posts.length === 0 && userId !== "me") {
+      const fbUrl =
+        `https://graph.facebook.com/v21.0/${encodeURIComponent(userId)}/media` +
+        `?fields=${MEDIA_FIELDS}&limit=12&access_token=${encodeURIComponent(token)}`;
+      result = await fetchMedia(fbUrl);
+    }
 
-    const data = (await res.json()) as { data?: GraphMediaItem[] };
-    const posts = (data.data ?? [])
-      .map(mapGraphPost)
-      .filter((post): post is InstagramPost => post !== null);
-
-    if (posts.length === 0) throw new Error("No posts returned");
+    if (result.posts.length === 0) {
+      return NextResponse.json({
+        posts: fallbackInstagramPosts,
+        source: "fallback" as const,
+        reason: result.error ?? "empty_feed",
+      });
+    }
 
     return NextResponse.json({
-      posts: posts.slice(0, 12),
+      posts: result.posts.slice(0, 12),
       source: "live" as const,
     });
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown_error";
     return NextResponse.json({
       posts: fallbackInstagramPosts,
       source: "fallback" as const,
+      reason: message,
     });
   }
 }

@@ -13,7 +13,7 @@ export default function ExpertiseSection() {
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden py-16 pastel-section section-glow lg:py-24"
+      className="relative overflow-hidden py-8 pastel-section section-glow lg:py-11"
     >
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <PortfolioSectionHeader

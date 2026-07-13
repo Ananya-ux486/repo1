@@ -35,9 +35,13 @@ export default function Header() {
     };
   }, [mobileOpen]);
 
-  const linkClass = (isActive: boolean) =>
-    `relative whitespace-nowrap rounded-md px-2 py-1.5 text-[13px] font-semibold tracking-wide transition-all duration-300 lg:px-2.5 lg:text-sm ${
-      isActive ? "text-brand" : "text-foreground/75 hover:text-foreground"
+  const linkClass = (isActive: boolean, isContact = false) =>
+    `relative whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[13px] font-semibold tracking-wide transition-all duration-300 lg:px-3 lg:text-sm ${
+      isActive
+        ? "text-brand"
+        : isContact
+          ? "text-foreground/80 hover:bg-brand/10 hover:text-brand"
+          : "text-foreground/75 hover:bg-black/[0.04] hover:text-foreground"
     }`;
 
   return (
@@ -99,7 +103,11 @@ export default function Header() {
             }
 
             return (
-              <Link key={link.href} href={link.href} className={linkClass(isActive)}>
+              <Link
+                key={link.href}
+                href={link.href}
+                className={linkClass(isActive, link.label === "Contact")}
+              >
                 {link.label}
                 {isActive && (
                   <motion.span
@@ -125,7 +133,7 @@ export default function Header() {
 
           <Link
             href="/contact"
-            className="hidden rounded-full border border-border bg-white/70 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground transition hover:border-brand/40 hover:text-brand xl:inline-flex"
+            className="hidden rounded-full border border-border bg-white px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground shadow-sm transition duration-200 hover:border-brand hover:bg-brand hover:text-white hover:shadow-md xl:inline-flex"
           >
             Let&apos;s Talk
           </Link>

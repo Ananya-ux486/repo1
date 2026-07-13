@@ -21,6 +21,33 @@ const highlightMap: Record<number, string[]> = {
   4: ["Reliable", "Infrastructure", "Count"],
 };
 
+/** Only slide 1 opens audit form — other slides keep original CTAs */
+const primaryCtaBySlideId: Record<
+  number,
+  { label: string; href: string; openAudit: boolean }
+> = {
+  1: {
+    label: "Get a Free Audit Report",
+    href: "/contact?audit=1",
+    openAudit: true,
+  },
+  2: {
+    label: "Start Your Project",
+    href: "/quote",
+    openAudit: false,
+  },
+  3: {
+    label: "Discover AI Solutions",
+    href: "/services",
+    openAudit: false,
+  },
+  4: {
+    label: "Contact Us Today",
+    href: "/contact",
+    openAudit: false,
+  },
+};
+
 function HeroSlideImage({
   src,
   alt,
@@ -28,7 +55,6 @@ function HeroSlideImage({
   active,
   animKey,
   objectPosition = "center center",
-  shouldLoad = true,
 }: {
   src: string;
   alt: string;
@@ -36,36 +62,33 @@ function HeroSlideImage({
   active: boolean;
   animKey: number;
   objectPosition?: string;
-  shouldLoad?: boolean;
 }) {
   return (
     <div className="relative h-full w-full overflow-hidden bg-slate-900">
       <motion.div
         key={active ? `hero-img-${animKey}` : "hero-img-idle"}
         className="absolute inset-0"
-        initial={{ scale: 1.08, y: 40, opacity: 0.5 }}
+        initial={{ scale: 1.02, opacity: 0.65 }}
         animate={
           active
-            ? { scale: 1, y: 0, opacity: 1 }
-            : { scale: 1.08, y: 40, opacity: 0.5 }
+            ? { scale: 1, opacity: 1 }
+            : { scale: 1.02, opacity: 0.65 }
         }
-        transition={{ duration: 1.1, ease: floatEase }}
+        transition={{ duration: 0.7, ease: floatEase }}
       >
-        {shouldLoad ? (
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            priority={priority}
-            quality={80}
-            placeholder="blur"
-            blurDataURL={IMAGE_BLUR}
-            loading={priority ? "eager" : "lazy"}
-            className="object-cover"
-            style={{ objectPosition }}
-            sizes="100vw"
-          />
-        ) : null}
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority={priority}
+          quality={priority ? 70 : 55}
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR}
+          loading={priority ? "eager" : "lazy"}
+          className="object-cover max-sm:object-[center_28%] sm:object-center"
+          style={{ objectPosition }}
+          sizes="100vw"
+        />
       </motion.div>
       <div className="hero-gradient-overlay absolute inset-0" />
     </div>
@@ -78,16 +101,12 @@ export default function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [animKey, setAnimKey] = useState(0);
 
-  const slide = heroSlides[activeIndex];
-  const slideCount = heroSlides.length;
-
-  const shouldLoadSlide = (idx: number) => {
-    const diff = Math.abs(idx - activeIndex);
-    return diff <= 1 || diff === slideCount - 1;
-  };
+  const slide = heroSlides[activeIndex] ?? heroSlides[0];
+  const primaryCta =
+    primaryCtaBySlideId[slide.id] ?? primaryCtaBySlideId[1];
 
   return (
-    <section className="hero-carousel-section relative h-[calc(100svh-var(--tf-header-height))] min-h-[420px] w-full overflow-hidden -mt-px lg:h-[88vh] lg:min-h-[500px]">
+    <section className="hero-carousel-section relative min-h-[460px] w-full overflow-hidden bg-slate-900 -mt-px lg:min-h-[520px]">
       <Swiper
         modules={[EffectFade, Autoplay, Pagination, Navigation]}
         effect="fade"
@@ -120,17 +139,16 @@ export default function HeroCarousel() {
               active={activeIndex === idx}
               animKey={animKey}
               objectPosition={s.objectPosition}
-              shouldLoad={shouldLoadSlide(idx)}
             />
           </SwiperSlide>
         ))}
       </Swiper>
 
-      <div className="pointer-events-none absolute inset-0 z-[5] flex items-center max-lg:items-end max-lg:pb-[7.5rem]">
+      <div className="pointer-events-none absolute inset-0 z-[5] flex items-center max-lg:items-end max-lg:pb-[6.5rem]">
         <div className="pointer-events-auto mx-auto w-full max-w-7xl px-4 lg:px-8">
-          <div className="hero-content-panel max-lg:mx-0">
-            <FloatBlock replayKey={animKey} scroll={false} duration={0.65}>
-              <span className="mb-4 inline-block rounded-full border border-brand/50 bg-brand px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-md">
+          <div className="hero-content-panel max-lg:mx-0 overflow-visible">
+            <FloatBlock replayKey={animKey} scroll={false} duration={0.65} clip={false}>
+              <span className="mb-3 inline-block rounded-full border border-brand/50 bg-brand px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-md">
                 TasmaFive Solutions
               </span>
             </FloatBlock>
@@ -141,27 +159,43 @@ export default function HeroCarousel() {
               text={slide.heading}
               highlightWords={highlightMap[slide.id] || []}
               variant="hero"
-              className="text-3xl font-black leading-[1.1] tracking-tight lg:text-[2.75rem]"
+              className="text-2xl font-black leading-[1.15] tracking-tight sm:text-3xl lg:text-[2.5rem]"
             />
 
-            <FloatBlock replayKey={animKey} scroll={false} index={1} duration={0.7}>
-              <p className="hero-subtext mt-4 max-w-xl text-sm leading-relaxed md:text-base">
+            <FloatBlock
+              replayKey={animKey}
+              scroll={false}
+              index={1}
+              duration={0.7}
+              clip={false}
+            >
+              <p className="hero-subtext mt-3 max-w-xl text-sm leading-relaxed md:text-base">
                 {slide.subheading}
               </p>
             </FloatBlock>
 
-            <FloatBlock replayKey={animKey} scroll={false} index={2} duration={0.65}>
-              <div className="mt-5 flex flex-wrap gap-3">
-                {slide.ctaPrimary ? (
-                  <MagneticButton href="/contact" variant="primary">
-                    {slide.ctaPrimary}
-                    <ArrowRight className="h-4 w-4" />
-                  </MagneticButton>
-                ) : null}
+            <FloatBlock
+              replayKey={animKey}
+              scroll={false}
+              index={2}
+              duration={0.65}
+              clip={false}
+            >
+              <div
+                key={`hero-cta-${slide.id}-${animKey}`}
+                className="mt-5 flex flex-wrap items-center gap-3"
+              >
+                <MagneticButton
+                  href={primaryCta.href}
+                  variant="primary"
+                  openAudit={primaryCta.openAudit}
+                >
+                  {primaryCta.label}
+                  <ArrowRight className="h-4 w-4" />
+                </MagneticButton>
                 <MagneticButton
                   href={slide.ctaSecondaryHref}
-                  variant="outline"
-                  className="!border-white/30 !text-white hover:!bg-white/15 hover:!text-white"
+                  variant="outline-on-dark"
                 >
                   {slide.ctaSecondary}
                 </MagneticButton>
@@ -186,7 +220,7 @@ export default function HeroCarousel() {
         <ChevronRight className="h-5 w-5" />
       </button>
 
-      <div className="hero-pagination absolute bottom-[5.75rem] left-1/2 z-10 flex -translate-x-1/2 gap-2 lg:bottom-8" />
+      <div className="hero-pagination absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2 max-lg:bottom-[5.5rem] lg:bottom-8" />
     </section>
   );
 }

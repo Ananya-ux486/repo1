@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
+import HashScroll from "@/components/HashScroll";
 import MotionProvider from "@/components/MotionProvider";
 import PageLoader from "@/components/PageLoader";
 import ScrollLock from "@/components/ScrollLock";
@@ -11,6 +12,8 @@ import {
   DeferredCursorGlow,
   DeferredFloatingWidgets,
 } from "@/components/DeferredClient";
+import AuditFormProviderGate from "@/components/AuditFormProviderGate";
+import RouteMark from "@/components/RouteMark";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,7 +31,12 @@ const geistMono = Geist_Mono({
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
   viewportFit: "cover" as const,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#eef6ff" },
+    { media: "(prefers-color-scheme: dark)", color: "#eef6ff" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -67,13 +75,17 @@ export default function RootLayout({
       <body className="textured-bg min-h-screen flex flex-col text-foreground">
         <PageLoader />
         <ScrollLock />
+        <RouteMark />
         <Header />
         <div id="app-root" className="flex min-h-0 flex-1 flex-col max-lg:block max-lg:min-h-0 max-lg:flex-none">
           <MotionProvider>
             <SmoothScroll>
+              <HashScroll />
               <DeferredCursorGlow />
-              <main className="max-lg:block lg:flex-1">{children}</main>
-              <Footer />
+              <AuditFormProviderGate>
+                <main className="max-lg:block lg:flex-1">{children}</main>
+                <Footer />
+              </AuditFormProviderGate>
             </SmoothScroll>
           </MotionProvider>
         </div>

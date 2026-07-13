@@ -6,7 +6,6 @@ const BrandMarquee = dynamic(() => import("@/components/BrandMarquee"));
 const CreativeStrip = dynamic(() => import("@/components/CreativeStrip"));
 const ServicesSection = dynamic(() => import("@/components/ServicesSection"));
 const ApproachSection = dynamic(() => import("@/components/ApproachSection"));
-
 const ExpertiseSection = dynamic(() => import("@/components/ExpertiseSection"));
 const Industry360Section = dynamic(() => import("@/components/Industry360Section"));
 const TestimonialsSection = dynamic(() => import("@/components/TestimonialsSection"));
@@ -20,39 +19,35 @@ export default function HomePage() {
       <HeroCarousel />
       <BrandMarquee />
       <CreativeStrip />
-      <ViewportGate minHeight="520px">
-        <ServicesSection />
-      </ViewportGate>
-      <ViewportGate minHeight="480px">
-        <ApproachSection />
-      </ViewportGate>
+      <ServicesSection />
+      <ApproachSection />
       <div className="perf-section">
-        <ViewportGate minHeight="560px">
+        <ViewportGate minHeight="420px">
           <ExpertiseSection />
         </ViewportGate>
       </div>
       <div className="perf-section">
-        <ViewportGate minHeight="520px">
+        <ViewportGate minHeight="420px">
           <Industry360Section />
         </ViewportGate>
       </div>
       <div className="perf-section">
-        <ViewportGate minHeight="480px">
+        <ViewportGate minHeight="360px">
           <TestimonialsSection />
         </ViewportGate>
       </div>
       <div className="perf-section">
-        <ViewportGate minHeight="520px">
+        <ViewportGate minHeight="420px">
           <InstagramFeedSection />
         </ViewportGate>
       </div>
       <div className="perf-section">
-        <ViewportGate minHeight="480px">
+        <ViewportGate minHeight="420px">
           <TeamBlogSection />
         </ViewportGate>
       </div>
       <div className="perf-section">
-        <ViewportGate minHeight="520px">
+        <ViewportGate minHeight="360px">
           <PresenceSection />
         </ViewportGate>
       </div>

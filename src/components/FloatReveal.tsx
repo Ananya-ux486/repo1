@@ -97,6 +97,7 @@ export function FloatBlock({
   scroll = true,
   amount = 0.15,
   duration = 0.7,
+  clip = true,
 }: {
   children: ReactNode;
   className?: string;
@@ -105,16 +106,25 @@ export function FloatBlock({
   scroll?: boolean;
   amount?: number;
   duration?: number;
+  /** Keep false for buttons/CTAs so content is never clipped */
+  clip?: boolean;
 }) {
   const scrollReplay = useScrollReplay(amount);
   const key = externalKey ?? (scroll ? scrollReplay.replayKey : 0);
 
   return (
-    <div ref={scroll ? scrollReplay.ref : undefined} className={`overflow-hidden ${className}`}>
+    <div
+      ref={scroll ? scrollReplay.ref : undefined}
+      className={`${clip ? "overflow-hidden" : "overflow-visible"} ${className}`}
+    >
       <motion.div
         key={key}
-        initial={{ y: "110%", opacity: 0 }}
-        animate={{ y: "0%", opacity: 1 }}
+        initial={
+          clip
+            ? { y: "110%", opacity: 0 }
+            : { y: 18, opacity: 0 }
+        }
+        animate={clip ? { y: "0%", opacity: 1 } : { y: 0, opacity: 1 }}
         transition={floatTransition(index * 0.08, duration)}
       >
         {children}
@@ -149,9 +159,9 @@ export function FloatImageWrap({
     >
       <motion.div
         key={key}
-        initial={{ y: "18%", scale: 1.08, opacity: 0 }}
-        animate={{ y: "0%", scale: 1, opacity: 1 }}
-        transition={floatTransition(index * 0.1, 0.9)}
+        initial={{ y: 14, scale: 1, opacity: 0 }}
+        animate={{ y: 0, scale: 1, opacity: 1 }}
+        transition={floatTransition(index * 0.06, 0.55)}
         className="h-full w-full"
       >
         {children}

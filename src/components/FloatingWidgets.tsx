@@ -58,7 +58,9 @@ export default function FloatingWidgets() {
           <WhatsAppIcon className="h-4 w-4 sm:h-[18px] sm:w-[18px] lg:h-5 lg:w-5" />
         </motion.a>
 
-        {socialLinks.map((item, index) => {
+        {socialLinks
+          .filter((item) => Boolean(item.href))
+          .map((item, index) => {
           const Icon = item.icon;
           return (
             <motion.a

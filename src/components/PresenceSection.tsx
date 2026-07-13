@@ -21,7 +21,7 @@ function IndiaCard({
     <motion.div
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.75, ease: floatEase }}
       className="group w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-white shadow-sm sm:w-[260px]"
     >
@@ -59,7 +59,7 @@ function FlagCard({
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.7, ease: floatEase }}
       className="group flex w-[180px] shrink-0 flex-col items-center rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:border-brand/30 sm:w-[200px]"
     >
@@ -114,8 +114,8 @@ export default function PresenceSection() {
   const intlReplay = useScrollReplay(0.15);
 
   return (
-    <section className="relative overflow-hidden py-16 pastel-section lg:py-24">
-      <div ref={indiaReplay.ref} className="mx-auto mb-12 max-w-7xl px-4 text-center lg:px-8">
+    <section className="relative overflow-hidden py-12 pastel-section lg:py-16">
+      <div ref={indiaReplay.ref} className="mx-auto mb-8 max-w-7xl px-4 text-center lg:px-8">
         <FloatLine replayKey={indiaReplay.replayKey}>
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
             Nationwide Reach
@@ -128,13 +128,13 @@ export default function PresenceSection() {
         </FloatLine>
       </div>
 
-      <CssMarquee duration={50} direction="right" className="mb-12 lg:mb-20">
+      <CssMarquee duration={50} direction="right" className="mb-10 lg:mb-14">
         {indiaPresence.map((city) => (
           <IndiaCard key={city.city} {...city} />
         ))}
       </CssMarquee>
 
-      <div ref={intlReplay.ref} className="mx-auto mb-12 max-w-7xl px-4 text-center lg:px-8">
+      <div ref={intlReplay.ref} className="mx-auto mb-8 max-w-7xl px-4 text-center lg:px-8">
         <FloatLine replayKey={intlReplay.replayKey}>
           <h2 className="text-3xl font-bold text-foreground md:text-4xl">
             Our Presence in International

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "description": "All static website images — commit this folder to Git for GitHub clone and Hostinger deploy.",
   "basePath": "/images",
   "categories": {
@@ -12,6 +12,12 @@
       "projects/portfolio.png",
       "projects/landing-page.png",
       "projects/government.png"
+    ],
+    "projectsLive": [
+      "projects/live/dr-tour.jpg",
+      "projects/live/atelier-ninetyfive.jpg",
+      "projects/live/please-gofundme.jpg",
+      "projects/live/shreeram-ayurvedic.jpg"
     ],
     "industries": [
       "industries/seo-360.webp",
@@ -41,7 +47,16 @@
       "blog/mobile-first-design.jpg",
       "blog/website-security-2026.jpg"
     ],
+    "about": [
+      "about/team-collab.jpg",
+      "about/mission.jpg",
+      "about/vision.jpg",
+      "about/office.jpg",
+      "about/trust.jpg"
+    ],
     "instagram": [
+      "instagram/post-hiring.jpg",
+      "instagram/post-marketer.jpg",
       "instagram/post-1-digital-transform.jpg",
       "instagram/post-2-ecommerce.jpg",
       "instagram/post-3-ai-trends.jpg",
@@ -56,8 +71,8 @@
       "presence/india/delhi-ncr.jpg",
       "presence/india/haryana.jpg"
     ],
-    "presenceFlags": "flags/lang/*.png (shared with language switcher — no duplicate folder)",
-    "languageFlags": "flags/lang/*.png"
+    "languageFlags": "flags/lang/*.png",
+    "dialFlags": "flags/dial/*.png (phone country picker — 108 flags)"
   },
   "registry": "src/data/images.ts"
 }

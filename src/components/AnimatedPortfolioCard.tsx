@@ -18,7 +18,7 @@ export type PortfolioCardItem = {
 const cardEase = [0.22, 1, 0.36, 1] as const;
 
 const cardEnter = {
-  initial: { opacity: 0, y: -120, scale: 0.92 },
+  initial: { opacity: 0, y: 24, scale: 0.98 },
   animate: { opacity: 1, y: 0, scale: 1 },
 };
 
@@ -50,7 +50,6 @@ export function AnimatedPortfolioCard({
 
   const motionProps = {
     ref: attachRef,
-    key: playKey,
     ...cardEnter,
     transition: {
       duration: 0.85,
@@ -61,8 +60,8 @@ export function AnimatedPortfolioCard({
 
   if (showDetails) {
     return (
-      <motion.article {...motionProps} className={cardClass}>
-        <div className={`relative overflow-hidden ${tall ? "aspect-[4/5]" : "aspect-[4/3]"}`}>
+      <motion.article key={playKey} {...motionProps} className={cardClass}>
+        <div className={`relative overflow-hidden ${tall ? "aspect-[16/11] sm:aspect-[4/5]" : "aspect-[16/11] sm:aspect-[4/3]"}`}>
           <Image
             src={item.image}
             alt={item.title}
@@ -70,7 +69,7 @@ export function AnimatedPortfolioCard({
             loading="lazy"
             placeholder="blur"
             blurDataURL={IMAGE_BLUR}
-            className="object-cover transition duration-700 group-hover:scale-105"
+            className="object-cover object-[center_25%] transition duration-700 group-hover:scale-105 sm:object-center"
             sizes="(max-width: 768px) 100vw, 50vw"
           />
           <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/50 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">
@@ -103,10 +102,10 @@ export function AnimatedPortfolioCard({
   }
 
   return (
-    <motion.article {...motionProps} className={`${cardClass} relative`}>
+    <motion.article key={playKey} {...motionProps} className={`${cardClass} relative`}>
       <div
         className={`relative overflow-hidden ${
-          tall ? "aspect-[3/4] lg:aspect-auto lg:h-full lg:min-h-[480px]" : "aspect-[4/3]"
+          tall ? "aspect-[16/11] sm:aspect-[3/4] lg:aspect-auto lg:h-full lg:min-h-[480px]" : "aspect-[16/11] sm:aspect-[4/3]"
         }`}
       >
         <Image
@@ -116,7 +115,7 @@ export function AnimatedPortfolioCard({
           loading="lazy"
           placeholder="blur"
           blurDataURL={IMAGE_BLUR}
-          className="object-cover transition duration-700 group-hover:scale-105"
+          className="object-cover object-[center_25%] transition duration-700 group-hover:scale-105 sm:object-center"
           sizes="(max-width: 768px) 100vw, 50vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />

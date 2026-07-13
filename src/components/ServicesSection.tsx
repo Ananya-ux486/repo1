@@ -71,9 +71,9 @@ export default function ServicesSection() {
   const { ref, replayKey } = useScrollReplay(0.15);
 
   return (
-    <section ref={ref} className="relative py-16 pastel-section section-glow lg:py-24">
+    <section ref={ref} className="relative py-8 pastel-section section-glow lg:py-11">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="mb-12 text-center lg:mb-16">
+        <div className="mb-8 text-center lg:mb-10">
           <FloatLine replayKey={replayKey} className="mx-auto">
             <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
               What We Do
@@ -98,7 +98,7 @@ export default function ServicesSection() {
                 <motion.div
                   initial={{ opacity: 0, y: 60 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.2, margin: "0px 0px -40px 0px" }}
+                  viewport={{ once: true, amount: 0.2, margin: "0px 0px -40px 0px" }}
                   transition={{
                     duration: 0.75,
                     delay: floatStagger(i, 0.08),

@@ -1,14 +1,12 @@
-import PlaceholderPage from "@/components/PlaceholderPage";
+import type { Metadata } from "next";
+import AboutPageContent from "@/components/AboutPageContent";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "About Us | TasmaFive Solutions",
+  description:
+    "Learn about TasmaFive Solutions — our mission, vision, values, leadership team, and why businesses trust us for websites, software, and digital growth.",
 };
 
 export default function AboutPage() {
-  return (
-    <PlaceholderPage
-      title="About Us"
-      description="Learn about TasmaFive Solutions — our mission, vision, and the team driving digital innovation across India and beyond."
-    />
-  );
+  return <AboutPageContent />;
 }

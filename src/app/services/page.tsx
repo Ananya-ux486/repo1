@@ -11,13 +11,11 @@ export const metadata = {
 
 export default function ServicesPage() {
   return (
-    <section className="relative py-16 pastel-section section-glow pt-24 lg:py-24 lg:pt-28">
+    <section className="relative pastel-section section-glow pb-8 pt-3 lg:pb-10 lg:pt-4">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <ServicesPageHero
           title="Our Services"
           subtitle="We deliver innovative and scalable IT solutions designed to help businesses grow, streamline operations, and achieve digital success."
-          backHref="/"
-          backLabel="Back to Home"
         />
         <ServicesOverview />
       </div>

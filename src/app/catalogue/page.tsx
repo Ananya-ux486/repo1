@@ -1,14 +1,11 @@
-import PlaceholderPage from "@/components/PlaceholderPage";
+import CataloguePageContent from "@/components/CataloguePageContent";
 
 export const metadata = {
-  title: "Catalogue | TasmaFive Solutions",
+  title: "Technology Catalogue | TasmaFive Solutions",
+  description:
+    "Explore TasmaFive Solutions LLP technology catalogue — solution categories, stack, delivery process, and capabilities across web, cloud, AI, and more.",
 };
 
 export default function CataloguePage() {
-  return (
-    <PlaceholderPage
-      title="Catalogue"
-      description="Browse our complete catalogue of IT services, software products, and digital solutions."
-    />
-  );
+  return <CataloguePageContent />;
 }

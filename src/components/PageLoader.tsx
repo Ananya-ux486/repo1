@@ -47,22 +47,39 @@ export default function PageLoader() {
       window.dispatchEvent(new CustomEvent("tf-loader-done"));
     };
 
+    const reduced =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const exitAt = reduced ? 120 : 450;
+    const hideAt = reduced ? 200 : 700;
+    const failsafeAt = reduced ? 400 : 1200;
+
     const exitTimer = window.setTimeout(() => {
       setExiting(true);
       body.dataset.tfLoading = "revealing";
-    }, 2300);
+    }, exitAt);
 
     const hideTimer = window.setTimeout(() => {
       setVisible(false);
       finish();
-    }, 3200);
+    }, hideAt);
 
-    const failsafeTimer = window.setTimeout(finish, 4500);
+    const failsafeTimer = window.setTimeout(finish, failsafeAt);
+
+    const onPageShow = () => {
+      if (body.dataset.tfLoading === "true") {
+        setVisible(false);
+        finish();
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
 
     return () => {
       window.clearTimeout(exitTimer);
       window.clearTimeout(hideTimer);
       window.clearTimeout(failsafeTimer);
+      window.removeEventListener("pageshow", onPageShow);
       finish();
     };
   }, []);

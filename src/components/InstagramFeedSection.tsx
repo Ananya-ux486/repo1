@@ -437,7 +437,7 @@ function PostTile({
       variants={tileVariants}
       custom={index}
       onClick={onOpen}
-      className="instagram-post-tile group relative aspect-square w-full shrink-0 overflow-hidden rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:rounded-2xl"
+      className="instagram-post-tile group relative aspect-square w-full shrink-0 overflow-hidden rounded-xl bg-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:rounded-2xl"
       whileHover={{ y: -4 }}
       transition={{ duration: 0.35, ease: floatEase }}
     >
@@ -519,16 +519,16 @@ export default function InstagramFeedSection() {
   return (
     <section
       ref={ref}
-      className="instagram-feed-section relative overflow-hidden bg-transparent py-16 lg:py-24"
+      className="instagram-feed-section relative overflow-hidden bg-transparent py-8 lg:py-11"
       aria-labelledby="instagram-feed-heading"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="instagram-feed-glow absolute -left-20 top-1/4 h-64 w-64 rounded-full bg-[#f58529]/15 blur-3xl" />
-        <div className="instagram-feed-glow absolute -right-16 bottom-1/4 h-72 w-72 rounded-full bg-[#8134af]/12 blur-3xl" />
+        <div className="instagram-feed-glow absolute -left-20 top-1/4 h-64 w-64 rounded-full bg-[#f58529]/15 blur-2xl" />
+        <div className="instagram-feed-glow absolute -right-16 bottom-1/4 h-72 w-72 rounded-full bg-[#8134af]/12 blur-2xl" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="mb-10 text-center lg:mb-12">
+        <div className="mb-6 text-center lg:mb-8">
           <FloatLine replayKey={replayKey}>
             <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
               Social
@@ -544,13 +544,22 @@ export default function InstagramFeedSection() {
           </FloatLine>
           <FloatBlock replayKey={replayKey} scroll={false} index={2} className="mt-3">
             <p className="text-muted">
-              Follow our journey — projects, tech tips & behind-the-scenes.
-              {isLive && (
+              Follow our journey — projects, tech tips & behind-the-scenes on{" "}
+              <a
+                href={INSTAGRAM_PROFILE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-brand hover:underline"
+              >
+                @{INSTAGRAM_USERNAME}
+              </a>
+              .
+              {isLive ? (
                 <span className="ml-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                   Live feed
                 </span>
-              )}
+              ) : null}
             </p>
           </FloatBlock>
         </div>
@@ -561,7 +570,7 @@ export default function InstagramFeedSection() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2, margin: "0px 0px -40px 0px" }}
+          viewport={{ once: true, amount: 0.2, margin: "0px 0px -40px 0px" }}
         >
           {visiblePosts.map((post, i) => (
             <PostTile
@@ -576,7 +585,7 @@ export default function InstagramFeedSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.5 }}
           transition={{
             delay: floatStagger(VISIBLE_COUNT, 0.08),
             duration: 0.6,

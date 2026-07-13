@@ -135,7 +135,7 @@ function GoogleReviewsHeader() {
   const { rating, reviewCount, writeReviewUrl } = siteConfig.googleBusiness;
 
   return (
-    <div ref={ref} className="mb-8 lg:mb-10">
+    <div ref={ref} className="mb-5 lg:mb-6">
       <FloatLine replayKey={replayKey}>
         <div className="google-reviews-header flex flex-col gap-5 rounded-2xl border border-border bg-white/80 p-5 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="flex items-center gap-4">
@@ -210,7 +210,7 @@ export default function TestimonialsSection() {
   }, [isMobile]);
 
   return (
-    <section className="google-reviews-section relative py-16 lg:py-24">
+    <section className="google-reviews-section relative py-8 lg:py-11">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <GoogleReviewsHeader />
 

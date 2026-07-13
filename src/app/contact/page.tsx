@@ -1,14 +1,11 @@
-import PlaceholderPage from "@/components/PlaceholderPage";
+import ContactPageContent from "@/components/ContactPageContent";
 
 export const metadata = {
-  title: "Contact | TasmaFive Solutions",
+  title: "Contact Us | TasmaFive Solutions",
+  description:
+    "Contact TasmaFive Solutions for general questions, support, and partnerships.",
 };
 
 export default function ContactPage() {
-  return (
-    <PlaceholderPage
-      title="Contact Us"
-      description="Get in touch with TasmaFive Solutions. We're ready to help transform your business with smart IT solutions."
-    />
-  );
+  return <ContactPageContent />;
 }

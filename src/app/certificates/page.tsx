@@ -8,7 +8,7 @@ export default function CertificatesPage() {
   return (
     <PlaceholderPage
       title="Certificates"
-      description="View our certifications, accreditations, and credentials that validate our expertise and commitment to quality."
+      description="Our certifications and accreditations will be published here shortly — proof of quality, security practices, and delivery standards."
     />
   );
 }

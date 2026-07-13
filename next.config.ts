@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "scontent-*.cdninstagram.com",
       },
+      {
+        protocol: "https",
+        hostname: "image.thum.io",
+      },
     ],
   },
   experimental: {

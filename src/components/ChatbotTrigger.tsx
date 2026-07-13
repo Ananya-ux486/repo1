@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bot, Sparkles } from "lucide-react";
+import { Bot } from "lucide-react";
 import { openAiChatbot } from "@/components/AiChatbot";
 
 type ChatbotTriggerProps = {
@@ -45,9 +45,6 @@ export default function ChatbotTrigger({
         <span className="ai-chat-pulse absolute inset-0 rounded-full" aria-hidden />
         <span className="relative flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-brand via-orange-500 to-amber-400">
           <Bot className="h-4 w-4 text-white sm:h-[18px] sm:w-[18px]" />
-        </span>
-        <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-brand shadow sm:h-4 sm:w-4">
-          <Sparkles className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
         </span>
       </motion.button>
     </div>

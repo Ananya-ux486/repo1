@@ -11,11 +11,11 @@ export const metadata = {
 
 export default function WebDevelopmentPage() {
   return (
-    <section className="relative py-16 pastel-section section-glow pt-24 lg:py-24 lg:pt-28">
+    <section className="relative pastel-section section-glow pb-8 pt-3 lg:pb-10 lg:pt-4">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <ServicesPageHero
           title="Web Development"
-          subtitle="End-to-end website solutions for every business need — from fast static sites to full e-commerce platforms."
+          subtitle="End-to-end website packages with transparent India & international pricing — from static sites to full e-commerce."
           backHref="/services"
           backLabel="All Services"
         />

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, Construction } from "lucide-react";
+import { Award, ArrowRight, ShieldCheck } from "lucide-react";
 
 interface PlaceholderPageProps {
   title: string;
@@ -14,27 +14,45 @@ export default function PlaceholderPage({
   description,
 }: PlaceholderPageProps) {
   return (
-    <section className="relative flex min-h-[80vh] items-center justify-center section-glow pt-20 lg:pt-24">
-      <div className="mx-auto max-w-lg px-4 text-center">
+    <section className="relative flex min-h-[min(70vh,640px)] items-center justify-center section-glow py-10 lg:py-12">
+      <div className="mx-auto max-w-xl px-4 text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="rounded-3xl border border-border/70 bg-white/80 p-8 shadow-sm backdrop-blur-sm sm:p-10"
         >
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-            <Construction className="h-10 w-10" />
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand/10 text-brand">
+            <Award className="h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground md:text-4xl">{title}</h1>
-          <p className="mt-4 text-muted">{description}</p>
-          <p className="mt-2 text-sm text-muted/70">
-            This page is under development. Coming soon!
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
+            Coming next
           </p>
-          <Link
-            href="/"
-            className="mt-8 inline-flex items-center gap-2 rounded-full border border-brand/30 px-6 py-3 text-sm font-medium text-brand transition hover:bg-brand/10"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to Home
-          </Link>
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground md:text-4xl">
+            {title}
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
+            {description}
+          </p>
+          <p className="mt-3 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-foreground/70">
+            <ShieldCheck className="h-3.5 w-3.5 text-brand" />
+            This section will be updated with official certificates soon.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/services"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark"
+            >
+              Explore Services
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:border-brand/40 hover:text-brand"
+            >
+              Contact Us
+            </Link>
+          </div>
         </motion.div>
       </div>
     </section>

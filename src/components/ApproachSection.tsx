@@ -13,7 +13,7 @@ export default function ApproachSection() {
   const { ref, replayKey } = useScrollReplay(0.18);
 
   return (
-    <section ref={ref} className="relative overflow-hidden py-16 pastel-section lg:py-24">
+    <section ref={ref} className="relative overflow-hidden py-8 pastel-section lg:py-11">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
         <span
           className="expert-bg-drift text-[clamp(6rem,20vw,18rem)] font-black uppercase leading-none text-foreground/[0.04]"
@@ -75,7 +75,7 @@ export default function ApproachSection() {
                 key={stat.label}
                 initial={{ opacity: 0, y: 60, scale: 0.92 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: false, amount: 0.25, margin: "0px 0px -40px 0px" }}
+                viewport={{ once: true, amount: 0.25, margin: "0px 0px -40px 0px" }}
                 transition={{
                   duration: 0.75,
                   delay: floatStagger(i, 0.08),

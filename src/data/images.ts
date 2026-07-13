@@ -12,6 +12,11 @@ export function languageFlag(code: string): string {
   return `${IMG}/flags/lang/${normalized}.png`;
 }
 
+/** Phone dial-code flags (bundled under public/images/flags/dial/) */
+export function dialFlag(code: string): string {
+  return `${IMG}/flags/dial/${code.toLowerCase()}.png`;
+}
+
 export const DEFAULT_LANGUAGE_FLAG = `${IMG}/flags/lang/us.png`;
 
 export const images = {
@@ -64,8 +69,18 @@ export const images = {
     websiteSecurity: `${IMG}/blog/website-security-2026.jpg`,
   },
 
+  about: {
+    teamCollab: `${IMG}/about/team-collab.jpg`,
+    mission: `${IMG}/about/mission.jpg`,
+    vision: `${IMG}/about/vision.jpg`,
+    office: `${IMG}/about/office.jpg`,
+    trust: `${IMG}/about/trust.jpg`,
+  },
+
   /** Dedicated Instagram feed images — never shared with expertise or blog */
   instagram: {
+    hiring: `${IMG}/instagram/post-hiring.jpg`,
+    marketer: `${IMG}/instagram/post-marketer.jpg`,
     digitalTransform: `${IMG}/instagram/post-1-digital-transform.jpg`,
     ecommerce: `${IMG}/instagram/post-2-ecommerce.jpg`,
     aiTrends: `${IMG}/instagram/post-3-ai-trends.jpg`,

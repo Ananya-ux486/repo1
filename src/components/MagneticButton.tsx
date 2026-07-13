@@ -3,12 +3,15 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ReactNode, useRef } from "react";
+import { useOptionalAuditForm } from "@/components/AuditFormProvider";
 
 interface MagneticButtonProps {
   href: string;
   children: ReactNode;
-  variant?: "primary" | "outline" | "pill-dark" | "pill-light";
+  variant?: "primary" | "outline" | "outline-on-dark" | "pill-dark" | "pill-light";
   className?: string;
+  /** Opens the Free Audit Report modal instead of navigating */
+  openAudit?: boolean;
 }
 
 export default function MagneticButton({
@@ -16,19 +19,24 @@ export default function MagneticButton({
   children,
   variant = "primary",
   className = "",
+  openAudit = false,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLAnchorElement>(null);
   const rafId = useRef(0);
   const offset = useRef({ x: 0, y: 0 });
+  const audit = useOptionalAuditForm();
 
   const variants = {
-    primary: "bg-brand text-white hover:bg-brand-dark",
+    primary:
+      "bg-brand text-white shadow-md hover:bg-brand-dark hover:shadow-lg",
     outline:
-      "border border-border text-foreground hover:border-brand/50 hover:bg-surface",
+      "border border-border bg-white text-foreground hover:border-brand hover:bg-brand hover:text-white hover:shadow-md",
+    "outline-on-dark":
+      "border-2 border-white/85 bg-white text-slate-900 shadow-md hover:bg-brand hover:border-brand hover:text-white hover:shadow-lg",
     "pill-dark":
-      "border border-border bg-white text-foreground shadow-sm hover:bg-brand hover:text-white",
+      "border border-border bg-white text-foreground shadow-sm hover:border-brand hover:bg-brand hover:text-white hover:shadow-md",
     "pill-light":
-      "bg-brand text-white hover:bg-brand-dark",
+      "bg-brand text-white shadow-md hover:bg-brand-dark hover:shadow-lg",
   };
 
   const paint = () => {
@@ -54,6 +62,28 @@ export default function MagneticButton({
     if (!rafId.current) rafId.current = requestAnimationFrame(paint);
   };
 
+  const classNames = `inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${variants[variant]} ${className}`;
+
+  if (openAudit) {
+    return (
+      <motion.div whileTap={{ scale: 0.96 }}>
+        <button
+          type="button"
+          onClick={() => {
+            if (audit) audit.openAuditForm();
+            else
+              window.location.assign(
+                href.includes("audit=") ? href : "/contact?audit=1",
+              );
+          }}
+          className={classNames}
+        >
+          {children}
+        </button>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div whileTap={{ scale: 0.96 }}>
       <Link
@@ -61,7 +91,7 @@ export default function MagneticButton({
         href={href}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${variants[variant]} ${className}`}
+        className={classNames}
       >
         {children}
       </Link>

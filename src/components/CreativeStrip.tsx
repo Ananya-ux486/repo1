@@ -8,71 +8,78 @@ import {
   CreativeParticles,
 } from "@/components/CreativeStripOrbs";
 
+/**
+ * Compact IT-agency style strip — one tight composition (no staggered empty rows).
+ * Keeps orb animations + float reveal; layout is denser and more professional.
+ */
 export default function CreativeStrip() {
   const { ref, replayKey } = useScrollReplay(0.2);
 
   return (
-    <section ref={ref} className="creative-strip-section relative overflow-hidden py-12 lg:py-24">
+    <section
+      ref={ref}
+      className="creative-strip-section relative overflow-hidden py-6 lg:py-9"
+    >
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        {/* CREATIVE + hex orb on the right */}
-        <div className="creative-row relative min-h-[clamp(4rem,16vw,9rem)]">
-          <FloatLine
-            replayKey={replayKey}
-            delay={0}
-            duration={0.85}
-            className="!overflow-visible text-left"
-          >
-            <h2 className="creative-hover-text relative z-[2] text-[clamp(2.5rem,10vw,7rem)] font-black uppercase leading-[0.9] tracking-tighter text-foreground/10 transition-all duration-500">
-              CREATIVE
-            </h2>
-          </FloatLine>
-          <div className="creative-orb-slot creative-orb-slot-right">
-            <CreativeHexOrb />
-            <CreativeParticles variant="hex" />
+        <div className="creative-strip-panel relative mx-auto flex max-w-5xl flex-col items-center justify-center gap-4 text-center sm:gap-5 lg:flex-row lg:items-center lg:gap-10 lg:text-left">
+          {/* Left orb — decorative, compact */}
+          <div className="creative-orb-inline relative order-1 shrink-0 lg:order-none">
+            <div className="creative-orb-slot creative-orb-slot-inline">
+              <CreativeRingOrb />
+              <CreativeParticles variant="ring" />
+            </div>
+          </div>
+
+          {/* Headline block — single composition */}
+          <div className="relative z-[2] order-2 min-w-0 flex-1 lg:order-none">
+            <FloatLine replayKey={replayKey} delay={0} duration={0.7}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-brand sm:text-xs">
+                What we craft
+              </p>
+            </FloatLine>
+
+            <FloatLine
+              replayKey={replayKey}
+              delay={0.08}
+              duration={0.8}
+              className="mt-2 !overflow-visible sm:mt-3"
+            >
+              <h2 className="creative-strip-heading text-[clamp(1.85rem,5.5vw,3.75rem)] font-black uppercase leading-[1.08] text-foreground">
+                <span className="creative-heading-row">
+                  <span className="creative-hover-text creative-word-solid">
+                    Creative
+                  </span>
+                  <span className="creative-hover-text creative-word-digital iridescent-text">
+                    Digital
+                  </span>
+                </span>
+                <span className="creative-hover-text creative-word-solutions">
+                  Solutions
+                </span>
+              </h2>
+            </FloatLine>
+
+            <FloatBlock
+              replayKey={replayKey}
+              scroll={false}
+              index={2}
+              className="mx-auto mt-3 max-w-xl lg:mx-0 lg:mt-4"
+            >
+              <p className="text-sm leading-relaxed text-muted sm:text-[15px]">
+                We build scalable websites, enterprise software &amp; AI-powered
+                experiences that help businesses grow faster.
+              </p>
+            </FloatBlock>
+          </div>
+
+          {/* Right orb */}
+          <div className="creative-orb-inline relative order-3 shrink-0 lg:order-none">
+            <div className="creative-orb-slot creative-orb-slot-inline">
+              <CreativeHexOrb />
+              <CreativeParticles variant="hex" />
+            </div>
           </div>
         </div>
-
-        {/* DIGITAL — center highlight */}
-        <FloatLine
-          replayKey={replayKey}
-          delay={0.12}
-          duration={0.85}
-          className="relative z-[2] !overflow-visible py-1 text-center"
-        >
-          <h2 className="creative-hover-text iridescent-text text-[clamp(2.5rem,10vw,7rem)] font-black uppercase leading-[0.9] tracking-tighter transition-all duration-500">
-            DIGITAL
-          </h2>
-        </FloatLine>
-
-        {/* SOLUTIONS + ring orb on the left */}
-        <div className="creative-row relative min-h-[clamp(4rem,16vw,9rem)]">
-          <div className="creative-orb-slot creative-orb-slot-left">
-            <CreativeRingOrb />
-            <CreativeParticles variant="ring" />
-          </div>
-          <FloatLine
-            replayKey={replayKey}
-            delay={0.24}
-            duration={0.85}
-            className="!overflow-visible text-right"
-          >
-            <h2 className="creative-hover-text relative z-[2] text-[clamp(2.5rem,10vw,7rem)] font-black uppercase leading-[0.9] tracking-tighter text-foreground/10 transition-all duration-500">
-              SOLUTIONS
-            </h2>
-          </FloatLine>
-        </div>
-
-        <FloatBlock
-          replayKey={replayKey}
-          scroll={false}
-          index={3}
-          className="relative z-[2] mt-6 max-w-md lg:ml-auto lg:mt-8 lg:text-right"
-        >
-          <p className="text-sm uppercase tracking-widest text-muted">
-            We build scalable websites, enterprise software & AI-powered experiences
-            that help businesses grow faster.
-          </p>
-        </FloatBlock>
       </div>
     </section>
   );
