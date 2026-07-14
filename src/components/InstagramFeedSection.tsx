@@ -426,16 +426,21 @@ function PostTile({
   post,
   index,
   onOpen,
+  forceVisible = false,
 }: {
   post: InstagramPost;
   index: number;
   onOpen: () => void;
+  /** Skip fade-in (mobile marquee must always be opaque). */
+  forceVisible?: boolean;
 }) {
   return (
     <motion.button
       type="button"
-      variants={tileVariants}
+      variants={forceVisible ? undefined : tileVariants}
       custom={index}
+      initial={forceVisible ? false : undefined}
+      animate={forceVisible ? { opacity: 1, y: 0, scale: 1 } : undefined}
       onClick={onOpen}
       className="instagram-post-tile group relative aspect-square w-full shrink-0 overflow-hidden rounded-xl bg-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:rounded-2xl"
       whileHover={{ y: -4 }}
@@ -564,9 +569,25 @@ export default function InstagramFeedSection() {
           </FloatBlock>
         </div>
 
+        {/* Mobile / tablet — auto-sliding row (desktop unchanged below) */}
+        <div className="instagram-feed-marquee mx-auto max-w-6xl lg:hidden">
+          <div className="instagram-feed-row gap-2.5">
+            {[...visiblePosts, ...visiblePosts].map((post, i) => (
+              <PostTile
+                key={`m-${post.id}-${i}`}
+                post={post}
+                index={i % visiblePosts.length}
+                forceVisible
+                onOpen={() => openPost(i % visiblePosts.length)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop / laptop — original 6-col grid (untouched layout) */}
         <motion.div
           key={replayKey}
-          className="instagram-feed-row mx-auto max-w-6xl gap-2.5 lg:grid lg:grid-cols-6 lg:gap-4"
+          className="mx-auto hidden max-w-6xl gap-4 lg:grid lg:grid-cols-6"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"

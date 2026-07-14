@@ -654,7 +654,16 @@ html.lenis body {
   }
 }
 
-/* 360° rotating landmark ring — legacy, kept for reference */
+/* 360° rotating hub — rings stay centered while spinning */
+@keyframes tf-spin-center {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 @keyframes tf-spin {
   from {
     transform: rotate(0deg);
@@ -720,7 +729,7 @@ html.lenis body {
   border-radius: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  animation: tf-spin linear infinite;
+  animation: tf-spin-center linear infinite;
 }
 
 .orbital-ring-1 {
@@ -943,8 +952,7 @@ select {
     backdrop-filter: none;
   }
 
-  .orbital-ring,
-  .orbital-node,
+  /* Keep orbital + marquee running on phones (was animation:none for perf). */
   .expert-bg-drift {
     animation: none !important;
   }
@@ -1026,9 +1034,15 @@ body {
 }
 
 /* Faster perceived language switch */
-html.gt-switching #app-root {
-  opacity: 0.97;
-  transition: opacity 0.08s ease;
+html.gt-switching #app-root,
+html.gt-switching #tf-page-scroll {
+  opacity: 0.9;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+}
+
+html.gt-switching body {
+  cursor: wait;
 }
 
 /* Testimonial carousel — center clear, sides faded (no CSS blur — GPU killer) */
@@ -1144,6 +1158,37 @@ html.gt-switching #app-root {
     overflow: visible;
   }
 
+  /* content-visibility can pause CSS animations on iOS/Android — keep them alive */
+  .perf-section {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+  }
+
+  .orbital-hub {
+    contain: none;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .orbital-ring,
+  .orbital-node {
+    -webkit-animation-play-state: running !important;
+    animation-play-state: running !important;
+  }
+
+  /* Industry cards slide — slightly faster so motion is obvious on small screens */
+  .marquee-left {
+    -webkit-animation: marquee-left 28s linear infinite;
+    animation: marquee-left 28s linear infinite;
+    -webkit-animation-play-state: running !important;
+    animation-play-state: running !important;
+  }
+
+  .marquee-right {
+    -webkit-animation: marquee-right 28s linear infinite;
+    animation: marquee-right 28s linear infinite;
+  }
+
   .hero-content-panel {
     max-width: none;
     padding: 1rem 1.25rem;
@@ -1166,31 +1211,52 @@ html.gt-switching #app-root {
     transform: scale(0.96);
   }
 
-  /* Instagram — horizontal scroll on phone & tablet */
+  /* Instagram — horizontal auto-slide on phone & tablet (desktop stays grid) */
   .instagram-feed-row {
     display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    padding-bottom: 0.35rem;
-    scrollbar-width: none;
+    width: max-content;
+    gap: 0.65rem;
+    -webkit-animation: marquee-left 32s linear infinite;
+    animation: marquee-left 32s linear infinite;
   }
 
-  .instagram-feed-row::-webkit-scrollbar {
-    display: none;
+  .instagram-feed-marquee {
+    overflow: hidden;
+    width: 100%;
   }
 
   .instagram-feed-row .instagram-post-tile {
     width: clamp(9.5rem, 42vw, 12.5rem);
     min-width: clamp(9.5rem, 42vw, 12.5rem);
-    scroll-snap-align: start;
     flex-shrink: 0;
+  }
+
+  /* Contact form — clear floating language + social bar */
+  .contact-page-shell {
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .contact-form-card {
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-form-card form {
+    padding-bottom: 0.25rem;
   }
 
   /* Creative strip — mobile uses centered text; orbs hidden via .creative-orb-inline */
   .creative-strip-section .creative-hover-text {
     text-align: center !important;
+  }
+}
+
+/* Desktop Instagram: cancel mobile marquee styles */
+@media (min-width: 1024px) {
+  .instagram-feed-row {
+    display: grid;
+    width: auto;
+    animation: none !important;
+    -webkit-animation: none !important;
   }
 }
 

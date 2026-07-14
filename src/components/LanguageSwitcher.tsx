@@ -9,7 +9,7 @@ import {
   SITE_LANGUAGES,
   writeStoredLanguage,
 } from "@/data/languages";
-import { languageFlag, DEFAULT_LANGUAGE_FLAG } from "@/data/images";
+import { languageFlag, languageFlagCdn, DEFAULT_LANGUAGE_FLAG } from "@/data/images";
 
 declare global {
   interface Window {
@@ -29,6 +29,8 @@ declare global {
     };
   }
 }
+
+const SKIP_LOADER_KEY = "tf-skip-loader";
 
 function setTranslateCookie(lang: string) {
   const hostname = window.location.hostname;
@@ -83,7 +85,6 @@ function loadGoogleTranslateScript(): Promise<void> {
 
   scriptPromise = new Promise((resolve) => {
     const finish = () => {
-      // Widget may need a tick after init callback
       window.setTimeout(() => resolve(), 0);
     };
 
@@ -128,7 +129,7 @@ function loadGoogleTranslateScript(): Promise<void> {
   return scriptPromise;
 }
 
-function waitForCombo(timeoutMs = 4000): Promise<HTMLSelectElement | null> {
+function waitForCombo(timeoutMs = 3500): Promise<HTMLSelectElement | null> {
   return new Promise((resolve) => {
     const start = Date.now();
     const tick = () => {
@@ -141,10 +142,44 @@ function waitForCombo(timeoutMs = 4000): Promise<HTMLSelectElement | null> {
         resolve(null);
         return;
       }
-      window.setTimeout(tick, 40);
+      window.setTimeout(tick, 30);
     };
     tick();
   });
+}
+
+function FlagImg({
+  code,
+  size,
+  className,
+}: {
+  code: string;
+  size: number;
+  className?: string;
+}) {
+  return (
+    <img
+      src={languageFlag(code)}
+      alt=""
+      width={size}
+      height={size}
+      loading="lazy"
+      decoding="async"
+      className={className}
+      onError={(e) => {
+        const el = e.currentTarget;
+        const cdn = languageFlagCdn(code);
+        if (el.src !== cdn && !el.src.includes("flagcdn.com")) {
+          el.src = cdn;
+          return;
+        }
+        if (code !== "us" && !el.dataset.fellBack) {
+          el.dataset.fellBack = "1";
+          el.src = DEFAULT_LANGUAGE_FLAG;
+        }
+      }}
+    />
+  );
 }
 
 export default function LanguageSwitcher() {
@@ -186,25 +221,47 @@ export default function LanguageSwitcher() {
       writeStoredLanguage(lang);
       setTranslateCookie(lang);
 
-      // Cookie + reload is the fastest reliable Google Translate path
+      // Soft fade — feels instant, avoids hang perception
+      document.documentElement.classList.add("gt-switching");
+
+      const combo = await ensureTranslator();
+
+      // Prefer in-place Google Translate (no reload) when combo is ready
+      // and we're not clearing back to English (English needs a clean reload).
+      if (combo && lang !== "en") {
+        const ok = triggerTranslate(lang);
+        if (ok) {
+          setCurrentCode(lang);
+          // Give GT a brief moment to rewrite the DOM, then clear overlay
+          window.setTimeout(() => {
+            document.documentElement.classList.remove("gt-switching");
+            setSwitching(false);
+          }, 180);
+          return;
+        }
+      }
+
+      // English restore OR combo unavailable → cookie + fast reload (skip intro loader)
+      try {
+        sessionStorage.setItem(SKIP_LOADER_KEY, "1");
+      } catch {
+        /* private mode */
+      }
       window.location.reload();
     },
-    [currentCode, switching]
+    [currentCode, ensureTranslator, switching]
   );
 
   useEffect(() => {
     setCurrentCode(readStoredLanguage());
   }, []);
 
-  // Only boot Google Translate when a non-English language is already selected.
-  // English users never pay the translator cost until they open the dropdown.
+  // Warm translator in the background after loader so first switch is faster
   useEffect(() => {
-    const stored = readStoredLanguage();
-    if (stored === "en") return;
-
-    const boot = () => {
+    const warm = () => {
       void ensureTranslator().then((combo) => {
-        if (combo) {
+        const stored = readStoredLanguage();
+        if (combo && stored !== "en") {
           triggerTranslate(stored);
           setCurrentCode(stored);
         }
@@ -213,15 +270,15 @@ export default function LanguageSwitcher() {
 
     if (document.body.dataset.tfLoading === "done") {
       if (typeof window.requestIdleCallback === "function") {
-        const id = window.requestIdleCallback(boot, { timeout: 1800 });
+        const id = window.requestIdleCallback(warm, { timeout: 1200 });
         return () => window.cancelIdleCallback(id);
       }
-      const t = window.setTimeout(boot, 600);
+      const t = window.setTimeout(warm, 400);
       return () => window.clearTimeout(t);
     }
 
-    window.addEventListener("tf-loader-done", boot, { once: true });
-    return () => window.removeEventListener("tf-loader-done", boot);
+    window.addEventListener("tf-loader-done", warm, { once: true });
+    return () => window.removeEventListener("tf-loader-done", warm);
   }, [ensureTranslator]);
 
   useEffect(() => {
@@ -277,15 +334,10 @@ export default function LanguageSwitcher() {
           disabled={switching}
           onClick={() => setOpen((v) => !v)}
         >
-          <img
-            src={languageFlag(current.flag)}
-            alt=""
-            width={22}
-            height={22}
-            className="h-[22px] w-[22px] shrink-0 rounded-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = DEFAULT_LANGUAGE_FLAG;
-            }}
+          <FlagImg
+            code={current.flag}
+            size={22}
+            className="h-[22px] w-[22px] shrink-0 rounded-full bg-slate-100 object-cover shadow-sm ring-1 ring-black/10"
           />
           <span className="max-w-[72px] truncate">{current.label}</span>
           <ChevronDown
@@ -329,16 +381,10 @@ export default function LanguageSwitcher() {
                       }`}
                       onClick={() => void applyLanguage(lang.code)}
                     >
-                      <img
-                        src={languageFlag(lang.flag)}
-                        alt=""
-                        width={18}
-                        height={18}
-                        loading="lazy"
-                        className="h-[18px] w-[18px] shrink-0 rounded-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = DEFAULT_LANGUAGE_FLAG;
-                        }}
+                      <FlagImg
+                        code={lang.flag}
+                        size={18}
+                        className="h-[18px] w-[18px] shrink-0 rounded-full bg-slate-100 object-cover shadow-sm ring-1 ring-black/10"
                       />
                       <span className="truncate">{lang.label}</span>
                     </button>

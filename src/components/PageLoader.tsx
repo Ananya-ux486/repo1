@@ -12,6 +12,24 @@ export default function PageLoader() {
 
   useEffect(() => {
     const body = document.body;
+
+    // Language switches reload the page — skip the long intro so it feels instant.
+    let skipLoader = false;
+    try {
+      skipLoader = sessionStorage.getItem("tf-skip-loader") === "1";
+      if (skipLoader) sessionStorage.removeItem("tf-skip-loader");
+    } catch {
+      /* private mode */
+    }
+
+    if (skipLoader) {
+      body.dataset.tfLoading = "done";
+      releaseDocumentScroll();
+      window.dispatchEvent(new CustomEvent("tf-loader-done"));
+      setPhase("gone");
+      return;
+    }
+
     body.dataset.tfLoading = "true";
 
     let finished = false;

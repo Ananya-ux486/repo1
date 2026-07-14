@@ -4,12 +4,30 @@
  */
 const IMG = "/images";
 
-/** Local language-switcher flag (bundled under public/images/flags/lang/) */
+/**
+ * Country flag for a language row.
+ * Uses FlagCDN SVG (always the correct country) — language switch already needs network
+ * for Google Translate, so this does not add a new dependency.
+ */
+/**
+ * Country flag for a language row.
+ * Prefers local dial-code flags (fast, offline-safe). CDN is only used as img onError fallback.
+ */
 export function languageFlag(code: string): string {
   const normalized = code
-    .replace(/^gb-(sct|wls)$/i, "gb")
-    .replace(/^eu$/i, "eu");
-  return `${IMG}/flags/lang/${normalized}.png`;
+    .trim()
+    .toLowerCase()
+    .replace(/^gb-(sct|wls)$/i, "gb");
+  return `${IMG}/flags/dial/${normalized}.png`;
+}
+
+/** CDN fallback when a local dial flag file is missing */
+export function languageFlagCdn(code: string): string {
+  const normalized = code
+    .trim()
+    .toLowerCase()
+    .replace(/^gb-(sct|wls)$/i, (_, region: string) => `gb-${region.toLowerCase()}`);
+  return `https://flagcdn.com/w80/${normalized}.png`;
 }
 
 /** Phone dial-code flags (bundled under public/images/flags/dial/) */
@@ -17,7 +35,8 @@ export function dialFlag(code: string): string {
   return `${IMG}/flags/dial/${code.toLowerCase()}.png`;
 }
 
-export const DEFAULT_LANGUAGE_FLAG = `${IMG}/flags/lang/us.png`;
+/** Fallback only when a flag CDN request fails for a genuine US/English row */
+export const DEFAULT_LANGUAGE_FLAG = `${IMG}/flags/dial/us.png`;
 
 export const images = {
   logo: `${IMG}/brand/tasmafive-logo.svg`,

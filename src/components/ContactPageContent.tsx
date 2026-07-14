@@ -94,7 +94,7 @@ export default function ContactPageContent() {
   };
 
   return (
-    <div className="relative overflow-hidden pb-12 pt-3 lg:pb-16 lg:pt-4">
+    <div className="relative overflow-hidden contact-page-shell pb-12 pt-3 lg:pb-16 lg:pt-4">
       <div
         className="pointer-events-none absolute -left-24 top-10 h-64 w-64 rounded-full bg-brand/[0.06] blur-3xl"
         aria-hidden
@@ -251,7 +251,7 @@ export default function ContactPageContent() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.08, ease: floatEase }}
-            className="rounded-3xl border border-border/80 bg-white p-5 shadow-md sm:p-7 lg:p-8"
+            className="contact-form-card rounded-3xl border border-border/80 bg-white p-5 shadow-md sm:p-7 lg:p-8"
           >
             <div className="mb-5 flex items-start gap-3 border-b border-border/60 pb-4">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-orange-400 text-white shadow-sm">

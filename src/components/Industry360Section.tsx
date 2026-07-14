@@ -2,10 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { industries } from "@/data/siteData";
 import { IMAGE_BLUR } from "@/lib/motion";
-import { floatEase } from "@/lib/floatMotion";
 import { FloatBlock, FloatImageWrap, FloatLine } from "@/components/FloatReveal";
 import { useScrollReplay } from "@/lib/useScrollReplay";
 import {
@@ -79,13 +77,7 @@ function OrbitalHub() {
 
 function IndustryCard({ name, image }: { name: string; image: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.7, ease: floatEase }}
-      className="flex w-[110px] shrink-0 flex-col items-center sm:w-[120px]"
-    >
+    <div className="flex w-[110px] shrink-0 flex-col items-center sm:w-[120px]">
       <FloatImageWrap
         scroll={false}
         replayKey={0}
@@ -107,7 +99,7 @@ function IndustryCard({ name, image }: { name: string; image: string }) {
       <p className="mt-1.5 text-center text-[11px] font-semibold text-brand sm:text-xs">
         {name}
       </p>
-    </motion.div>
+    </div>
   );
 }
 
