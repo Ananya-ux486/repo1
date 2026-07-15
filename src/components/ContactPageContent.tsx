@@ -108,7 +108,8 @@ export default function ContactPageContent() {
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.35 }}
           transition={{ duration: 0.4, ease: floatEase }}
           className="mb-7 text-center lg:mb-9"
         >
@@ -140,7 +141,8 @@ export default function ContactPageContent() {
           {/* Left — contact details */}
           <motion.aside
             initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.45, delay: 0.05, ease: floatEase }}
             className="flex flex-col gap-3"
           >
@@ -249,7 +251,8 @@ export default function ContactPageContent() {
           {/* Right — form */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.15 }}
             transition={{ duration: 0.45, delay: 0.08, ease: floatEase }}
             className="contact-form-card rounded-3xl border border-border/80 bg-white p-5 shadow-md sm:p-7 lg:p-8"
           >

@@ -1,11 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { indiaPresence, internationalPresence } from "@/data/siteData";
 import { IMAGE_BLUR } from "@/lib/motion";
-import { floatEase } from "@/lib/floatMotion";
-import { FloatImageWrap, FloatLine } from "@/components/FloatReveal";
+import { FloatLine } from "@/components/FloatReveal";
 import { useScrollReplay } from "@/lib/useScrollReplay";
 
 function IndiaCard({
@@ -17,34 +15,27 @@ function IndiaCard({
   landmark: string;
   image: string;
 }) {
+  // Marquee cards must stay visible — whileInView/opacity gates break under CSS transforms.
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 60 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.75, ease: floatEase }}
-      className="group w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-white shadow-sm sm:w-[260px]"
-    >
-      <FloatImageWrap scroll={false} replayKey={0} className="aspect-[4/3]">
-        <div className="relative aspect-[4/3] overflow-hidden">
-          <Image
-            src={image}
-            alt={`${landmark}, ${city}`}
-            fill
-            loading="lazy"
-            placeholder="blur"
-            blurDataURL={IMAGE_BLUR}
-            className="object-cover transition duration-500 group-hover:scale-105"
-            sizes="260px"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <p className="text-sm font-semibold text-white">{city}</p>
-            <p className="text-[10px] text-white/50">{landmark}</p>
-          </div>
+    <div className="group w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-white shadow-sm sm:w-[260px]">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <Image
+          src={image}
+          alt={`${landmark}, ${city}`}
+          fill
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR}
+          className="object-cover transition duration-500 group-hover:scale-105"
+          sizes="260px"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          <p className="text-sm font-semibold text-white">{city}</p>
+          <p className="text-[10px] text-white/50">{landmark}</p>
         </div>
-      </FloatImageWrap>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -56,13 +47,7 @@ function FlagCard({
   image: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, ease: floatEase }}
-      className="group flex w-[180px] shrink-0 flex-col items-center rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:border-brand/30 sm:w-[200px]"
-    >
+    <div className="group flex w-[180px] shrink-0 flex-col items-center rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:border-brand/30 sm:w-[200px]">
       <div className="relative mb-4 flex h-[72px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-slate-50 p-2 shadow-inner sm:h-20">
         <Image
           src={image}
@@ -74,7 +59,7 @@ function FlagCard({
         />
       </div>
       <p className="text-center text-sm font-semibold text-foreground">{country}</p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -112,9 +97,13 @@ function CssMarquee({
 export default function PresenceSection() {
   const indiaReplay = useScrollReplay(0.15);
   const intlReplay = useScrollReplay(0.15);
+  const active = indiaReplay.isInView || intlReplay.isInView;
 
   return (
-    <section className="relative overflow-hidden py-12 pastel-section lg:py-16">
+    <section
+      data-tf-active={active ? "1" : "0"}
+      className="relative overflow-hidden py-12 pastel-section lg:py-16"
+    >
       <div ref={indiaReplay.ref} className="mx-auto mb-8 max-w-7xl px-4 text-center lg:px-8">
         <FloatLine replayKey={indiaReplay.replayKey}>
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">

@@ -34,7 +34,7 @@ export function ReplayMotion({
   as = "div",
   ...rest
 }: ReplayMotionProps) {
-  const { ref, replayKey } = useScrollReplay(amount);
+  const { ref, play } = useScrollReplay(amount);
   const Component = motion[as];
 
   let preset: {
@@ -64,11 +64,11 @@ export function ReplayMotion({
   return (
     <Component
       ref={ref}
-      key={replayKey}
       initial={preset.initial}
-      animate={preset.animate}
-      transition={{ ...preset.transition, delay: staggerDelay(index) }}
+      animate={play ? preset.animate : preset.initial}
+      transition={{ ...preset.transition, delay: play ? staggerDelay(index) : 0 }}
       className={className}
+      style={{ willChange: play ? "transform, opacity" : "auto" }}
     >
       {children}
     </Component>

@@ -485,6 +485,7 @@ function PostTile({
 
 export default function InstagramFeedSection() {
   const { ref, replayKey, isInView } = useScrollReplay(0.15);
+  // isInView also pauses CSS marquees via data-tf-active
   const [posts, setPosts] = useState<InstagramPost[]>(fallbackInstagramPosts);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isLive, setIsLive] = useState(false);
@@ -524,6 +525,7 @@ export default function InstagramFeedSection() {
   return (
     <section
       ref={ref}
+      data-tf-active={isInView ? "1" : "0"}
       className="instagram-feed-section relative overflow-hidden bg-transparent py-8 lg:py-11"
       aria-labelledby="instagram-feed-heading"
     >
@@ -586,12 +588,10 @@ export default function InstagramFeedSection() {
 
         {/* Desktop / laptop — original 6-col grid (untouched layout) */}
         <motion.div
-          key={replayKey}
           className="mx-auto hidden max-w-6xl gap-4 lg:grid lg:grid-cols-6"
           variants={containerVariants}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2, margin: "0px 0px -40px 0px" }}
+          animate={replayKey > 0 && isInView ? "visible" : "hidden"}
         >
           {visiblePosts.map((post, i) => (
             <PostTile
@@ -606,7 +606,7 @@ export default function InstagramFeedSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
+          viewport={{ once: false, amount: 0.5 }}
           transition={{
             delay: floatStagger(VISIBLE_COUNT, 0.08),
             duration: 0.6,

@@ -3,28 +3,68 @@
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 
+type Options = {
+  amount?: number;
+  /** When false, no IntersectionObserver work and play stays false until driven externally. */
+  enabled?: boolean;
+};
+
 /**
- * Fires enter animation once when element first scrolls into view.
- * (Previously re-triggered on every re-entry — that made the site feel laggy.)
+ * Replays enter animations every time the element scrolls back into view.
+ * Prefer driving `Float*` via `replayKey`/`play` — never remount heavy trees.
  */
-export function useScrollReplay(amount = 0.15) {
+export function useScrollReplay(amountOrOpts: number | Options = 0.15) {
+  const opts =
+    typeof amountOrOpts === "number"
+      ? { amount: amountOrOpts, enabled: true }
+      : { amount: 0.15, enabled: true, ...amountOrOpts };
+
+  const enabled = opts.enabled !== false;
+  const amount = opts.amount ?? 0.15;
+
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, {
     amount,
-    margin: "0px 0px -40px 0px",
-    once: true,
+    margin: "0px 0px -8% 0px",
+    once: false,
   });
-  const fired = useRef(false);
+  const wasInView = useRef(false);
   const [replayKey, setReplayKey] = useState(0);
+  const [play, setPlay] = useState(false);
+  const cooldown = useRef(0);
 
   useEffect(() => {
-    if (isInView && !fired.current) {
-      fired.current = true;
-      setReplayKey(1);
-    }
-  }, [isInView]);
+    if (!enabled) return;
 
-  return { ref, replayKey, isInView };
+    const now = performance.now();
+
+    if (isInView && !wasInView.current) {
+      if (now - cooldown.current < 140) {
+        wasInView.current = isInView;
+        return;
+      }
+      cooldown.current = now;
+      setReplayKey((k) => k + 1);
+      setPlay(false);
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setPlay(true));
+      });
+      wasInView.current = true;
+      return () => cancelAnimationFrame(id);
+    }
+
+    if (!isInView && wasInView.current) {
+      setPlay(false);
+      wasInView.current = false;
+    }
+  }, [isInView, enabled]);
+
+  return {
+    ref,
+    replayKey,
+    play,
+    isInView: enabled ? isInView : false,
+  };
 }
 
 export const replayEnter = {

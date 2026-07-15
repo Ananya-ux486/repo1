@@ -13,11 +13,12 @@ import {
  * Keeps orb animations + float reveal; layout is denser and more professional.
  */
 export default function CreativeStrip() {
-  const { ref, replayKey } = useScrollReplay(0.2);
+  const { ref, replayKey, isInView } = useScrollReplay(0.2);
 
   return (
     <section
       ref={ref}
+      data-tf-active={isInView ? "1" : "0"}
       className="creative-strip-section relative overflow-hidden py-6 lg:py-9"
     >
       <div className="mx-auto max-w-7xl px-4 lg:px-8">

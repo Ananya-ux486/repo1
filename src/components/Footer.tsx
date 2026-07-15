@@ -67,7 +67,7 @@ export default function Footer() {
       <div className="relative mx-auto max-w-7xl px-4 py-12 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:px-8 lg:py-16 lg:pb-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {/* Brand */}
-          <div className="rounded-2xl border border-white/70 bg-white/55 p-5 shadow-sm backdrop-blur-sm lg:p-6">
+          <div className="min-w-0 rounded-2xl border border-white/70 bg-white/55 p-5 shadow-sm backdrop-blur-sm lg:p-6">
             <Link href="/" className="inline-block transition hover:opacity-90">
               <Image
                 src={images.logo}
@@ -102,7 +102,7 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div className="rounded-2xl border border-white/70 bg-white/45 p-5 backdrop-blur-sm lg:border-transparent lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+          <div className="min-w-0 rounded-2xl border border-white/70 bg-white/45 p-5 backdrop-blur-sm lg:border-transparent lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
             <FooterHeading>Quick Links</FooterHeading>
             <ul className="space-y-1">
               {navLinks.map((link) => (
@@ -122,7 +122,7 @@ export default function Footer() {
           </div>
 
           {/* Our Services — deep links to pricing / detail sections */}
-          <div className="rounded-2xl border border-white/70 bg-white/45 p-5 backdrop-blur-sm lg:border-transparent lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+          <div className="min-w-0 rounded-2xl border border-white/70 bg-white/45 p-5 backdrop-blur-sm lg:border-transparent lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
             <FooterHeading>Our Services</FooterHeading>
             <ul className="space-y-1">
               {footerServices.map((item) => (
@@ -142,35 +142,38 @@ export default function Footer() {
           </div>
 
           {/* Contact */}
-          <div className="rounded-2xl border border-brand/15 bg-gradient-to-br from-white/80 to-orange-50/50 p-5 shadow-sm backdrop-blur-sm lg:p-6">
+          <div className="min-w-0 rounded-2xl border border-brand/15 bg-gradient-to-br from-white/80 to-orange-50/50 p-5 shadow-sm backdrop-blur-sm lg:p-6">
             <FooterHeading>Contact Us</FooterHeading>
-            <ul className="space-y-3.5 text-sm text-muted">
-              <li className="flex items-start gap-2.5 max-lg:break-words">
+            <ul className="min-w-0 space-y-3.5 text-sm text-muted">
+              <li className="flex min-w-0 items-start gap-2.5">
                 <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
                   <MapPin className="h-3.5 w-3.5" />
                 </span>
-                {siteConfig.address}
+                <span className="min-w-0 break-words leading-relaxed">
+                  {siteConfig.address}
+                </span>
               </li>
               {siteConfig.phones.map((phone) => (
-                <li key={phone} className="flex items-center gap-2.5">
+                <li key={phone} className="flex min-w-0 items-center gap-2.5">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
                     <Phone className="h-3.5 w-3.5" />
                   </span>
                   <a
                     href={`tel:${phone}`}
-                    className="font-medium transition hover:text-brand"
+                    className="min-w-0 font-medium transition hover:text-brand"
                   >
                     {phone}
                   </a>
                 </li>
               ))}
-              <li className="flex items-center gap-2.5">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+              <li className="flex min-w-0 items-start gap-2.5">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
                   <Mail className="h-3.5 w-3.5" />
                 </span>
                 <a
                   href={`mailto:${siteConfig.email}`}
-                  className="font-medium transition hover:text-brand"
+                  className="min-w-0 break-all text-[13px] font-medium leading-snug transition hover:text-brand sm:text-sm"
+                  title={siteConfig.email}
                 >
                   {siteConfig.email}
                 </a>

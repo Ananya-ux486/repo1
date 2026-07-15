@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { IMAGE_BLUR } from "@/lib/motion";
-import { FloatBlock, FloatLine } from "@/components/FloatReveal";
+import { FloatBlock, FloatLine, useReplayPlay } from "@/components/FloatReveal";
 import { useScrollReplay } from "@/lib/useScrollReplay";
 
 export type PortfolioCardItem = {
@@ -35,32 +35,33 @@ export function AnimatedPortfolioCard({
   showDetails?: boolean;
   replayKey?: number;
 }) {
-  const cardReplay = useScrollReplay(0.12);
+  const useSectionKey = sectionReplayKey !== undefined;
+  const cardReplay = useScrollReplay({
+    amount: 0.12,
+    enabled: !useSectionKey,
+  });
+  const sectionPlay = useReplayPlay(sectionReplayKey, false);
   const cardClass = `group overflow-hidden rounded-3xl border border-border bg-white shadow-md ${
     tall ? "lg:row-span-2" : ""
   }`;
 
-  // Section replay syncs all cards; fallback = per-card replay when section key is 0
-  const playKey =
-    sectionReplayKey !== undefined && sectionReplayKey > 0
-      ? `section-${sectionReplayKey}-${index}`
-      : `card-${cardReplay.replayKey}-${index}`;
-
-  const attachRef = sectionReplayKey !== undefined ? undefined : cardReplay.ref;
+  // Section replay OR per-card observer — animate without remounting images
+  const play = useSectionKey ? sectionPlay : cardReplay.play;
 
   const motionProps = {
-    ref: attachRef,
-    ...cardEnter,
+    ref: useSectionKey ? undefined : cardReplay.ref,
+    initial: cardEnter.initial,
+    animate: play ? cardEnter.animate : cardEnter.initial,
     transition: {
       duration: 0.45,
-      delay: Math.min(index * 0.05, 0.2),
+      delay: play ? Math.min(index * 0.05, 0.2) : 0,
       ease: cardEase,
     },
   };
 
   if (showDetails) {
     return (
-      <motion.article key={playKey} {...motionProps} className={cardClass}>
+      <motion.article {...motionProps} className={cardClass}>
         <div className={`relative overflow-hidden ${tall ? "aspect-[16/11] sm:aspect-[4/5]" : "aspect-[16/11] sm:aspect-[4/3]"}`}>
           <Image
             src={item.image}
@@ -103,7 +104,7 @@ export function AnimatedPortfolioCard({
   }
 
   return (
-    <motion.article key={playKey} {...motionProps} className={`${cardClass} relative`}>
+    <motion.article {...motionProps} className={`${cardClass} relative`}>
       <div
         className={`relative overflow-hidden ${
           tall ? "aspect-[16/11] sm:aspect-[3/4] lg:aspect-auto lg:h-full lg:min-h-[480px]" : "aspect-[16/11] sm:aspect-[4/3]"

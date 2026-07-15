@@ -59,10 +59,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang="en" className={`${geistSans.variable} antialiased`} data-tf-scroll="native">
       <body
-        className="textured-bg h-full overflow-hidden text-foreground"
+        className="textured-bg text-foreground"
         data-tf-loading="true"
+        data-tf-scroll="native"
       >
         <PageLoader />
         <RouteProgress />
@@ -70,7 +71,7 @@ export default function RootLayout({
         <ScrollLock />
         <RouteMark />
         <Header />
-        {/* Same scroll model as language dropdown: nested overflow-y:auto (trackpad works). */}
+        {/* Native document scroll — browser scrollbar + trackpad. #tf-page-scroll is a marker only. */}
         <div id="tf-page-scroll" className="tf-page-scroll">
           <div id="app-root" className="block w-full">
             <MotionProvider>

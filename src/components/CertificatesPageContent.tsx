@@ -2,24 +2,39 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, X, ShieldCheck, BadgeCheck, ExternalLink, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import {
+  Award,
+  X,
+  ShieldCheck,
+  BadgeCheck,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Building2,
+  FileCheck2,
+  Trophy,
+  Factory,
+  Lock,
+} from "lucide-react";
+import { lockPageScroll, unlockPageScroll } from "@/lib/scrollLock";
 
-/* ─── Certificate data ─────────────────────────────────────────── */
+/* ─── Certificate data (files in /public/certificates/) ─────────── */
 const CERTIFICATES = [
   {
     id: "startup-india",
     label: "DPIIT Recognised Startup",
     sublabel: "Startup India · Certificate No. DIPP259927",
     badge: "GOI",
-    badgeGradient: "from-blue-500 via-blue-600 to-indigo-700",
-    cardGlow: "hover:shadow-blue-200/60",
-    borderAccent: "border-blue-200",
-    iconBg: "bg-blue-50",
-    stripeGradient: "from-blue-500 to-indigo-600",
+    badgeGradient: "from-sky-500 via-blue-600 to-indigo-700",
+    cardGlow: "hover:shadow-blue-200/70",
+    borderAccent: "border-blue-200/80",
+    iconBg: "bg-blue-50 text-blue-600",
+    stripeGradient: "from-sky-500 to-indigo-600",
     file: "/certificates/startup-india.pdf",
     issued: "07 May 2026",
-    icon: "🇮🇳",
     authority: "Govt. of India",
+    Icon: Building2,
   },
   {
     id: "gst",
@@ -27,14 +42,14 @@ const CERTIFICATES = [
     sublabel: "GSTIN: 09AAZFT7005M1ZA",
     badge: "GST",
     badgeGradient: "from-emerald-500 via-green-600 to-teal-700",
-    cardGlow: "hover:shadow-green-200/60",
-    borderAccent: "border-green-200",
-    iconBg: "bg-emerald-50",
+    cardGlow: "hover:shadow-emerald-200/70",
+    borderAccent: "border-emerald-200/80",
+    iconBg: "bg-emerald-50 text-emerald-600",
     stripeGradient: "from-emerald-500 to-teal-600",
     file: "/certificates/gst-registration.pdf",
     issued: "10 Apr 2026",
-    icon: "📋",
     authority: "Govt. of India",
+    Icon: FileCheck2,
   },
   {
     id: "iso-9001",
@@ -42,35 +57,69 @@ const CERTIFICATES = [
     sublabel: "Quality Management Systems · ICV Assessments",
     badge: "ISO",
     badgeGradient: "from-orange-500 via-amber-500 to-yellow-500",
-    cardGlow: "hover:shadow-orange-200/60",
-    borderAccent: "border-orange-200",
-    iconBg: "bg-orange-50",
+    cardGlow: "hover:shadow-orange-200/70",
+    borderAccent: "border-orange-200/80",
+    iconBg: "bg-orange-50 text-brand",
     stripeGradient: "from-orange-500 to-amber-500",
     file: "/certificates/iso-9001.pdf",
     issued: "13 Apr 2026",
-    icon: "🏆",
     authority: "ICV Assessments",
+    Icon: Trophy,
   },
   {
     id: "udyam",
     label: "MSME Udyam Registration",
     sublabel: "UDYAM-UP-43-0185264 · Micro Enterprise",
     badge: "MSME",
-    badgeGradient: "from-purple-500 via-violet-600 to-purple-700",
-    cardGlow: "hover:shadow-purple-200/60",
-    borderAccent: "border-purple-200",
-    iconBg: "bg-purple-50",
-    stripeGradient: "from-purple-500 to-violet-600",
+    badgeGradient: "from-violet-500 via-purple-600 to-fuchsia-700",
+    cardGlow: "hover:shadow-violet-200/70",
+    borderAccent: "border-violet-200/80",
+    iconBg: "bg-violet-50 text-violet-600",
+    stripeGradient: "from-violet-500 to-purple-600",
     file: "/certificates/udyam-registration.pdf",
     issued: "14 Apr 2026",
-    icon: "🏢",
     authority: "Ministry of MSME",
+    Icon: Factory,
   },
-];
+] as const;
 
 type Cert = (typeof CERTIFICATES)[number];
 
-/* ─── Canvas PDF Renderer ───────────────────────────────────────── */
+const ease = [0.22, 1, 0.36, 1] as const;
+
+/** Draw repeating watermark on rendered certificate canvas */
+function watermarkCanvas(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+) {
+  ctx.save();
+  ctx.globalAlpha = 0.11;
+  ctx.fillStyle = "#0f172a";
+  ctx.font = `bold ${Math.max(18, width / 20)}px system-ui, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.translate(width / 2, height / 2);
+  ctx.rotate(-Math.PI / 5);
+  const line = "TASMAFIVE · VIEW ONLY";
+  for (let y = -height; y < height; y += 72) {
+    ctx.fillText(line, 0, y);
+    ctx.fillText(line, -width * 0.35, y + 36);
+    ctx.fillText(line, width * 0.35, y + 36);
+  }
+  ctx.restore();
+}
+
+async function clearClipboard() {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText("");
+    }
+  } catch {
+    /* denied — ok */
+  }
+}
+
+/* ─── Canvas PDF Renderer (view-only) ───────────────────────────── */
 function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,51 +134,56 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
   const renderPage = useCallback(async (pageNum: number) => {
     if (!pdfDocRef.current || !canvasRef.current) return;
     try {
-      // Cancel any ongoing render
       if (renderTaskRef.current) {
-        renderTaskRef.current.cancel();
+        try {
+          renderTaskRef.current.cancel();
+        } catch {
+          /* ignore */
+        }
         renderTaskRef.current = null;
       }
+
       const page = await pdfDocRef.current.getPage(pageNum);
       const container = containerRef.current;
-      const containerWidth = container ? container.clientWidth - 2 : 680;
-      const viewport = page.getViewport({ scale: 1 });
-      const scale = containerWidth / viewport.width;
-      const scaledViewport = page.getViewport({ scale });
+      const viewportW =
+        typeof window !== "undefined" ? window.innerWidth : 680;
+      const containerWidth = Math.max(
+        260,
+        (container?.clientWidth ?? 680) - 8,
+      );
+      // On phones render wider than the screen so text stays readable;
+      // horizontal pan + outer vertical scroll let the whole page move.
+      const layoutWidth =
+        viewportW < 768
+          ? Math.min(820, Math.max(containerWidth * 1.7, 620))
+          : containerWidth;
+      const base = page.getViewport({ scale: 1 });
+      const scale = Math.min(2.4, layoutWidth / base.width);
+      const viewport = page.getViewport({ scale });
 
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { alpha: false });
       if (!ctx) return;
 
-      canvas.width = scaledViewport.width;
-      canvas.height = scaledViewport.height;
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      canvas.style.width = `${Math.floor(viewport.width)}px`;
+      canvas.style.height = `${Math.floor(viewport.height)}px`;
 
-      const renderTask = page.render({ canvasContext: ctx, viewport: scaledViewport });
+      const renderTask = page.render({
+        canvasContext: ctx,
+        viewport,
+        canvas,
+      });
       renderTaskRef.current = renderTask;
-
       await renderTask.promise;
       renderTaskRef.current = null;
 
-      // Draw watermark overlay on canvas
-      ctx.save();
-      ctx.globalAlpha = 0.06;
-      ctx.font = `bold ${Math.max(18, scaledViewport.width / 20)}px Arial`;
-      ctx.fillStyle = "#1e293b";
-      ctx.translate(scaledViewport.width / 2, scaledViewport.height / 2);
-      ctx.rotate(-Math.PI / 5);
-      ctx.textAlign = "center";
-      const wm = "TASMAFIVE SOLUTIONS LLP";
-      for (let y = -scaledViewport.height; y < scaledViewport.height; y += 120) {
-        ctx.fillText(wm, 0, y);
-        ctx.fillText(wm, -scaledViewport.width / 2, y + 60);
-        ctx.fillText(wm, scaledViewport.width / 2, y + 60);
-      }
-      ctx.restore();
-
+      watermarkCanvas(ctx, canvas.width, canvas.height);
       setLoading(false);
+      setError(false);
     } catch (e: unknown) {
-      // Ignore cancelled renders
-      if (e instanceof Error && e.message === "Rendering cancelled") return;
+      if (e instanceof Error && /cancel/i.test(e.message)) return;
       setError(true);
       setLoading(false);
     }
@@ -140,13 +194,19 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
     setLoading(true);
     setError(false);
     setCurrentPage(1);
+    pdfDocRef.current = null;
 
     const load = async () => {
       try {
         const pdfjsLib = await import("pdfjs-dist");
         pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
-        const loadingTask = pdfjsLib.getDocument(file);
+        const loadingTask = pdfjsLib.getDocument({
+          url: file,
+          withCredentials: false,
+          isEvalSupported: false,
+          useSystemFonts: true,
+        });
         const pdf = await loadingTask.promise;
         if (cancelled) return;
         pdfDocRef.current = pdf;
@@ -160,70 +220,103 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
       }
     };
 
-    load();
-    return () => { cancelled = true; };
+    void load();
+    return () => {
+      cancelled = true;
+      if (renderTaskRef.current) {
+        try {
+          renderTaskRef.current.cancel();
+        } catch {
+          /* ignore */
+        }
+      }
+    };
   }, [file, renderPage]);
 
   useEffect(() => {
-    if (pdfDocRef.current) {
-      setLoading(true);
-      renderPage(currentPage);
+    if (!pdfDocRef.current || currentPage < 1) return;
+    setLoading(true);
+    void renderPage(currentPage);
+  }, [currentPage, renderPage]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") {
+      const onResize = () => {
+        if (pdfDocRef.current) void renderPage(currentPage);
+      };
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
     }
+    let t = 0;
+    const ro = new ResizeObserver(() => {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        if (pdfDocRef.current) void renderPage(currentPage);
+      }, 120);
+    });
+    ro.observe(el);
+    return () => {
+      window.clearTimeout(t);
+      ro.disconnect();
+    };
   }, [currentPage, renderPage]);
 
   return (
     <div
       ref={containerRef}
-      className="relative select-none bg-slate-100 flex flex-col items-center"
-      style={{ minHeight: 460 }}
+      className="cert-protected relative flex min-h-[240px] w-full flex-col items-stretch overflow-x-auto overscroll-x-contain bg-slate-100 sm:min-h-[360px] sm:items-center"
       onContextMenu={(e) => e.preventDefault()}
       onDragStart={(e) => e.preventDefault()}
     >
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 z-20">
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-100">
           <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
         </div>
       )}
       {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 z-20 gap-2">
-          <p className="text-sm text-slate-500 font-medium">Unable to load certificate</p>
-          <p className="text-xs text-slate-400">Please try again later</p>
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-slate-100 px-4 text-center">
+          <Lock className="h-8 w-8 text-slate-300" />
+          <p className="text-sm font-medium text-slate-500">
+            Unable to load certificate
+          </p>
+          <p className="text-xs text-slate-400">
+            Check your connection and try again
+          </p>
         </div>
       )}
 
-      {/* Canvas — PDF renders here, no right-click menu */}
       <canvas
         ref={canvasRef}
-        className="w-full block"
-        style={{
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          pointerEvents: "none", // prevents any interaction
-        }}
+        className="cert-canvas mx-auto block h-auto max-w-none"
         aria-label={label}
+        draggable={false}
       />
 
-      {/* Transparent shield overlay — blocks all mouse events on canvas */}
+      {/* Interaction shield — blocks save-as / long-press / selection */}
       <div
-        aria-hidden="true"
-        className="absolute inset-0 z-10"
-        style={{
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          cursor: "default",
-        }}
+        aria-hidden
+        className="cert-shield absolute inset-0 z-10"
         onContextMenu={(e) => e.preventDefault()}
         onMouseDown={(e) => e.preventDefault()}
         onDragStart={(e) => e.preventDefault()}
+        onTouchStart={(e) => {
+          /* Kill iOS/Android image callout / long-press save */
+          if (e.touches.length > 1) e.preventDefault();
+        }}
       />
 
-      {/* Page controls */}
+      {/* Extra CSS watermark layer so OS screenshots still show VIEW ONLY */}
+      <div aria-hidden className="cert-watermark-layer" />
+
       {totalPages > 1 && (
-        <div className="relative z-20 flex items-center gap-3 py-2.5 bg-white/90 w-full justify-center border-t border-slate-100">
+        <div className="relative z-20 flex w-full items-center justify-center gap-3 border-t border-slate-100 bg-white/95 py-2.5">
           <button
+            type="button"
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 disabled:opacity-40 hover:bg-slate-200 transition"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 transition hover:bg-slate-200 disabled:opacity-40"
+            aria-label="Previous page"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -231,9 +324,11 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
             {currentPage} / {totalPages}
           </span>
           <button
+            type="button"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 disabled:opacity-40 hover:bg-slate-200 transition"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 transition hover:bg-slate-200 disabled:opacity-40"
+            aria-label="Next page"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -243,61 +338,165 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
   );
 }
 
-/* ─── Protected Viewer Modal ────────────────────────────────────── */
+/* ─── Protected Viewer (full overlay scrolls as one unit) ───────── */
 function ProtectedViewer({ cert, onClose }: { cert: Cert; onClose: () => void }) {
-  // Block keyboard shortcuts: Ctrl+S, Ctrl+P, Ctrl+C
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && ["s", "p", "c", "a"].includes(e.key.toLowerCase())) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-    window.addEventListener("keydown", handler, true);
-    return () => window.removeEventListener("keydown", handler, true);
+  const [blurred, setBlurred] = useState(false);
+  const Icon = cert.Icon;
+  const privacyTimer = useRef(0);
+
+  const flashPrivacy = useCallback((ms = 2800) => {
+    setBlurred(true);
+    void clearClipboard();
+    window.clearTimeout(privacyTimer.current);
+    privacyTimer.current = window.setTimeout(() => {
+      if (!document.hidden && document.hasFocus()) setBlurred(false);
+    }, ms);
   }, []);
 
-  return (
-    <AnimatePresence>
-      <motion.div
-        key="overlay"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-6"
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.93, y: 24 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.93, y: 24 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="relative flex w-full max-w-3xl flex-col rounded-3xl bg-white shadow-2xl overflow-hidden"
-          style={{ maxHeight: "92dvh" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Gradient top bar */}
-          <div className={`h-1 w-full bg-gradient-to-r ${cert.stripeGradient}`} />
+  useEffect(() => {
+    // Soft lock — keep html from scrolling under the overlay without body:fixed
+    // (body:fixed was collapsing the viewer height on mobile).
+    const html = document.documentElement;
+    const prevHtmlOverflow = html.style.overflow;
+    html.style.overflow = "hidden";
+    document.body.classList.add("cert-viewer-open");
+    lockPageScroll();
+    // Undo body:fixed side-effects from lockPageScroll for this viewer.
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    document.body.style.overflow = "hidden";
 
-          {/* Header */}
-          <div className="flex items-center justify-between gap-3 bg-white px-5 py-3.5 border-b border-slate-100">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${cert.iconBg} text-xl`}>
-                {cert.icon}
+    return () => {
+      unlockPageScroll();
+      html.style.overflow = prevHtmlOverflow;
+      document.body.classList.remove("cert-viewer-open");
+      window.clearTimeout(privacyTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const blockKeys = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase();
+      const key = e.key;
+
+      if (key === "PrintScreen" || key === "Snapshot") {
+        e.preventDefault();
+        e.stopPropagation();
+        flashPrivacy(3500);
+        return;
+      }
+
+      if (
+        ((e.ctrlKey || e.metaKey) &&
+          ["s", "p", "c", "a", "u"].includes(k)) ||
+        (e.ctrlKey && e.shiftKey && ["i", "j", "c", "s"].includes(k)) ||
+        (e.metaKey && e.shiftKey && ["3", "4", "5"].includes(k))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        flashPrivacy(2200);
+      }
+
+      if (key === "Escape") onClose();
+    };
+
+    const onVis = () => {
+      if (document.hidden || !document.hasFocus()) {
+        setBlurred(true);
+        void clearClipboard();
+      } else {
+        setBlurred(false);
+      }
+    };
+
+    const blockContext = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const blockCopy = (e: ClipboardEvent) => {
+      e.preventDefault();
+      flashPrivacy(1600);
+    };
+
+    const blockDrag = (e: DragEvent) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener("keydown", blockKeys, true);
+    window.addEventListener("keyup", blockKeys, true);
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("blur", onVis);
+    window.addEventListener("focus", onVis);
+    document.addEventListener("contextmenu", blockContext, true);
+    document.addEventListener("copy", blockCopy, true);
+    document.addEventListener("cut", blockCopy, true);
+    document.addEventListener("dragstart", blockDrag, true);
+    return () => {
+      window.removeEventListener("keydown", blockKeys, true);
+      window.removeEventListener("keyup", blockKeys, true);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("blur", onVis);
+      window.removeEventListener("focus", onVis);
+      document.removeEventListener("contextmenu", blockContext, true);
+      document.removeEventListener("copy", blockCopy, true);
+      document.removeEventListener("cut", blockCopy, true);
+      document.removeEventListener("dragstart", blockDrag, true);
+    };
+  }, [onClose, flashPrivacy]);
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-modal="true"
+      aria-label={cert.label}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="cert-viewer-overlay fixed inset-0 z-[2147482000] overflow-y-auto overscroll-contain bg-black/85 backdrop-blur-md"
+      onClick={onClose}
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      {/* Outer scroller — title + PDF + footer scroll together */}
+      <div className="flex min-h-[100dvh] items-start justify-center px-0 py-0 sm:items-center sm:px-4 sm:py-6 md:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 36, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 24, scale: 0.98 }}
+          transition={{ duration: 0.32, ease }}
+          className="cert-protected relative my-0 w-full max-w-3xl bg-white shadow-2xl sm:my-4 sm:rounded-3xl"
+          onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <div className={`h-1.5 w-full bg-gradient-to-r ${cert.stripeGradient}`} />
+
+          {/* Sticky toolbar so Close always stays reachable while scrolling */}
+          <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-slate-100 bg-white/95 px-3 py-3 backdrop-blur-sm supports-[padding:max(0px)]:pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-5">
+            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 ${cert.iconBg}`}
+              >
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold text-foreground">{cert.label}</p>
+                <p className="truncate text-sm font-bold text-foreground">
+                  {cert.label}
+                </p>
                 <p className="truncate text-[11px] text-muted">{cert.sublabel}</p>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <span className="hidden items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 sm:inline-flex">
                 <ShieldCheck className="h-3 w-3" /> View Only
               </span>
               <button
+                type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-foreground"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 hover:text-foreground"
                 aria-label="Close viewer"
               >
                 <X className="h-4 w-4" />
@@ -305,150 +504,203 @@ function ProtectedViewer({ cert, onClose }: { cert: Cert; onClose: () => void })
             </div>
           </div>
 
-          {/* Canvas viewer — scrollable */}
-          <div className="overflow-y-auto flex-1">
+          <div
+            className={`relative transition-[filter] duration-150 ${
+              blurred ? "blur-2xl brightness-75 contrast-75" : ""
+            }`}
+          >
             <CanvasPdfViewer file={cert.file} label={cert.label} />
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-slate-100 bg-slate-50 px-5 py-2.5 text-center text-[11px] text-slate-400">
-            🔒 Protected document — downloading, printing or saving is not permitted
+          {blurred && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-950/55 px-6 text-center">
+              <p className="rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-slate-700 shadow-xl">
+                Preview hidden — screenshots &amp; capture tools are blocked
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-center gap-1.5 border-t border-slate-100 bg-slate-50 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-[11px] text-slate-500">
+            <Lock className="h-3.5 w-3.5 shrink-0" />
+            Protected — download, print, save &amp; screenshot shortcuts are blocked
           </div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
-/* ─── Certificate card ──────────────────────────────────────────── */
-function CertCard({ cert, index, onView }: { cert: Cert; index: number; onView: () => void }) {
-  return (
-    <motion.div
-      custom={index}
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-30px" }}
-      transition={{ delay: index * 0.1, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -6, transition: { duration: 0.25 } }}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-md transition-shadow duration-300 hover:shadow-xl ${cert.cardGlow} ${cert.borderAccent}`}
-    >
-      <div className={`h-1.5 w-full bg-gradient-to-r ${cert.stripeGradient}`} />
-      <div className={`absolute inset-0 bg-gradient-to-br ${cert.stripeGradient} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500 pointer-events-none`} />
-
-      <div className="relative flex flex-1 flex-col p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-2 mb-4">
-          <div
-            className={`flex items-center justify-center rounded-2xl ${cert.iconBg} text-2xl shadow-sm border border-white`}
-            style={{ height: "3.25rem", width: "3.25rem" }}
-          >
-            {cert.icon}
-          </div>
-          <span className={`rounded-full bg-gradient-to-br ${cert.badgeGradient} px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow`}>
-            {cert.badge}
-          </span>
-        </div>
-
-        <h3 className="text-[15px] font-bold leading-snug text-foreground mb-1">{cert.label}</h3>
-        <p className="text-[11px] leading-relaxed text-muted mb-4">{cert.sublabel}</p>
-
-        <div className="mt-auto mb-4 flex items-center justify-between rounded-xl bg-slate-50 px-3.5 py-2.5 border border-slate-100">
-          <div>
-            <span className="block text-[9px] font-semibold uppercase tracking-widest text-slate-400 mb-0.5">Issued by</span>
-            <span className="text-[11px] font-semibold text-foreground">{cert.authority}</span>
-          </div>
-          <div className="text-right">
-            <span className="block text-[9px] font-semibold uppercase tracking-widest text-slate-400 mb-0.5">Date</span>
-            <span className="text-[11px] font-semibold text-foreground">{cert.issued}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 mb-3">
-          <BadgeCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-          <span className="text-[11px] font-medium text-emerald-600">Verified &amp; Active</span>
-        </div>
-
-        <button
-          onClick={onView}
-          className={`inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r ${cert.stripeGradient} px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:shadow-md hover:opacity-90 active:scale-[0.98]`}
-        >
-          <ExternalLink className="h-3.5 w-3.5" />
-          View Certificate
-        </button>
       </div>
     </motion.div>
   );
 }
 
-/* ─── Page content ──────────────────────────────────────────────── */
+/* ─── Certificate card ──────────────────────────────────────────── */
+function CertCard({
+  cert,
+  index,
+  onView,
+}: {
+  cert: Cert;
+  index: number;
+  onView: () => void;
+}) {
+  const Icon = cert.Icon;
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: false, margin: "-24px" }}
+      transition={{ delay: index * 0.08, duration: 0.55, ease }}
+      whileHover={{ y: -6, transition: { duration: 0.22 } }}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-md transition-shadow duration-300 hover:shadow-xl ${cert.cardGlow} ${cert.borderAccent}`}
+    >
+      <div className={`h-1.5 w-full bg-gradient-to-r ${cert.stripeGradient}`} />
+      <div
+        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${cert.stripeGradient} opacity-0 transition-opacity duration-500 group-hover:opacity-[0.04]`}
+      />
+
+      <div className="relative flex flex-1 flex-col p-4 sm:p-5 lg:p-6">
+        <div className="mb-3 flex items-start justify-between gap-2 sm:mb-4">
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-white shadow-sm sm:h-14 sm:w-14 ${cert.iconBg}`}
+          >
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+          </div>
+          <span
+            className={`rounded-full bg-gradient-to-br ${cert.badgeGradient} px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow`}
+          >
+            {cert.badge}
+          </span>
+        </div>
+
+        <h3 className="mb-1 text-[15px] font-bold leading-snug text-foreground">
+          {cert.label}
+        </h3>
+        <p className="mb-3 text-[11px] leading-relaxed text-muted sm:mb-4">
+          {cert.sublabel}
+        </p>
+
+        <div className="mb-3 mt-auto flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 sm:mb-4 sm:px-3.5">
+          <div className="min-w-0 pr-2">
+            <span className="mb-0.5 block text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+              Issued by
+            </span>
+            <span className="block truncate text-[11px] font-semibold text-foreground">
+              {cert.authority}
+            </span>
+          </div>
+          <div className="shrink-0 text-right">
+            <span className="mb-0.5 block text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+              Date
+            </span>
+            <span className="text-[11px] font-semibold text-foreground">
+              {cert.issued}
+            </span>
+          </div>
+        </div>
+
+        <div className="mb-3 flex items-center gap-1.5">
+          <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+          <span className="text-[11px] font-medium text-emerald-600">
+            Verified &amp; Active
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={onView}
+          className={`inline-flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r ${cert.stripeGradient} px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 hover:shadow-md active:scale-[0.98]`}
+        >
+          <Eye className="h-4 w-4" />
+          View Certificate
+        </button>
+      </div>
+    </motion.article>
+  );
+}
+
+/* ─── Page ──────────────────────────────────────────────────────── */
 export default function CertificatesPageContent() {
   const [active, setActive] = useState<Cert | null>(null);
 
   return (
     <>
-      <section className="relative overflow-hidden pastel-section section-glow pb-8 pt-3 lg:pb-10 lg:pt-4">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+      <section className="relative overflow-hidden pastel-section section-glow pb-6 pt-3 sm:pb-8 lg:pb-10 lg:pt-4">
+        <div className="pointer-events-none absolute -left-16 top-10 h-56 w-56 rounded-full bg-brand/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-64 w-64 rounded-full bg-sky-300/20 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.5, ease }}
             className="text-center"
           >
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-sm">
-              <Award className="h-7 w-7" />
-            </div>
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05, duration: 0.45, ease }}
+              className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-sm sm:mb-4 sm:h-14 sm:w-14"
+            >
+              <Award className="h-6 w-6 sm:h-7 sm:w-7" />
+            </motion.div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
               Accreditations &amp; Compliance
             </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl lg:text-[2.6rem] lg:leading-[1.15]">
+            <h1 className="mt-2 text-[1.75rem] font-black tracking-tight text-foreground sm:text-4xl lg:text-[2.6rem] lg:leading-[1.15]">
               Our <span className="iridescent-text">Certifications</span>
             </h1>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
-              TasmaFive Solutions is government-recognised, ISO-certified, and fully
-              compliant — proof of our commitment to quality, security, and delivery standards.
+              Government-recognised, ISO-certified, and fully compliant — view
+              official documents securely on any device.
             </p>
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18, duration: 0.45 }}
-              className="mt-5 flex flex-wrap items-center justify-center gap-2"
+              className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:mt-5"
             >
-              {[
-                { emoji: "🇮🇳", text: "DPIIT Startup India" },
-                { emoji: "📋", text: "GST Registered" },
-                { emoji: "🏆", text: "ISO 9001:2015" },
-                { emoji: "🏢", text: "MSME Certified" },
-              ].map((pill) => (
-                <span
-                  key={pill.text}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white/80 px-3 py-1 text-xs font-medium text-foreground/80 shadow-sm"
+              {CERTIFICATES.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setActive(c)}
+                  className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-border bg-white/85 px-3 py-1.5 text-xs font-medium text-foreground/80 shadow-sm backdrop-blur-sm transition hover:border-brand/40 hover:text-foreground"
                 >
-                  {pill.emoji} {pill.text}
-                </span>
+                  <c.Icon className="h-3.5 w-3.5 text-brand" />
+                  {c.badge}
+                </button>
               ))}
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 pt-4 lg:px-8 lg:pb-20">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mx-auto max-w-7xl px-4 pb-24 pt-1 sm:pb-16 sm:pt-2 lg:px-8 lg:pb-20">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
           {CERTIFICATES.map((cert, i) => (
-            <CertCard key={cert.id} cert={cert} index={i} onView={() => setActive(cert)} />
+            <CertCard
+              key={cert.id}
+              cert={cert}
+              index={i}
+              onView={() => setActive(cert)}
+            />
           ))}
         </div>
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-8 text-center text-xs text-muted/60"
+          viewport={{ once: false }}
+          transition={{ delay: 0.25, duration: 0.5 }}
+          className="mt-8 px-2 text-center text-xs text-muted/70"
         >
           <ShieldCheck className="mr-1 inline h-3.5 w-3.5 text-brand" />
-          All certificates are view-only. Downloading or saving is disabled to protect document integrity.
+          View-only gallery — right-click, download, print &amp; capture shortcuts
+          are blocked on desktop and mobile.
         </motion.p>
       </section>
 
-      {active && <ProtectedViewer cert={active} onClose={() => setActive(null)} />}
+      <AnimatePresence>
+        {active && (
+          <ProtectedViewer cert={active} onClose={() => setActive(null)} />
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -8,11 +8,12 @@ import {
 import { useScrollReplay } from "@/lib/useScrollReplay";
 
 export default function ExpertiseSection() {
-  const { ref, replayKey } = useScrollReplay(0.12);
+  const { ref, replayKey, isInView } = useScrollReplay(0.12);
 
   return (
     <section
       ref={ref}
+      data-tf-active={isInView ? "1" : "0"}
       className="relative overflow-hidden py-8 pastel-section section-glow lg:py-11"
     >
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -20,7 +21,7 @@ export default function ExpertiseSection() {
           replayKey={replayKey}
           eyebrow="Capabilities"
           title="Expertise &"
-          titleAccent="Capabilities."
+          titleAccent="Capabilities"
           description="Delivering secure, scalable, and high-performance IT solutions tailored for modern businesses — from architecture and development to ongoing support."
         />
 

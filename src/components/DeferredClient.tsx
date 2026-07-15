@@ -14,6 +14,6 @@ export function DeferredFloatingWidgets() {
 }
 
 export function DeferredAiChatbot() {
-  const ready = usePostLoaderReady(80);
+  const ready = usePostLoaderReady(900);
   return ready ? <AiChatbot /> : null;
 }

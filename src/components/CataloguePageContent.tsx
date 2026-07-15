@@ -179,7 +179,7 @@ export default function CataloguePageContent() {
                 key={item.title}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.25 }}
+                viewport={{ once: false, amount: 0.25 }}
                 transition={{
                   duration: 0.45,
                   delay: floatStagger(i, 0.06),
@@ -234,7 +234,7 @@ export default function CataloguePageContent() {
                   key={cat.title}
                   initial={{ opacity: 0, y: 28 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
+                  viewport={{ once: false, amount: 0.2 }}
                   transition={{
                     duration: 0.45,
                     delay: floatStagger(i % 4, 0.05),
@@ -337,7 +337,7 @@ export default function CataloguePageContent() {
                   key={feat.title}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
+                  viewport={{ once: false, amount: 0.2 }}
                   transition={{
                     duration: 0.45,
                     delay: floatStagger(i % 3, 0.06),
@@ -392,7 +392,7 @@ export default function CataloguePageContent() {
                   key={step}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
+                  viewport={{ once: false, amount: 0.4 }}
                   transition={{
                     duration: 0.4,
                     delay: floatStagger(i, 0.05),
@@ -435,7 +435,7 @@ export default function CataloguePageContent() {
                   key={faq.q}
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
+                  viewport={{ once: false, amount: 0.2 }}
                   transition={{
                     duration: 0.4,
                     delay: floatStagger(i, 0.04),
@@ -485,7 +485,7 @@ export default function CataloguePageContent() {
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
+            viewport={{ once: false, amount: 0.35 }}
             transition={{ duration: 0.5, ease: floatEase }}
             className="relative overflow-hidden rounded-3xl border border-brand/20 bg-gradient-to-br from-orange-50 via-white to-sky-50 shadow-sm"
           >

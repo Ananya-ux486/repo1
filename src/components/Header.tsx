@@ -45,7 +45,7 @@ export default function Header() {
     }`;
 
   return (
-    <header className="site-header border-b border-white/60 bg-gradient-to-r from-sky-100/90 via-white/85 to-pink-100/90 backdrop-blur-xl shadow-sm max-lg:pt-[env(safe-area-inset-top,0px)]">
+    <header className="site-header border-b border-white/60 bg-gradient-to-r from-sky-100/95 via-white/94 to-pink-100/95 shadow-sm backdrop-blur-md max-lg:pt-[env(safe-area-inset-top,0px)]">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 py-1.5 pl-2 pr-3 sm:gap-3 sm:pl-3 sm:pr-4 lg:gap-3 lg:py-2 lg:pl-3 lg:pr-4 xl:gap-4 xl:pl-5 xl:pr-6 2xl:pr-8">
         <Link href="/" className="group shrink-0">
           <motion.div whileHover={{ scale: 1.02 }} className="flex items-center">

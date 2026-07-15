@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   motion,
   useScroll,
@@ -131,16 +131,11 @@ function FanCard({
  */
 export default function CatalogueFanReveal() {
   const ref = useRef<HTMLElement>(null);
-  const scrollContainerRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion() ?? false;
 
-  useEffect(() => {
-    scrollContainerRef.current = document.getElementById("tf-page-scroll");
-  }, []);
-
+  // Window / document is the scroll root — do not bind a nested container.
   const { scrollYProgress } = useScroll({
     target: ref,
-    container: scrollContainerRef,
     offset: ["start 0.75", "center 0.45"],
   });
 

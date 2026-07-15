@@ -45,13 +45,20 @@ function AnimatedStat({
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const inView = useInView(ref, { once: false, amount: 0.5 });
   const [display, setDisplay] = useState(value);
 
   useEffect(() => {
-    if (!inView) return;
-
     const numeric = value.match(/^(\d+(?:\.\d+)?)/);
+
+    if (!inView) {
+      if (numeric) {
+        const suffix = value.slice(numeric[1].length);
+        setDisplay(`0${suffix}`);
+      }
+      return;
+    }
+
     if (!numeric) {
       setDisplay(value);
       return;
@@ -82,7 +89,7 @@ function AnimatedStat({
       ref={ref}
       initial={{ opacity: 0, y: 28, scale: 0.96 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.35 }}
+      viewport={{ once: false, amount: 0.35 }}
       transition={{ duration: 0.5, delay: floatStagger(index, 0.06), ease: floatEase }}
       whileHover={{ y: -4, scale: 1.02 }}
       className="glass-card rounded-2xl p-4 text-center sm:p-5"
@@ -271,7 +278,7 @@ export default function AboutPageContent() {
             <motion.article
               initial={{ opacity: 0, y: 36 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
+              viewport={{ once: false, amount: 0.25 }}
               transition={{ duration: 0.55, ease: floatEase }}
               whileHover={{ y: -5 }}
               className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg"
@@ -303,7 +310,7 @@ export default function AboutPageContent() {
             <motion.article
               initial={{ opacity: 0, y: 36 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
+              viewport={{ once: false, amount: 0.25 }}
               transition={{ duration: 0.55, delay: 0.1, ease: floatEase }}
               whileHover={{ y: -5 }}
               className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg"
@@ -368,7 +375,7 @@ export default function AboutPageContent() {
                 key={item.step}
                 initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
+                viewport={{ once: false, amount: 0.3 }}
                 transition={{
                   duration: 0.5,
                   delay: floatStagger(i, 0.07),
@@ -438,7 +445,7 @@ export default function AboutPageContent() {
                   key={item.title}
                   initial={{ opacity: 0, y: 28 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: false, amount: 0.3 }}
                   transition={{
                     duration: 0.5,
                     delay: floatStagger(i, 0.07),
@@ -544,7 +551,7 @@ export default function AboutPageContent() {
                 key={item.number}
                 initial={{ opacity: 0, x: i % 2 === 0 ? -28 : 28 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.25 }}
+                viewport={{ once: false, amount: 0.25 }}
                 transition={{
                   duration: 0.5,
                   delay: floatStagger(i, 0.07),
@@ -607,7 +614,7 @@ export default function AboutPageContent() {
                 key={item.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: false, amount: 0.2 }}
                 transition={{
                   duration: 0.4,
                   delay: floatStagger(i % 6, 0.04),
@@ -666,7 +673,7 @@ export default function AboutPageContent() {
                   key={item.title}
                   initial={{ opacity: 0, y: 28 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: false, amount: 0.3 }}
                   transition={{
                     duration: 0.5,
                     delay: floatStagger(i, 0.06),
@@ -695,7 +702,7 @@ export default function AboutPageContent() {
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
+            viewport={{ once: false, amount: 0.4 }}
             transition={{ duration: 0.55, ease: floatEase }}
             className="about-cta-panel relative overflow-hidden rounded-2xl border border-brand/20 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-5 py-8 text-center shadow-sm sm:px-8 sm:py-10"
           >

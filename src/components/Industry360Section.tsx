@@ -75,12 +75,20 @@ function OrbitalHub() {
   );
 }
 
-function IndustryCard({ name, image }: { name: string; image: string }) {
+function IndustryCard({
+  name,
+  image,
+  replayKey = 0,
+}: {
+  name: string;
+  image: string;
+  replayKey?: number;
+}) {
   return (
     <div className="flex w-[110px] shrink-0 flex-col items-center sm:w-[120px]">
       <FloatImageWrap
         scroll={false}
-        replayKey={0}
+        replayKey={replayKey}
         className="h-[72px] w-[72px] sm:h-[80px] sm:w-[80px]"
       >
         <div className="relative h-[72px] w-[72px] sm:h-[80px] sm:w-[80px]">
@@ -105,10 +113,14 @@ function IndustryCard({ name, image }: { name: string; image: string }) {
 
 export default function Industry360Section() {
   const slides = [...industries, ...industries];
-  const { ref, replayKey } = useScrollReplay(0.15);
+  const { ref, replayKey, isInView } = useScrollReplay(0.15);
 
   return (
-    <section ref={ref} className="relative overflow-hidden py-8 pastel-section lg:py-11">
+    <section
+      ref={ref}
+      data-tf-active={isInView ? "1" : "0"}
+      className="relative overflow-hidden py-8 pastel-section lg:py-11"
+    >
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="mb-6 text-center lg:mb-7">
           <FloatLine replayKey={replayKey}>
@@ -145,6 +157,7 @@ export default function Industry360Section() {
                   key={`${industry.name}-${i}`}
                   name={industry.name}
                   image={industry.image}
+                  replayKey={replayKey}
                 />
               ))}
             </div>

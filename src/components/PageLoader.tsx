@@ -5,7 +5,7 @@ import { releaseDocumentScroll } from "@/lib/scrollLock";
 
 /**
  * Full-screen intro on every hard refresh.
- * CSS-driven so the hex animation always paints reliably.
+ * Network diagram + “TasmaFive” → “Solutions” word-by-word reveal.
  */
 export default function PageLoader() {
   const [phase, setPhase] = useState<"in" | "out" | "gone">("in");
@@ -13,7 +13,6 @@ export default function PageLoader() {
   useEffect(() => {
     const body = document.body;
 
-    // Language switches reload the page — skip the long intro so it feels instant.
     let skipLoader = false;
     try {
       skipLoader = sessionStorage.getItem("tf-skip-loader") === "1";
@@ -41,17 +40,18 @@ export default function PageLoader() {
       window.dispatchEvent(new CustomEvent("tf-loader-done"));
     };
 
+    // Give words time to land before fade-out
     const revealTimer = window.setTimeout(() => {
       setPhase("out");
       body.dataset.tfLoading = "revealing";
-    }, 2100);
+    }, 2600);
 
     const hideTimer = window.setTimeout(() => {
       setPhase("gone");
       finish();
-    }, 2800);
+    }, 3300);
 
-    const failsafe = window.setTimeout(finish, 4000);
+    const failsafe = window.setTimeout(finish, 4500);
 
     return () => {
       window.clearTimeout(revealTimer);
@@ -67,70 +67,57 @@ export default function PageLoader() {
       className={`tf-loader${phase === "out" ? " tf-loader--out" : ""}`}
       role="status"
       aria-live="polite"
-      aria-label="Loading TasmaFive"
+      aria-label="Loading TasmaFive Solutions"
     >
       <div className="tf-loader__glow" aria-hidden />
-      <div className="tf-loader__stage" aria-hidden>
-        <svg className="tf-loader__svg" viewBox="0 0 320 300" fill="none">
+
+      {/* Tech network diagram */}
+      <div className="tf-loader__diagram" aria-hidden>
+        <svg className="tf-loader__svg" viewBox="0 0 280 180" fill="none">
           <defs>
-            <linearGradient id="tfHexStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.2" />
-              <stop offset="50%" stopColor="#fb923c" stopOpacity="0.75" />
-              <stop offset="100%" stopColor="#64748b" stopOpacity="0.25" />
+            <linearGradient id="tfNetStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.9" />
+              <stop offset="55%" stopColor="#fb923c" stopOpacity="1" />
+              <stop offset="100%" stopColor="#f97316" stopOpacity="0.85" />
             </linearGradient>
-            <linearGradient id="tfHexPulse" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#f97316" stopOpacity="0" />
-              <stop offset="50%" stopColor="#fdba74" stopOpacity="1" />
-              <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
-            </linearGradient>
-            <filter id="tfHexGlow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2.4" result="b" />
-              <feMerge>
-                <feMergeNode in="b" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
           </defs>
 
-          <g
-            className="tf-loader__lattice"
-            stroke="url(#tfHexStroke)"
-            strokeWidth="1.15"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M120 40 L160 63 L160 109 L120 132 L80 109 L80 63 Z" />
-            <path d="M200 63 L240 86 L240 132 L200 155 L160 132 L160 86 Z" />
-            <path d="M80 109 L120 132 L120 178 L80 201 L40 178 L40 132 Z" />
-            <path d="M160 109 L200 132 L200 178 L160 201 L120 178 L120 132 Z" />
-            <path d="M240 132 L280 155 L280 201 L240 224 L200 201 L200 155 Z" />
-            <path d="M120 178 L160 201 L160 247 L120 270 L80 247 L80 201 Z" />
-            <path d="M200 178 L240 201 L240 247 L200 270 L160 247 L160 201 Z" />
+          {/* Connection lines — draw on */}
+          <g className="tf-loader__links" stroke="url(#tfNetStroke)" strokeWidth="1.6" strokeLinecap="round">
+            <path className="tf-loader__link tf-loader__link--1" d="M40 130 L100 70" />
+            <path className="tf-loader__link tf-loader__link--2" d="M100 70 L180 55" />
+            <path className="tf-loader__link tf-loader__link--3" d="M180 55 L240 95" />
+            <path className="tf-loader__link tf-loader__link--4" d="M100 70 L140 130" />
+            <path className="tf-loader__link tf-loader__link--5" d="M180 55 L140 130" />
+            <path className="tf-loader__link tf-loader__link--6" d="M140 130 L220 145" />
+            <path className="tf-loader__link tf-loader__link--7" d="M240 95 L220 145" />
           </g>
 
-          <path
-            className="tf-loader__trace"
-            d="M120 40 L160 63 L200 63 L240 86 L280 155 L240 201 L200 270 L160 247 L120 270 L80 247 L40 178 L80 109 L120 40"
-            stroke="url(#tfHexPulse)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            fill="none"
-            filter="url(#tfHexGlow)"
-          />
+          {/* Nodes */}
+          <g className="tf-loader__nodes">
+            <circle className="tf-loader__node tf-loader__node--1" cx="40" cy="130" r="6" />
+            <circle className="tf-loader__node tf-loader__node--2" cx="100" cy="70" r="7" />
+            <circle className="tf-loader__node tf-loader__node--3" cx="180" cy="55" r="8" />
+            <circle className="tf-loader__node tf-loader__node--4" cx="240" cy="95" r="6.5" />
+            <circle className="tf-loader__node tf-loader__node--5" cx="140" cy="130" r="9" />
+            <circle className="tf-loader__node tf-loader__node--6" cx="220" cy="145" r="6" />
+          </g>
 
-          <circle className="tf-loader__core" cx="160" cy="155" r="6" fill="#f97316" />
-          <circle
-            className="tf-loader__ring"
-            cx="160"
-            cy="155"
-            r="14"
-            fill="none"
-            stroke="#f97316"
-          />
+          {/* Center pulse ring on hub */}
+          <circle className="tf-loader__hub-ring" cx="140" cy="130" r="16" />
         </svg>
       </div>
 
-      <p className="tf-loader__brand">TASMAFIVE</p>
+      {/* Word-by-word brand name */}
+      <h1 className="tf-loader__title" aria-hidden>
+        <span className="tf-loader__word tf-loader__word--1">TasmaFive</span>
+        <span className="tf-loader__word tf-loader__word--2">Solutions</span>
+      </h1>
+
+      <p className="tf-loader__tagline" aria-hidden>
+        Smart IT · Real Growth
+      </p>
+
       <div className="tf-loader__bar" aria-hidden>
         <span />
       </div>

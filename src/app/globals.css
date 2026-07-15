@@ -68,8 +68,33 @@ html {
   scroll-behavior: auto;
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow: hidden !important;
+  min-height: 100%;
+  /* auto + scroll (NOT hidden/clip on X) — Chromium trackpad-safe. */
+  overflow-x: auto !important;
+  overflow-y: scroll !important;
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: #64748b #e2e8f0;
+  touch-action: pan-y;
+}
+
+html::-webkit-scrollbar {
+  width: 12px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #64748b;
+  border-radius: 999px;
+  border: 2px solid #e2e8f0;
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 body {
@@ -77,30 +102,26 @@ body {
   padding: 0;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
-  height: 100%;
-  overflow: hidden !important;
+  min-height: 100%;
+  /* Horizontal clip lives on body; vertical scroll stays on html. */
+  overflow-x: clip;
+  overflow-y: visible !important;
   user-select: text;
   -webkit-user-select: text;
   top: 0 !important;
 }
 
 /**
- * Page scrollport — fixed-height box with overflow-y: scroll.
- * IMPORTANT: use overflow-x: clip (NOT hidden). Chromium breaks two-finger
- * trackpad scrolling when overflow-x: hidden is on the same scroll root.
+ * Marker wrapper only — document/html is the real scrollport.
+ * Keeps #tf-page-scroll id for any legacy selectors without trapping scroll.
  */
 .tf-page-scroll {
   position: relative;
   z-index: 1;
-  height: 100%;
-  height: 100dvh;
   width: 100%;
-  overflow-x: clip;
-  overflow-y: scroll;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
+  min-height: 100%;
+  overflow: visible !important;
   touch-action: pan-y;
-  scrollbar-gutter: stable;
 }
 
 .hero-carousel-section,
@@ -130,16 +151,17 @@ body {
 
 .textured-bg::before {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  /* Soft washes only — no SVG feTurbulence (was costing continuous GPU paint) */
+  /* Absolute (not fixed) — avoids repainting a full-viewport layer on every scroll */
   background-image:
     radial-gradient(ellipse 80% 60% at 10% 20%, rgba(147, 197, 253, 0.45) 0%, transparent 55%),
     radial-gradient(ellipse 70% 50% at 90% 80%, rgba(249, 168, 212, 0.4) 0%, transparent 55%),
     radial-gradient(ellipse 50% 40% at 50% 50%, rgba(186, 230, 253, 0.25) 0%, transparent 60%);
   opacity: 1;
+  contain: paint;
 }
 
 .textured-bg > main,
@@ -694,6 +716,8 @@ html.lenis body {
 
 .marquee-track {
   will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .marquee-left {
@@ -704,12 +728,41 @@ html.lenis body {
   animation: marquee-right 40s linear infinite;
 }
 
+/**
+ * Pause infinite CSS while the section is off-screen.
+ * Visual look is unchanged when the section is visible — just saves GPU/CPU
+ * (Chrome, Safari, Firefox).
+ */
+[data-tf-active="0"] .marquee-left,
+[data-tf-active="0"] .marquee-right,
+[data-tf-active="0"] .orbital-ring,
+[data-tf-active="0"] .orbital-node,
+[data-tf-active="0"] .expert-bg-drift,
+[data-tf-active="0"] .instagram-feed-row,
+[data-tf-active="0"] .instagram-feed-glow,
+[data-tf-active="0"] .iridescent-text,
+[data-tf-active="0"] .outline-iridescent {
+  -webkit-animation-play-state: paused !important;
+  animation-play-state: paused !important;
+}
+
+[data-tf-active="0"] .marquee-track {
+  will-change: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-left,
   .marquee-right,
   .orbital-ring,
   .orbital-node {
     animation: none !important;
+  }
+}
+
+/* Browsers without backdrop-filter (older Safari/Firefox) — solid frosted look */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .site-header {
+    background: linear-gradient(90deg, #e0f2fe 0%, #ffffff 50%, #fce7f3 100%) !important;
   }
 }
 
@@ -1034,8 +1087,7 @@ body {
 }
 
 /* Faster perceived language switch */
-html.gt-switching #app-root,
-html.gt-switching #tf-page-scroll {
+html.gt-switching #app-root {
   opacity: 0.9;
   transition: opacity 0.12s ease;
   pointer-events: none;
@@ -1129,13 +1181,13 @@ html.gt-switching body {
 @media (max-width: 1023px) {
   body {
     display: block;
-    height: 100%;
-    overflow: hidden !important;
+    min-height: 100%;
+    overflow-x: clip;
+    overflow-y: visible !important;
   }
 
   .tf-page-scroll {
-    height: 100%;
-    height: 100dvh;
+    overflow: visible !important;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -1285,7 +1337,7 @@ html.gt-switching body {
   backface-visibility: hidden;
 }
 
-/* ── Page loader (CSS-driven hex constellation) ── */
+/* ── Page loader — network diagram + word-by-word brand ── */
 .tf-loader {
   position: fixed !important;
   inset: 0 !important;
@@ -1294,138 +1346,209 @@ html.gt-switching body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.35rem;
   overflow: hidden;
-  background: #070b16;
+  padding: 1.5rem;
+  background: #07101f;
   opacity: 1;
   visibility: visible !important;
   pointer-events: auto;
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .tf-loader--out {
   opacity: 0;
-  transform: scale(1.03);
+  transform: translateY(-10px) scale(1.02);
   pointer-events: none;
 }
 
 .tf-loader__glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse 55% 45% at 50% 42%,
-    rgba(249, 115, 22, 0.16),
-    transparent 70%
-  );
   pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 40% at 50% 38%, rgba(249, 115, 22, 0.2), transparent 68%),
+    radial-gradient(ellipse 45% 35% at 70% 70%, rgba(56, 189, 248, 0.12), transparent 65%);
 }
 
-.tf-loader__stage {
+.tf-loader__diagram {
   position: relative;
-  width: min(88vw, 340px);
-  margin-bottom: 2.25rem;
+  z-index: 1;
+  width: min(78vw, 300px);
+  margin-bottom: 0.5rem;
 }
 
 .tf-loader__svg {
   display: block;
   width: 100%;
   height: auto;
+  overflow: visible;
 }
 
-.tf-loader__lattice path {
-  stroke-dasharray: 280;
-  stroke-dashoffset: 280;
-  animation: tf-hex-draw 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.tf-loader__link {
+  fill: none;
+  stroke-dasharray: 180;
+  stroke-dashoffset: 180;
+  animation: tf-loader-draw 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.tf-loader__lattice path:nth-child(1) { animation-delay: 0.05s; }
-.tf-loader__lattice path:nth-child(2) { animation-delay: 0.12s; }
-.tf-loader__lattice path:nth-child(3) { animation-delay: 0.18s; }
-.tf-loader__lattice path:nth-child(4) { animation-delay: 0.24s; }
-.tf-loader__lattice path:nth-child(5) { animation-delay: 0.3s; }
-.tf-loader__lattice path:nth-child(6) { animation-delay: 0.36s; }
-.tf-loader__lattice path:nth-child(7) { animation-delay: 0.42s; }
+.tf-loader__link--1 { animation-delay: 0.05s; }
+.tf-loader__link--2 { animation-delay: 0.12s; }
+.tf-loader__link--3 { animation-delay: 0.18s; }
+.tf-loader__link--4 { animation-delay: 0.24s; }
+.tf-loader__link--5 { animation-delay: 0.3s; }
+.tf-loader__link--6 { animation-delay: 0.36s; }
+.tf-loader__link--7 { animation-delay: 0.42s; }
 
-.tf-loader__trace {
-  stroke-dasharray: 90 520;
-  stroke-dashoffset: 610;
-  animation: tf-hex-pulse 2.1s linear infinite;
+.tf-loader__node {
+  fill: #0b1220;
+  stroke: #fb923c;
+  stroke-width: 2;
+  opacity: 0;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: tf-loader-node 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.tf-loader__core {
-  transform-origin: 160px 155px;
-  animation: tf-hex-core 1.8s ease-in-out 0.4s infinite;
+.tf-loader__node--1 { animation-delay: 0.2s; stroke: #38bdf8; }
+.tf-loader__node--2 { animation-delay: 0.28s; }
+.tf-loader__node--3 { animation-delay: 0.36s; stroke: #38bdf8; }
+.tf-loader__node--4 { animation-delay: 0.44s; }
+.tf-loader__node--5 { animation-delay: 0.5s; fill: #f97316; stroke: #fed7aa; }
+.tf-loader__node--6 { animation-delay: 0.56s; stroke: #38bdf8; }
+
+.tf-loader__hub-ring {
+  fill: none;
+  stroke: rgba(249, 115, 22, 0.45);
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-origin: 140px 130px;
+  animation: tf-loader-hub 1.6s ease-out 0.55s infinite;
 }
 
-.tf-loader__ring {
-  transform-origin: 160px 155px;
-  stroke-opacity: 0.35;
-  animation: tf-hex-ring 1.8s ease-out 0.4s infinite;
-}
-
-.tf-loader__brand {
+.tf-loader__title {
   position: relative;
   z-index: 1;
-  margin: 0;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.55em;
-  text-indent: 0.55em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35em 0.55em;
+  margin: 0.35rem 0 0;
+  text-align: center;
+  font-size: clamp(1.55rem, 6.5vw, 2.65rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #f8fafc;
+}
+
+.tf-loader__word {
+  display: inline-block;
+  opacity: 0;
+}
+
+/* Word 1 — rise + soft blur clear */
+.tf-loader__word--1 {
+  background: linear-gradient(110deg, #fff7ed 0%, #fb923c 55%, #f97316 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: tf-loader-word-a 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.65s forwards;
+}
+
+/* Word 2 — slide in from right with shine */
+.tf-loader__word--2 {
+  color: #e2e8f0;
+  animation: tf-loader-word-b 0.75s cubic-bezier(0.22, 1, 0.36, 1) 1.25s forwards;
+}
+
+.tf-loader__tagline {
+  position: relative;
+  z-index: 1;
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
   text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.95);
-  animation: tf-loader-fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  color: rgba(148, 163, 184, 0.9);
+  opacity: 0;
+  animation: tf-loader-fade-up 0.55s ease 1.85s forwards;
 }
 
 .tf-loader__bar {
   position: relative;
   z-index: 1;
-  margin-top: 1rem;
-  width: 4rem;
-  height: 1px;
+  margin-top: 1.25rem;
+  width: min(14rem, 52vw);
+  height: 2px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .tf-loader__bar span {
   display: block;
-  width: 50%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, #f97316, transparent);
-  animation: tf-loader-bar 1.6s ease-in-out infinite;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ea580c, #fb923c, #38bdf8);
+  animation: tf-loader-progress 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes tf-hex-draw {
+@keyframes tf-loader-draw {
   to {
     stroke-dashoffset: 0;
   }
 }
 
-@keyframes tf-hex-pulse {
+@keyframes tf-loader-node {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
   to {
-    stroke-dashoffset: -610;
-  }
-}
-
-@keyframes tf-hex-core {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: scale(1);
-  }
-  50% {
     opacity: 1;
-    transform: scale(1.25);
+    transform: scale(1);
   }
 }
 
-@keyframes tf-hex-ring {
+@keyframes tf-loader-hub {
   0% {
-    opacity: 0.4;
-    transform: scale(1);
+    opacity: 0.55;
+    transform: scale(0.85);
   }
   100% {
     opacity: 0;
-    transform: scale(1.45);
+    transform: scale(1.55);
+  }
+}
+
+@keyframes tf-loader-word-a {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.92);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes tf-loader-word-b {
+  from {
+    opacity: 0;
+    transform: translateX(36px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
   }
 }
 
@@ -1440,13 +1563,28 @@ html.gt-switching body {
   }
 }
 
-@keyframes tf-loader-bar {
-  from {
-    transform: translateX(-120%);
+@keyframes tf-loader-progress {
+  0% {
+    width: 0%;
   }
-  to {
-    transform: translateX(240%);
+  100% {
+    width: 100%;
   }
+}
+
+/* Lighter paint for footer only — keeps above-fold section animations intact */
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
+}
+
+html:has(body[data-tf-loading="true"]) {
+  overflow-y: hidden !important;
+}
+
+body[data-tf-loading="true"] {
+  overflow-x: clip !important;
+  overflow-y: hidden !important;
 }
 
 body[data-tf-loading="true"] > :not(.tf-loader) {
@@ -1455,17 +1593,18 @@ body[data-tf-loading="true"] > :not(.tf-loader) {
   pointer-events: none;
 }
 
-body[data-tf-loading="true"] .tf-page-scroll {
-  overflow: hidden !important;
-}
-
-body[data-tf-loading="revealing"] .tf-page-scroll,
-body[data-tf-loading="done"] .tf-page-scroll {
-  overflow-x: clip !important;
+html:has(body[data-tf-loading="revealing"]),
+html:has(body[data-tf-loading="done"]) {
   overflow-y: scroll !important;
 }
 
-body[data-tf-loading="revealing"] > :not(.tf-loader):not(#tf-page-scroll) {
+body[data-tf-loading="revealing"],
+body[data-tf-loading="done"] {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
+body[data-tf-loading="revealing"] > :not(.tf-loader) {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -1475,8 +1614,7 @@ body[data-tf-loading="revealing"] #tf-page-scroll {
   visibility: visible;
   pointer-events: auto;
   opacity: 1;
-  will-change: opacity, transform;
-  animation: tf-page-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: tf-page-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 body[data-tf-loading="revealing"] .site-header,
@@ -1484,14 +1622,13 @@ body[data-tf-loading="revealing"] .site-floating-widgets {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  animation: tf-page-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: tf-page-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 body[data-tf-loading="done"] > :not(.tf-loader) {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  will-change: auto;
 }
 
 body[data-tf-loading="done"] #tf-page-scroll,
@@ -1502,7 +1639,7 @@ body[data-tf-loading="done"] #app-root {
 @keyframes tf-page-reveal {
   0% {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(18px);
   }
   100% {
     opacity: 1;
@@ -1511,18 +1648,30 @@ body[data-tf-loading="done"] #app-root {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tf-loader__lattice path,
-  .tf-loader__trace,
-  .tf-loader__core,
-  .tf-loader__ring,
-  .tf-loader__brand,
+  .tf-loader__link,
+  .tf-loader__node,
+  .tf-loader__hub-ring,
+  .tf-loader__word,
+  .tf-loader__tagline,
   .tf-loader__bar span {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
 
-  .tf-loader__lattice path {
+  .tf-loader__link {
     stroke-dashoffset: 0;
+  }
+
+  .tf-loader__node,
+  .tf-loader__word,
+  .tf-loader__tagline {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .tf-loader__bar span {
+    width: 100%;
   }
 
   body[data-tf-loading="revealing"] #tf-page-scroll,
@@ -1636,33 +1785,94 @@ body[data-tf-loading="done"] #app-root {
 
 /* ── Certificate viewer — view-only protection ────────────────── */
 
-/* Block drag-to-save and text selection inside the protected viewer */
-.cert-viewer-frame,
-.cert-viewer-frame iframe {
+.cert-protected,
+.cert-protected * {
   -webkit-user-select: none !important;
   user-select: none !important;
-  pointer-events: none !important; /* overlay sits on top */
+  -webkit-touch-callout: none !important;
 }
 
-/* The blocking overlay itself MUST have pointer-events: none so the
-   iframe below can still scroll via touch — real interaction is with
-   the outer scroll container, not the iframe directly */
-.cert-protect-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
+.cert-canvas {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  pointer-events: none !important;
+  -webkit-user-drag: none !important;
+  user-drag: none;
+}
+
+.cert-shield {
+  cursor: default;
   -webkit-user-select: none;
   user-select: none;
+  -webkit-touch-callout: none;
   touch-action: none;
-  /* Invisible — just blocks OS drag → save on desktop */
   background: transparent;
 }
 
-/* Disable print for certificate iframe pages */
+/* Repeating VIEW ONLY overlay — still appears in OS screenshots */
+.cert-watermark-layer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  opacity: 0.14;
+  background-image: repeating-linear-gradient(
+    -32deg,
+    transparent 0,
+    transparent 46px,
+    rgba(15, 23, 42, 0.55) 46px,
+    rgba(15, 23, 42, 0.55) 47px
+  );
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, #000 20%, transparent 100%);
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, #000 20%, transparent 100%);
+}
+
+.cert-watermark-layer::after {
+  content: "TASMAFIVE  ·  VIEW ONLY  ·  TASMAFIVE  ·  VIEW ONLY  ·  TASMAFIVE  ·  VIEW ONLY";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(0.85rem, 3.5vw, 1.35rem);
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(15, 23, 42, 0.55);
+  transform: rotate(-28deg) scale(1.35);
+  white-space: nowrap;
+}
+
+.cert-viewer-overlay {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.cert-viewer-open {
+  overscroll-behavior: none;
+}
+
+body.cert-viewer-open .site-header,
+body.cert-viewer-open .site-floating-widgets,
+body.cert-viewer-open .tf-language-widget {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Hide certificate canvas from print / OS print-to-PDF */
 @media print {
-  .cert-viewer-frame,
-  [data-cert-viewer] {
+  body.cert-viewer-open * {
+    display: none !important;
+  }
+
+  .cert-protected,
+  .cert-canvas,
+  .cert-viewer-overlay,
+  [aria-modal="true"] {
     display: none !important;
   }
 }
+

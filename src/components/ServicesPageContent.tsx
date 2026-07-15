@@ -93,7 +93,7 @@ function ServiceDetailBlock({
       id={id}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: false, amount: 0.2 }}
       transition={{
         duration: 0.6,
         delay: floatStagger(index, 0.05),
@@ -144,7 +144,7 @@ export function ServicesOverview() {
           id={webDev.slug}
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.55, ease: floatEase }}
           className="scroll-mt-28 overflow-hidden rounded-3xl border border-brand/20 bg-gradient-to-br from-white via-orange-50/40 to-sky-50/50 p-5 shadow-sm lg:p-7"
         >
@@ -225,7 +225,7 @@ function WebDevPackageCard({
       id={service.slug}
       initial={{ opacity: 0, x: fromLeft ? -56 : 56, y: 24 }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, amount: 0.28 }}
+      viewport={{ once: false, amount: 0.28 }}
       transition={{
         duration: 0.7,
         delay: 0.05,
@@ -345,7 +345,7 @@ export function WebDevelopmentDetail() {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.5 }}
+        viewport={{ once: false, amount: 0.5 }}
         transition={{ duration: 0.5, ease: floatEase }}
         className="mx-auto max-w-3xl text-center"
       >

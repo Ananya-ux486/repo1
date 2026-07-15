@@ -93,7 +93,8 @@ export default function QuotePageContent() {
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.45, ease: floatEase }}
           className="rounded-3xl border border-border bg-white p-6 shadow-sm sm:p-8"
         >

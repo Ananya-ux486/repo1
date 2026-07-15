@@ -256,12 +256,14 @@ export default function LanguageSwitcher() {
     setCurrentCode(readStoredLanguage());
   }, []);
 
-  // Warm translator in the background after loader so first switch is faster
+  // Only warm Google Translate when a non-English language is already stored.
+  // Loading GT for English users trashes scroll FPS across browsers.
   useEffect(() => {
     const warm = () => {
+      const stored = readStoredLanguage();
+      if (stored === "en") return;
       void ensureTranslator().then((combo) => {
-        const stored = readStoredLanguage();
-        if (combo && stored !== "en") {
+        if (combo) {
           triggerTranslate(stored);
           setCurrentCode(stored);
         }
@@ -270,10 +272,10 @@ export default function LanguageSwitcher() {
 
     if (document.body.dataset.tfLoading === "done") {
       if (typeof window.requestIdleCallback === "function") {
-        const id = window.requestIdleCallback(warm, { timeout: 1200 });
+        const id = window.requestIdleCallback(warm, { timeout: 2500 });
         return () => window.cancelIdleCallback(id);
       }
-      const t = window.setTimeout(warm, 400);
+      const t = window.setTimeout(warm, 900);
       return () => window.clearTimeout(t);
     }
 
