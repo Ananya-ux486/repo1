@@ -1633,3 +1633,36 @@ body[data-tf-loading="done"] #app-root {
   }
 }
 
+
+/* ── Certificate viewer — view-only protection ────────────────── */
+
+/* Block drag-to-save and text selection inside the protected viewer */
+.cert-viewer-frame,
+.cert-viewer-frame iframe {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  pointer-events: none !important; /* overlay sits on top */
+}
+
+/* The blocking overlay itself MUST have pointer-events: none so the
+   iframe below can still scroll via touch — real interaction is with
+   the outer scroll container, not the iframe directly */
+.cert-protect-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+  /* Invisible — just blocks OS drag → save on desktop */
+  background: transparent;
+}
+
+/* Disable print for certificate iframe pages */
+@media print {
+  .cert-viewer-frame,
+  [data-cert-viewer] {
+    display: none !important;
+  }
+}
