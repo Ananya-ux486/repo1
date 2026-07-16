@@ -18,6 +18,24 @@ import {
   Lock,
 } from "lucide-react";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scrollLock";
+import { pdfLayoutWidth, pdfMaxScale } from "@/lib/devicePerf";
+import { usePostLoaderReady } from "@/lib/usePostLoaderReady";
+
+const prefetchedAssets = new Set<string>();
+
+function prefetchAsset(url: string) {
+  if (prefetchedAssets.has(url)) return;
+  prefetchedAssets.add(url);
+  try {
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = url;
+    link.as = url.endsWith(".pdf") ? "fetch" : "script";
+    document.head.appendChild(link);
+  } catch {
+    /* ignore */
+  }
+}
 
 /* ─── Certificate data (files in /public/certificates/) ─────────── */
 const CERTIFICATES = [
@@ -130,9 +148,12 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pdfDocRef = useRef<any>(null);
   const renderTaskRef = useRef<{ cancel: () => void } | null>(null);
+  const hasRenderedRef = useRef(false);
+  const lastLayoutWidthRef = useRef(0);
 
-  const renderPage = useCallback(async (pageNum: number) => {
+  const renderPage = useCallback(async (pageNum: number, showOverlay = true) => {
     if (!pdfDocRef.current || !canvasRef.current) return;
+    if (showOverlay) setLoading(true);
     try {
       if (renderTaskRef.current) {
         try {
@@ -153,12 +174,17 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
       );
       // On phones render wider than the screen so text stays readable;
       // horizontal pan + outer vertical scroll let the whole page move.
-      const layoutWidth =
-        viewportW < 768
-          ? Math.min(820, Math.max(containerWidth * 1.7, 620))
-          : containerWidth;
+      const layoutWidth = pdfLayoutWidth(viewportW, containerWidth);
+      if (
+        hasRenderedRef.current &&
+        lastLayoutWidthRef.current > 0 &&
+        Math.abs(layoutWidth - lastLayoutWidthRef.current) < 48
+      ) {
+        return;
+      }
+      lastLayoutWidthRef.current = layoutWidth;
       const base = page.getViewport({ scale: 1 });
-      const scale = Math.min(2.4, layoutWidth / base.width);
+      const scale = Math.min(pdfMaxScale(viewportW), layoutWidth / base.width);
       const viewport = page.getViewport({ scale });
 
       const canvas = canvasRef.current;
@@ -179,9 +205,21 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
       await renderTask.promise;
       renderTaskRef.current = null;
 
-      watermarkCanvas(ctx, canvas.width, canvas.height);
+      hasRenderedRef.current = true;
       setLoading(false);
       setError(false);
+
+      const applyWatermark = () => {
+        if (!canvasRef.current) return;
+        const wctx = canvasRef.current.getContext("2d");
+        if (!wctx) return;
+        watermarkCanvas(wctx, canvas.width, canvas.height);
+      };
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(applyWatermark, { timeout: 600 });
+      } else {
+        window.setTimeout(applyWatermark, 40);
+      }
     } catch (e: unknown) {
       if (e instanceof Error && /cancel/i.test(e.message)) return;
       setError(true);
@@ -195,6 +233,8 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
     setError(false);
     setCurrentPage(1);
     pdfDocRef.current = null;
+    hasRenderedRef.current = false;
+    lastLayoutWidthRef.current = 0;
 
     const load = async () => {
       try {
@@ -235,8 +275,7 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
 
   useEffect(() => {
     if (!pdfDocRef.current || currentPage < 1) return;
-    setLoading(true);
-    void renderPage(currentPage);
+    void renderPage(currentPage, true);
   }, [currentPage, renderPage]);
 
   useEffect(() => {
@@ -249,11 +288,15 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
       return () => window.removeEventListener("resize", onResize);
     }
     let t = 0;
+    let lastW = el.clientWidth;
     const ro = new ResizeObserver(() => {
+      const w = el.clientWidth;
+      if (Math.abs(w - lastW) < 40) return;
+      lastW = w;
       window.clearTimeout(t);
       t = window.setTimeout(() => {
-        if (pdfDocRef.current) void renderPage(currentPage);
-      }, 120);
+        if (pdfDocRef.current) void renderPage(currentPage, false);
+      }, 180);
     });
     ro.observe(el);
     return () => {
@@ -343,6 +386,7 @@ function ProtectedViewer({ cert, onClose }: { cert: Cert; onClose: () => void })
   const [blurred, setBlurred] = useState(false);
   const Icon = cert.Icon;
   const privacyTimer = useRef(0);
+  const openedAt = useRef(Date.now());
 
   const flashPrivacy = useCallback((ms = 2800) => {
     setBlurred(true);
@@ -404,6 +448,7 @@ function ProtectedViewer({ cert, onClose }: { cert: Cert; onClose: () => void })
     };
 
     const onVis = () => {
+      if (Date.now() - openedAt.current < 900) return;
       if (document.hidden || !document.hasFocus()) {
         setBlurred(true);
         void clearClipboard();
@@ -457,7 +502,7 @@ function ProtectedViewer({ cert, onClose }: { cert: Cert; onClose: () => void })
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="cert-viewer-overlay fixed inset-0 z-[2147482000] overflow-y-auto overscroll-contain bg-black/85 backdrop-blur-md"
+      className="cert-viewer-overlay fixed inset-0 z-[2147482000] overflow-y-auto overscroll-contain bg-black/88 sm:bg-black/85"
       onClick={onClose}
       onContextMenu={(e) => e.preventDefault()}
     >
@@ -605,6 +650,8 @@ function CertCard({
         <button
           type="button"
           onClick={onView}
+          onPointerEnter={() => prefetchAsset(cert.file)}
+          onFocus={() => prefetchAsset(cert.file)}
           className={`inline-flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r ${cert.stripeGradient} px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 hover:shadow-md active:scale-[0.98]`}
         >
           <Eye className="h-4 w-4" />
@@ -618,6 +665,21 @@ function CertCard({
 /* ─── Page ──────────────────────────────────────────────────────── */
 export default function CertificatesPageContent() {
   const [active, setActive] = useState<Cert | null>(null);
+  const postLoaderReady = usePostLoaderReady(0);
+
+  useEffect(() => {
+    if (!postLoaderReady) return;
+    const warm = () => {
+      prefetchAsset("/pdf.worker.min.mjs");
+      CERTIFICATES.forEach((c) => prefetchAsset(c.file));
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(warm, { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(warm, 800);
+    return () => window.clearTimeout(t);
+  }, [postLoaderReady]);
 
   return (
     <>

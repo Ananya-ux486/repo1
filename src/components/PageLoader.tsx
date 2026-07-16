@@ -31,6 +31,27 @@ export default function PageLoader() {
 
     body.dataset.tfLoading = "true";
 
+    let seenBefore = false;
+    try {
+      seenBefore = localStorage.getItem("tf-seen-loader") === "1";
+    } catch {
+      /* private mode */
+    }
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const mem = (navigator as Navigator & { deviceMemory?: number })
+      .deviceMemory;
+    const cores = navigator.hardwareConcurrency ?? 4;
+    const lowSpec =
+      reducedMotion ||
+      (mem !== undefined && mem <= 4) ||
+      (cores <= 4 && window.innerWidth < 1024);
+
+    const revealMs = reducedMotion ? 700 : seenBefore ? 1900 : lowSpec ? 2200 : 2600;
+    const hideMs = reducedMotion ? 1000 : seenBefore ? 2500 : lowSpec ? 2900 : 3300;
+
     let finished = false;
     const finish = () => {
       if (finished) return;
@@ -38,20 +59,24 @@ export default function PageLoader() {
       body.dataset.tfLoading = "done";
       releaseDocumentScroll();
       window.dispatchEvent(new CustomEvent("tf-loader-done"));
+      try {
+        localStorage.setItem("tf-seen-loader", "1");
+      } catch {
+        /* private mode */
+      }
     };
 
-    // Give words time to land before fade-out
     const revealTimer = window.setTimeout(() => {
       setPhase("out");
       body.dataset.tfLoading = "revealing";
-    }, 2600);
+    }, revealMs);
 
     const hideTimer = window.setTimeout(() => {
       setPhase("gone");
       finish();
-    }, 3300);
+    }, hideMs);
 
-    const failsafe = window.setTimeout(finish, 4500);
+    const failsafe = window.setTimeout(finish, hideMs + 1200);
 
     return () => {
       window.clearTimeout(revealTimer);

@@ -1000,9 +1000,15 @@ select {
 
   .glass-card,
   .hero-content-panel,
-  .site-header {
+  .site-header,
+  .cert-viewer-overlay,
+  .projects-lock-overlay {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+
+  .cert-viewer-overlay {
+    background-color: rgba(0, 0, 0, 0.92) !important;
   }
 
   /* Keep orbital + marquee running on phones (was animation:none for perf). */

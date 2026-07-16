@@ -1,4 +1,15 @@
-import CertificatesPageContent from "@/components/CertificatesPageContent";
+import dynamic from "next/dynamic";
+
+const CertificatesPageContent = dynamic(
+  () => import("@/components/CertificatesPageContent"),
+  {
+    loading: () => (
+      <div className="flex min-h-[40vh] items-center justify-center py-10 text-sm text-muted">
+        Loading certificates…
+      </div>
+    ),
+  },
+);
 
 export const metadata = {
   title: "Certificates | TasmaFive Solutions",

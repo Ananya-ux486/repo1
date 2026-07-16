@@ -1,20 +1,27 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   ExternalLink,
   Lock,
   LogOut,
   ShieldCheck,
-  Loader2,
 } from "lucide-react";
 import { liveProjects } from "@/data/liveProjects";
-import ProjectsAuthModal from "@/components/ProjectsAuthModal";
-import AdminActivityPanel from "@/components/AdminActivityPanel";
 import { floatEase, floatStagger } from "@/lib/floatMotion";
 import { IMAGE_BLUR } from "@/lib/motion";
+
+const ProjectsAuthModal = dynamic(
+  () => import("@/components/ProjectsAuthModal"),
+  { ssr: false },
+);
+const AdminActivityPanel = dynamic(
+  () => import("@/components/AdminActivityPanel"),
+  { ssr: false },
+);
 
 type AuthUser = {
   id: string;
@@ -22,48 +29,21 @@ type AuthUser = {
   email: string;
 };
 
-export default function ProjectsPageContent() {
-  const [checking, setChecking] = useState(true);
-  const [hasAccess, setHasAccess] = useState(false);
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+export type ProjectsInitialSession = {
+  hasAccess: boolean;
+  user: AuthUser | null;
+  isAdmin: boolean;
+};
 
-  useEffect(() => {
-    let cancelled = false;
+type Props = {
+  initialSession: ProjectsInitialSession;
+};
 
-    (async () => {
-      try {
-        const res = await fetch("/api/auth/session", { cache: "no-store" });
-        const data = (await res.json()) as {
-          projectsAccess?: boolean;
-          user?: AuthUser;
-        };
-        if (cancelled) return;
-
-        if (data.projectsAccess && data.user) {
-          setHasAccess(true);
-          setUser(data.user);
-          setIsAdmin(data.user.id === "team-admin");
-          setShowModal(false);
-        } else {
-          setHasAccess(false);
-          setShowModal(true);
-        }
-      } catch {
-        if (!cancelled) {
-          setHasAccess(false);
-          setShowModal(true);
-        }
-      } finally {
-        if (!cancelled) setChecking(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+export default function ProjectsPageContent({ initialSession }: Props) {
+  const [hasAccess, setHasAccess] = useState(initialSession.hasAccess);
+  const [user, setUser] = useState<AuthUser | null>(initialSession.user);
+  const [showModal, setShowModal] = useState(!initialSession.hasAccess);
+  const [isAdmin, setIsAdmin] = useState(initialSession.isAdmin);
 
   const handleUnlocked = (nextUser: AuthUser) => {
     setUser(nextUser);
@@ -112,76 +92,73 @@ export default function ProjectsPageContent() {
           )}
         </div>
 
-        {checking ? (
-          <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-muted">
-            <Loader2 className="h-7 w-7 animate-spin text-brand" />
-            <p className="text-sm font-medium">Loading projects…</p>
-          </div>
-        ) : hasAccess ? (
+        {hasAccess ? (
           <>
             {isAdmin && <AdminActivityPanel />}
             <div className="grid gap-5 sm:grid-cols-2 lg:gap-6">
-            {liveProjects.map((project, i) => (
-              <motion.article
-                key={project.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.25 }}
-                transition={{
-                  duration: 0.6,
-                  delay: floatStagger(i, 0.1),
-                  ease: floatEase,
-                }}
-                className="group overflow-hidden rounded-3xl border border-border bg-white shadow-md"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                  <Image
-                    src={project.preview}
-                    alt={`${project.title} homepage`}
-                    fill
-                    placeholder="blur"
-                    blurDataURL={IMAGE_BLUR}
-                    className="object-cover object-top transition duration-700 group-hover:scale-[1.03]"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                  <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/55 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">
-                    {String(i + 1).padStart(2, "0")}
+              {liveProjects.map((project, i) => (
+                <motion.article
+                  key={project.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{
+                    duration: 0.55,
+                    delay: floatStagger(i, 0.08),
+                    ease: floatEase,
+                  }}
+                  className="group overflow-hidden rounded-3xl border border-border bg-white shadow-md"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                    <Image
+                      src={project.preview}
+                      alt={`${project.title} homepage`}
+                      fill
+                      placeholder="blur"
+                      blurDataURL={IMAGE_BLUR}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      priority={i === 0}
+                      className="object-cover object-top transition duration-700 group-hover:scale-[1.03]"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                    <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/55 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-800 backdrop-blur-sm">
+                      {project.category}
+                    </div>
                   </div>
-                  <div className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-800 backdrop-blur-sm">
-                    {project.category}
-                  </div>
-                </div>
 
-                <div className="p-5 sm:p-6">
-                  <h2 className="text-xl font-bold text-foreground sm:text-2xl">
-                    {project.title}
-                  </h2>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {project.description}
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-border bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-muted"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                  <div className="p-5 sm:p-6">
+                    <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+                      {project.title}
+                    </h2>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">
+                      {project.description}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-border bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-muted"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-5 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-brand-dark"
+                    >
+                      View Project
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
                   </div>
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-5 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-brand-dark"
-                  >
-                    View Project
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </div>
-              </motion.article>
-            ))}
-          </div>
+                </motion.article>
+              ))}
+            </div>
           </>
         ) : (
           <div className="relative overflow-hidden rounded-3xl border border-border bg-white/70 shadow-sm">
@@ -195,7 +172,7 @@ export default function ProjectsPageContent() {
                 ))}
               </div>
             </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/40 px-6 text-center backdrop-blur-[2px]">
+            <div className="projects-lock-overlay absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/50 px-6 text-center">
               <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-lg">
                 <Lock className="h-6 w-6" />
               </span>
@@ -217,10 +194,12 @@ export default function ProjectsPageContent() {
         )}
       </div>
 
-      <ProjectsAuthModal
-        open={showModal && !hasAccess}
-        onUnlocked={handleUnlocked}
-      />
+      {showModal && !hasAccess && (
+        <ProjectsAuthModal
+          open={showModal}
+          onUnlocked={handleUnlocked}
+        />
+      )}
     </div>
   );
 }

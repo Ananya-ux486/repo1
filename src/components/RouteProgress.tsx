@@ -42,6 +42,12 @@ export default function RouteProgress() {
         return;
       }
 
+      try {
+        sessionStorage.setItem("tf-skip-loader", "1");
+      } catch {
+        /* private mode */
+      }
+
       setActive(true);
     };
 
