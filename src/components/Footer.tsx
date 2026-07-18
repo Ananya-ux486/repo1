@@ -8,7 +8,6 @@ import { ChevronRight } from "lucide-react";
 import {
   siteConfig,
   navLinks,
-  webDevelopmentServices,
   services,
 } from "@/data/siteData";
 import { images } from "@/data/images";
@@ -27,15 +26,10 @@ const socialIcons = [
   { icon: FacebookIcon, href: siteConfig.social.facebook, label: "Facebook" },
 ];
 
-const footerServices = [
-  ...webDevelopmentServices.map((s) => ({
-    label: s.title,
-    href: s.href,
-  })),
-  ...services
-    .filter((s) => s.slug === "cyber-security" || s.slug === "data-analytics")
-    .map((s) => ({ label: s.title, href: s.href })),
-];
+const footerServices = services.map((s) => ({
+  label: s.title,
+  href: s.href,
+}));
 
 function FooterHeading({ children }: { children: ReactNode }) {
   return (
@@ -166,13 +160,13 @@ export default function Footer() {
                   </a>
                 </li>
               ))}
-              <li className="flex min-w-0 items-start gap-2.5">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+              <li className="flex min-w-0 items-center gap-2.5">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
                   <Mail className="h-3.5 w-3.5" />
                 </span>
                 <a
                   href={`mailto:${siteConfig.email}`}
-                  className="min-w-0 break-all text-[13px] font-medium leading-snug transition hover:text-brand sm:text-sm"
+                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium transition hover:text-brand"
                   title={siteConfig.email}
                 >
                   {siteConfig.email}

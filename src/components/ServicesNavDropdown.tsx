@@ -1,43 +1,221 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { ChevronRight, ChevronDown } from "lucide-react";
 
-/** Header Services menu — Web Development only + 4 sub-items */
-const WEB_DEV_SUB_ITEMS = [
-  { label: "Static Websites", href: "/services/web-development#static-websites" },
-  { label: "Landing Pages", href: "/services/web-development#landing-pages" },
-  { label: "Dynamic Websites", href: "/services/web-development#dynamic-websites" },
-  { label: "E-Commerce Solutions", href: "/services/web-development#e-commerce-solutions" },
+const SERVICE_MENU = [
+  {
+    label: "Web Development",
+    href: "/services/web-development",
+    color: "from-orange-400 to-amber-500",
+    sub: [
+      { label: "Static Websites", href: "/services/web-development#static-websites" },
+      { label: "Landing Pages", href: "/services/web-development#landing-pages" },
+      { label: "Dynamic Websites", href: "/services/web-development#dynamic-websites" },
+      { label: "E-Commerce Solutions", href: "/services/web-development#e-commerce-solutions" },
+    ],
+  },
+  {
+    label: "Digital Marketing",
+    href: "/services/digital-marketing",
+    color: "from-pink-500 to-rose-500",
+    sub: [
+      { label: "SEO Services", href: "/services/digital-marketing#seo-services" },
+      { label: "Graphic Designing", href: "/services/digital-marketing#graphic-designing" },
+      { label: "Social Media Promotion", href: "/services/digital-marketing#social-media-promotion" },
+      { label: "Verified GNB Creation", href: "/services/digital-marketing#verified-gnd-creation" },
+      { label: "GMB Profile Ranking (Top 5)", href: "/services/digital-marketing#google-my-business-ranking" },
+    ],
+  },
+  {
+    label: "CRM Solutions",
+    href: "/services/crm",
+    color: "from-violet-500 to-purple-600",
+    sub: [
+      { label: "Lead Management", href: "/services/crm#lead-management" },
+      { label: "Service Desk", href: "/services/crm#service-desk" },
+      { label: "Client Management", href: "/services/crm#client-management" },
+      { label: "HR Management", href: "/services/crm#hr-management" },
+      { label: "Email Management", href: "/services/crm#email-management" },
+      { label: "Finance & Advanced Dashboard", href: "/services/crm#finance-dashboard" },
+    ],
+  },
+  {
+    label: "Cloud Solutions",
+    href: "/services#cloud-solutions",
+    color: "from-sky-400 to-blue-500",
+    sub: [],
+  },
+  {
+    label: "Cyber Security",
+    href: "/services#cyber-security",
+    color: "from-emerald-500 to-teal-600",
+    sub: [],
+  },
+  {
+    label: "Data Analytics",
+    href: "/services#data-analytics",
+    color: "from-indigo-500 to-blue-600",
+    sub: [],
+  },
 ] as const;
 
-export default function ServicesNavDropdown({
-  onNavigate,
-}: {
-  onNavigate?: () => void;
-}) {
+// ── Desktop flyout (two-column) ───────────────────────────────────────────────
+function DesktopDropdown({ onNavigate }: { onNavigate?: () => void }) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const active = activeIndex !== null ? SERVICE_MENU[activeIndex] : null;
+
   return (
-    <nav aria-label="Web development services">
-      <Link
-        href="/services/web-development"
-        onClick={onNavigate}
-        className="block border-b border-border/50 bg-brand/[0.04] px-4 py-3 text-sm font-bold text-brand transition hover:bg-brand/10"
-      >
-        Web Development
-      </Link>
-      <ul className="py-2">
-        {WEB_DEV_SUB_ITEMS.map((item) => (
-          <li key={item.href}>
+    <div className="flex overflow-hidden rounded-2xl border border-border/60 bg-white shadow-2xl shadow-black/10" style={{ minWidth: 480 }}>
+      {/* Left — main headings */}
+      <div className="w-52 shrink-0 border-r border-border/40 bg-gradient-to-b from-orange-50/60 to-white py-2">
+        {SERVICE_MENU.map((item, i) => (
+          <div
+            key={item.label}
+            className={`group flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-semibold transition-all cursor-pointer ${
+              activeIndex === i
+                ? "bg-brand/10 text-brand"
+                : "text-foreground/80 hover:bg-brand/[0.06] hover:text-brand"
+            }`}
+            onClick={() => setActiveIndex(activeIndex === i ? null : i)}
+          >
+            <Link
+              href={item.href}
+              onClick={(e) => {
+                if (item.sub.length > 0) {
+                  e.preventDefault();
+                  setActiveIndex(activeIndex === i ? null : i);
+                } else {
+                  onNavigate?.();
+                }
+              }}
+              className="flex-1 py-0.5"
+            >
+              {item.label}
+            </Link>
+            {item.sub.length > 0 && (
+              <ChevronRight
+                className={`h-3.5 w-3.5 shrink-0 transition-transform ${
+                  activeIndex === i ? "rotate-90 text-brand" : "text-muted"
+                }`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Right — sub-items */}
+      <div className="flex flex-1 flex-col min-w-[220px]">
+        {active ? (
+          <>
+            <div className={`bg-gradient-to-r ${active.color} px-5 py-3.5`}>
+              <Link
+                href={active.href}
+                onClick={onNavigate}
+                className="text-sm font-bold text-white transition hover:opacity-80"
+              >
+                {active.label}
+              </Link>
+            </div>
+
+            {active.sub.length > 0 ? (
+              <ul className="flex-1 py-2">
+                {active.sub.map((sub) => (
+                  <li key={sub.href}>
+                    <Link
+                      href={sub.href}
+                      onClick={onNavigate}
+                      className="flex items-center gap-2.5 px-5 py-2 text-sm text-muted transition hover:bg-brand/[0.06] hover:text-brand"
+                    >
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand/50" />
+                      {sub.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-1 items-center justify-center px-5 py-6 text-center">
+                <Link
+                  href={active.href}
+                  onClick={onNavigate}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand/20"
+                >
+                  View {active.label}
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-1 items-center justify-center px-6 py-8 text-center">
+            <p className="text-sm text-muted">Select a service to see details</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Mobile accordion ──────────────────────────────────────────────────────────
+function MobileDropdown({ onNavigate }: { onNavigate?: () => void }) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="py-1">
+      {SERVICE_MENU.map((item, i) => (
+        <div key={item.label}>
+          <div className="flex items-center">
             <Link
               href={item.href}
               onClick={onNavigate}
-              className="flex items-center gap-2 py-2 pl-6 pr-4 text-xs font-medium text-muted transition hover:bg-surface hover:text-brand"
+              className="flex-1 px-4 py-2.5 text-sm font-semibold text-foreground/80 hover:text-brand"
             >
-              <span className="h-1 w-1 shrink-0 rounded-full bg-brand/60" aria-hidden />
               {item.label}
             </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+            {item.sub.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                className="px-3 py-2.5 text-muted"
+                aria-label={`Toggle ${item.label} sub-menu`}
+              >
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${openIndex === i ? "rotate-180 text-brand" : ""}`}
+                />
+              </button>
+            )}
+          </div>
+          {openIndex === i && item.sub.length > 0 && (
+            <ul className="pb-1 pl-4">
+              {item.sub.map((sub) => (
+                <li key={sub.href}>
+                  <Link
+                    href={sub.href}
+                    onClick={onNavigate}
+                    className="flex items-center gap-2 py-2 pl-3 pr-4 text-xs text-muted hover:text-brand"
+                  >
+                    <span className="h-1 w-1 shrink-0 rounded-full bg-brand/60" />
+                    {sub.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
   );
+}
+
+// ── Export — renders correct variant based on prop ────────────────────────────
+export default function ServicesNavDropdown({
+  onNavigate,
+  mobile = false,
+}: {
+  onNavigate?: () => void;
+  mobile?: boolean;
+}) {
+  if (mobile) return <MobileDropdown onNavigate={onNavigate} />;
+  return <DesktopDropdown onNavigate={onNavigate} />;
 }

@@ -185,6 +185,254 @@ export const webDevelopmentServices = [
   },
 ];
 
+export const digitalMarketingServices = [
+  {
+    slug: "seo-services",
+    title: "SEO Services",
+    tagline: "Rank higher on Google with a free audit report to start.",
+    description:
+      "End-to-end search engine optimisation — technical fixes, on-page content, and link building to grow organic traffic.",
+    features: [
+      "Free website SEO audit report",
+      "On-page & technical SEO fixes",
+      "Keyword research & content strategy",
+      "Google Search Console setup",
+      "Backlink building & off-page SEO",
+      "Monthly ranking & traffic reports",
+    ],
+    details:
+      "Every engagement starts with a free, no-obligation SEO audit that maps exactly what is hurting your rankings. From there we fix site structure, page speed, meta data, and content gaps — and build authority through quality links. Reports every month keep you informed on where you rank and where traffic is coming from.",
+    includesFreeAudit: true,
+    priceNote: "Pricing as per requirements / budget",
+    accent: "amber",
+    href: "/services/digital-marketing#seo-services",
+  },
+  {
+    slug: "graphic-designing",
+    title: "Graphic Designing",
+    tagline: "Brand visuals, social creatives, and marketing collateral that stand out.",
+    description:
+      "Professional graphic design for brand identity, social media posts, banners, brochures, and digital campaigns.",
+    features: [
+      "Logo & brand identity design",
+      "Social media post creatives",
+      "Digital & print banners",
+      "Brochures & flyers",
+      "Pitch deck / presentation design",
+      "Ad creative for campaigns",
+    ],
+    details:
+      "Great marketing starts with visuals that stop the scroll. We design social media creatives, brand assets, and campaign collateral that look consistent and professional — whether shared on Instagram, printed on a banner, or attached to a proposal. Fast turnaround, unlimited revisions on concepts, and files delivered print-ready and web-ready.",
+    includesFreeAudit: false,
+    priceNote: "Pricing as per requirements / budget",
+    accent: "coral",
+    href: "/services/digital-marketing#graphic-designing",
+  },
+  {
+    slug: "social-media-promotion",
+    title: "Social Media Promotion",
+    tagline: "Meta campaigns, Google Ads, and Meta Ads — measurable results every month.",
+    description:
+      "Paid advertising and organic growth across Meta (Facebook & Instagram) and Google to drive leads, sales, and brand awareness.",
+    subServices: [
+      {
+        name: "Meta Campaigns",
+        description:
+          "Audience-targeted Facebook & Instagram campaigns with creative, copy, and optimisation for leads or reach.",
+      },
+      {
+        name: "Google Ads",
+        description:
+          "Search, display, and performance max campaigns on Google to capture high-intent buyers and drive conversions.",
+      },
+      {
+        name: "Meta Ads",
+        description:
+          "Scroll-stopping ad creatives and strategic targeting on Meta platforms to grow brand and generate enquiries.",
+      },
+    ],
+    features: [
+      "Meta (Facebook & Instagram) campaigns",
+      "Google Search & Display Ads",
+      "Ad creative design included",
+      "Audience targeting & retargeting",
+      "A/B testing for best-performing ads",
+      "Weekly performance reporting",
+    ],
+    details:
+      "We manage ad spend carefully so every rupee goes towards real results — leads, calls, and sales — not vanity metrics. Strategy, creative, targeting, and optimisation are handled by our team. You get transparent reports showing spend, impressions, clicks, and conversions so the ROI is always clear.",
+    includesFreeAudit: false,
+    priceNote: "Pricing as per requirements / budget",
+    accent: "sky",
+    href: "/services/digital-marketing#social-media-promotion",
+  },
+  {
+    slug: "verified-gnd-creation",
+    title: "Verified GNB Creation",
+    tagline: "Establish your verified brand presence across key digital directories.",
+    description:
+      "Get your business listed, verified, and optimised on Google, business directories, and key digital platforms.",
+    features: [
+      "Google My Business setup & verification",
+      "Business directory listings",
+      "Brand consistency across platforms",
+      "Citation building & NAP accuracy",
+      "Review management setup",
+      "Profile optimisation for discovery",
+    ],
+    details:
+      "A verified, consistent business presence across directories builds trust with both customers and search engines. We handle the setup, verification, and optimisation of your profiles on Google, Just Dial, Sulekha, India Mart, and other relevant platforms — making sure your name, address, and phone number match everywhere and your business shows up when it counts.",
+    includesFreeAudit: false,
+    priceNote: "Pricing as per requirements / budget",
+    accent: "mint",
+    href: "/services/digital-marketing#verified-gnd-creation",
+  },
+  {
+    slug: "google-my-business-ranking",
+    title: "Google My Business Profile Ranking",
+    tagline: "Top 5 local pack ranking — more calls, more walk-ins.",
+    description:
+      "Strategic GMB optimisation to rank your business in the local top 5 results on Google Maps and Search.",
+    features: [
+      "Top 5 local map pack targeting",
+      "GMB profile deep optimisation",
+      "Regular posts & Q&A management",
+      "Photo & category optimisation",
+      "Review strategy & response templates",
+      "Local keyword targeting",
+    ],
+    details:
+      "When someone searches for your service near them, showing up in the top 5 on Google Maps is the difference between a call and being invisible. We optimise every element of your Google Business Profile — category, attributes, photos, posts, and reviews — and use local SEO techniques to improve your map pack position consistently over time.",
+    includesFreeAudit: false,
+    priceNote: "Pricing as per requirements / budget",
+    accent: "amber",
+    href: "/services/digital-marketing#google-my-business-ranking",
+  },
+];
+
+export const crmServices = [
+  {
+    slug: "lead-management",
+    title: "Lead Management",
+    tagline: "Capture, track and convert all your business leads in one place.",
+    description:
+      "Capture, track and manage all business leads in one centralized system for better conversions.",
+    features: [
+      "Lead capture from multiple sources",
+      "Lead status & pipeline tracking",
+      "Automated follow-up reminders",
+      "Lead assignment to team members",
+      "Conversion analytics & reports",
+      "Integration with web forms",
+    ],
+    details:
+      "Never lose a lead again. Our CRM captures enquiries from your website, ads, and manual entry into a single pipeline. Each lead is tracked through stages — from first contact to closed deal — with automated reminders so your team follows up on time, every time.",
+    priceNote: "Pricing as per requirements / budget",
+    accent: "amber",
+    href: "/services/crm#lead-management",
+  },
+  {
+    slug: "service-desk",
+    title: "Service Desk",
+    tagline: "Manage customer tickets and support requests with ease.",
+    description:
+      "Manage customer tickets, support requests and issue resolution with an organized service desk.",
+    features: [
+      "Ticket creation & categorisation",
+      "Priority & SLA management",
+      "Agent assignment & tracking",
+      "Customer communication log",
+      "Resolution status updates",
+      "Support performance reports",
+    ],
+    details:
+      "Give your support team a structured workspace. Every customer complaint or request becomes a trackable ticket with priority levels, assigned agents, and SLA timers — so nothing slips through and clients always get timely responses.",
+    priceNote: "Pricing as per requirements / budget",
+    accent: "coral",
+    href: "/services/crm#service-desk",
+  },
+  {
+    slug: "client-management",
+    title: "Client Management",
+    tagline: "Store complete client profiles, history and service records.",
+    description:
+      "Store and manage complete client details, communication history and service records securely.",
+    features: [
+      "Centralised client profiles",
+      "Communication history log",
+      "Document & contract storage",
+      "Service & purchase records",
+      "Notes & activity timeline",
+      "Role-based access control",
+    ],
+    details:
+      "Keep every client detail in one secure place. From first interaction to ongoing projects, your team has instant access to contact info, past conversations, documents, and billing history — enabling faster, more personalised service.",
+    priceNote: "Pricing as per requirements / budget",
+    accent: "sky",
+    href: "/services/crm#client-management",
+  },
+  {
+    slug: "hr-management",
+    title: "HR Management",
+    tagline: "Manage employees, attendance, roles and HR operations centrally.",
+    description:
+      "Manage employees, attendance, roles and HR operations through a centralized HR system.",
+    features: [
+      "Employee profiles & records",
+      "Attendance & leave tracking",
+      "Role & department management",
+      "Payroll summary reports",
+      "Onboarding workflow",
+      "Performance tracking",
+    ],
+    details:
+      "Streamline your HR operations without spreadsheets. Track attendance, manage leave requests, maintain employee records, and oversee onboarding — all from a single dashboard that keeps your HR team organised and compliant.",
+    priceNote: "Pricing as per requirements / budget",
+    accent: "mint",
+    href: "/services/crm#hr-management",
+  },
+  {
+    slug: "email-management",
+    title: "Email Management",
+    tagline: "Secure and organised email handling for teams and clients.",
+    description:
+      "Secure and organized email handling system for internal teams and client communication.",
+    features: [
+      "Centralised inbox management",
+      "Email templates & automation",
+      "Team inbox & shared folders",
+      "Client email history tracking",
+      "Campaign & bulk email support",
+      "Email open & reply analytics",
+    ],
+    details:
+      "Keep all client and team communication organised in one place. Shared inboxes, saved templates, and automated responses help your team respond faster — while every email is logged against the relevant client or ticket for full visibility.",
+    priceNote: "Pricing as per requirements / budget",
+    accent: "amber",
+    href: "/services/crm#email-management",
+  },
+  {
+    slug: "finance-dashboard",
+    title: "Finance & Advanced Dashboard",
+    tagline: "Real-time finance data, reports and business insights at a glance.",
+    description:
+      "Private dashboards with real-time finance data, reports, analytics and business insights.",
+    features: [
+      "Revenue & expense tracking",
+      "Invoice & payment management",
+      "Profit & loss overview",
+      "Custom analytics dashboards",
+      "Team performance metrics",
+      "Exportable financial reports",
+    ],
+    details:
+      "Get a real-time view of your business health. Track invoices, payments, expenses, and revenue — all visualised in clean dashboards. Leadership gets the big picture; finance teams get the details — with exportable reports ready for accounting or audits.",
+    priceNote: "Pricing as per requirements / budget",
+    accent: "coral",
+    href: "/services/crm#finance-dashboard",
+  },
+];
+
 export const services = [
   {
     slug: "web-development",
@@ -193,6 +441,22 @@ export const services = [
       "We create fast, responsive, and scalable websites that enhance your online presence and drive business growth.",
     features: ["Frontend & Backend Development", "Mobile-Friendly & Responsive Design"],
     href: "/services/web-development",
+  },
+  {
+    slug: "digital-marketing",
+    title: "Digital Marketing",
+    description:
+      "Full-stack digital marketing to grow your brand — SEO, paid ads, social media, GMB ranking, and graphic design.",
+    features: ["SEO & Google My Business Ranking", "Meta & Google Ads Campaigns"],
+    href: "/services/digital-marketing",
+  },
+  {
+    slug: "crm",
+    title: "CRM Solutions",
+    description:
+      "One platform to manage leads, clients, teams and finances — a complete CRM built around your business workflows.",
+    features: ["Lead & Client Management", "HR, Email & Finance Dashboards"],
+    href: "/services/crm",
   },
   {
     slug: "cloud-solutions",

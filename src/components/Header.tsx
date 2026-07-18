@@ -92,9 +92,7 @@ export default function Header() {
                         transition={{ duration: 0.2 }}
                         className="absolute top-full left-0 z-50 pt-1"
                       >
-                        <div className="w-56 overflow-hidden rounded-xl border border-border bg-white shadow-xl">
-                          <ServicesNavDropdown />
-                        </div>
+                        <ServicesNavDropdown onNavigate={() => setServicesOpen(false)} />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -192,7 +190,7 @@ export default function Header() {
                             exit={{ opacity: 0, height: 0 }}
                             className="overflow-hidden pl-2"
                           >
-                            <ServicesNavDropdown onNavigate={() => setMobileOpen(false)} />
+                            <ServicesNavDropdown mobile onNavigate={() => setMobileOpen(false)} />
                           </motion.div>
                         )}
                       </AnimatePresence>
