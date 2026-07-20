@@ -49,8 +49,8 @@ export default function PageLoader() {
       (mem !== undefined && mem <= 4) ||
       (cores <= 4 && window.innerWidth < 1024);
 
-    const revealMs = reducedMotion ? 700 : seenBefore ? 1900 : lowSpec ? 2200 : 2600;
-    const hideMs = reducedMotion ? 1000 : seenBefore ? 2500 : lowSpec ? 2900 : 3300;
+    const revealMs = reducedMotion ? 300 : seenBefore ? 900 : lowSpec ? 1200 : 1600;
+    const hideMs = reducedMotion ? 500 : seenBefore ? 1300 : lowSpec ? 1700 : 2100;
 
     let finished = false;
     const finish = () => {

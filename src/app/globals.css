@@ -1180,7 +1180,7 @@ html.gt-switching body {
 
 .tf-route-progress {
   transform-origin: left center;
-  animation: tf-route-progress 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: tf-route-progress 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* ── Mobile & tablet only (desktop lg+ unchanged) ── */
@@ -1620,7 +1620,7 @@ body[data-tf-loading="revealing"] #tf-page-scroll {
   visibility: visible;
   pointer-events: auto;
   opacity: 1;
-  animation: tf-page-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: tf-page-reveal 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 body[data-tf-loading="revealing"] .site-header,
@@ -1628,7 +1628,7 @@ body[data-tf-loading="revealing"] .site-floating-widgets {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  animation: tf-page-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: tf-page-reveal 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 body[data-tf-loading="done"] > :not(.tf-loader) {
@@ -1645,7 +1645,7 @@ body[data-tf-loading="done"] #app-root {
 @keyframes tf-page-reveal {
   0% {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(8px);
   }
   100% {
     opacity: 1;

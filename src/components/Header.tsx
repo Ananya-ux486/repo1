@@ -88,10 +88,10 @@ export default function Header() {
                   <AnimatePresence>
                     {servicesOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.2 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.15 }}
                         className="absolute top-full left-0 z-50 pt-1"
                       >
                         <ServicesNavDropdown onNavigate={() => setServicesOpen(false)} />
@@ -121,14 +121,24 @@ export default function Header() {
                   <AnimatePresence>
                     {catalogueOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.2 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.15 }}
                         className="absolute top-full left-0 z-50 pt-1"
                       >
                         <div className="min-w-[180px] overflow-hidden rounded-2xl border border-border/60 bg-white py-2 shadow-2xl shadow-black/10">
-                          {catalogueNavLinks.map((item) => (
+                          <a
+                            href="/brochure"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setCatalogueOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold transition-all hover:bg-brand/[0.06] hover:text-brand text-foreground/80"
+                          >
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand/50" />
+                            Catalogue
+                          </a>
+                          {catalogueNavLinks.slice(1).map((item) => (
                             <Link
                               key={item.href}
                               href={item.href}
@@ -203,6 +213,7 @@ export default function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden border-t border-border bg-white lg:hidden"
           >
             <nav className="flex max-h-[calc(100dvh-var(--tf-header-height)-0.5rem)] flex-col gap-1 overflow-y-auto overscroll-contain p-4">
@@ -237,6 +248,7 @@ export default function Header() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                             className="overflow-hidden pl-2"
                           >
                             <ServicesNavDropdown mobile onNavigate={() => setMobileOpen(false)} />
@@ -272,10 +284,21 @@ export default function Header() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                             className="overflow-hidden pl-2"
                           >
                             <div className="py-1">
-                              {catalogueNavLinks.map((item) => (
+                              <a
+                                href="/brochure"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => setMobileOpen(false)}
+                                className="flex items-center gap-2 py-2 pl-3 pr-4 text-xs text-muted hover:text-brand"
+                              >
+                                <span className="h-1 w-1 shrink-0 rounded-full bg-brand/60" />
+                                Catalogue
+                              </a>
+                              {catalogueNavLinks.slice(1).map((item) => (
                                 <Link
                                   key={item.href}
                                   href={item.href}
