@@ -180,24 +180,64 @@ export const catalogueProcess = [
 
 export const catalogueFaqs = [
   {
+    category: "General",
     q: "What is included in the Technology Catalogue?",
     a: "It summarizes our delivery capabilities — solution categories, technology stack, process, and engagement style — so you can quickly see how we can support your project.",
   },
   {
+    category: "General",
     q: "Do you customize solutions for each business?",
     a: "Yes. Every engagement starts with discovery. We adapt architecture, design, and features to your goals, users, and budget — not a one-size template.",
   },
   {
+    category: "General",
     q: "Can you work with an existing website or product?",
     a: "Absolutely. We audit, improve, migrate, or extend existing platforms — including performance, security, UX, and feature upgrades.",
   },
   {
+    category: "Pricing & Timeline",
     q: "How do pricing and timelines work?",
     a: "After a short brief we share a clear scope, estimate, and timeline. Packages are available for common website needs, while custom software is quoted by deliverables.",
   },
   {
+    category: "Pricing & Timeline",
+    q: "Do you offer flexible payment terms?",
+    a: "Yes. We typically work with a milestone-based payment structure — an initial deposit, mid-project payment, and final payment on delivery. For ongoing retainers, monthly billing is available.",
+  },
+  {
+    category: "Pricing & Timeline",
+    q: "What is the typical project turnaround time?",
+    a: "Static websites: 5–10 days. Landing pages: 3–7 days. Dynamic websites: 3–6 weeks. E-commerce stores: 4–8 weeks. Custom software: 6–16 weeks depending on complexity. Timelines are confirmed after the brief.",
+  },
+  {
+    category: "Technical",
+    q: "Which technologies do you specialize in?",
+    a: "Our core stack includes React, Next.js, Node.js, Laravel, MongoDB, PostgreSQL, and AWS/Azure. We also work with Shopify for e-commerce and integrate third-party APIs as needed.",
+  },
+  {
+    category: "Technical",
+    q: "Do you provide hosting and domain setup?",
+    a: "Yes. Our website packages include domain and hosting setup. For custom software, we deploy to AWS, Azure, or your preferred cloud provider and handle all configuration.",
+  },
+  {
+    category: "Technical",
+    q: "Is SEO included in web development projects?",
+    a: "Yes. All our websites are built with SEO best practices — semantic HTML, fast load times, mobile responsiveness, meta tags, and Google Search Console integration are included by default.",
+  },
+  {
+    category: "Support",
     q: "Do you provide support after launch?",
     a: "Yes. We offer maintenance, updates, monitoring guidance, and ongoing improvements so your product stays secure and useful.",
+  },
+  {
+    category: "Support",
+    q: "What does post-launch support include?",
+    a: "Our support covers bug fixes, minor content updates, security patches, uptime monitoring, and technical consultation. We offer both one-time support packages and ongoing monthly retainers.",
+  },
+  {
+    category: "Support",
+    q: "How do I contact support after my project is delivered?",
+    a: "You can reach our team via email at info@tasmafivesolutions.com or WhatsApp. We typically respond within 4–8 business hours for support queries.",
   },
 ];
 

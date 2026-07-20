@@ -43,28 +43,19 @@ const SERVICE_MENU = [
   },
   {
     label: "Cloud Solutions",
-    href: "/services#cloud-solutions",
+    href: "/services/cloud-solutions",
     color: "from-sky-400 to-blue-500",
-    sub: [],
-  },
-  {
-    label: "Cyber Security",
-    href: "/services#cyber-security",
-    color: "from-emerald-500 to-teal-600",
-    sub: [],
-  },
-  {
-    label: "Data Analytics",
-    href: "/services#data-analytics",
-    color: "from-indigo-500 to-blue-600",
-    sub: [],
+    sub: [
+      { label: "AWS Solutions", href: "/services/cloud-solutions#aws-solutions" },
+      { label: "Azure Solutions", href: "/services/cloud-solutions#azure-solutions" },
+    ],
   },
 ] as const;
 
 // ── Desktop flyout (two-column) ───────────────────────────────────────────────
 function DesktopDropdown({ onNavigate }: { onNavigate?: () => void }) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const active = activeIndex !== null ? SERVICE_MENU[activeIndex] : null;
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const active = SERVICE_MENU[activeIndex];
 
   return (
     <div className="flex overflow-hidden rounded-2xl border border-border/60 bg-white shadow-2xl shadow-black/10" style={{ minWidth: 480 }}>
@@ -78,14 +69,14 @@ function DesktopDropdown({ onNavigate }: { onNavigate?: () => void }) {
                 ? "bg-brand/10 text-brand"
                 : "text-foreground/80 hover:bg-brand/[0.06] hover:text-brand"
             }`}
-            onClick={() => setActiveIndex(activeIndex === i ? null : i)}
+            onClick={() => setActiveIndex(i)}
           >
             <Link
               href={item.href}
               onClick={(e) => {
                 if (item.sub.length > 0) {
                   e.preventDefault();
-                  setActiveIndex(activeIndex === i ? null : i);
+                  setActiveIndex(i);
                 } else {
                   onNavigate?.();
                 }
@@ -107,49 +98,41 @@ function DesktopDropdown({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* Right — sub-items */}
       <div className="flex flex-1 flex-col min-w-[220px]">
-        {active ? (
-          <>
-            <div className={`bg-gradient-to-r ${active.color} px-5 py-3.5`}>
-              <Link
-                href={active.href}
-                onClick={onNavigate}
-                className="text-sm font-bold text-white transition hover:opacity-80"
-              >
-                {active.label}
-              </Link>
-            </div>
+        <div className={`bg-gradient-to-r ${active.color} px-5 py-3.5`}>
+          <Link
+            href={active.href}
+            onClick={onNavigate}
+            className="text-sm font-bold text-white transition hover:opacity-80"
+          >
+            {active.label}
+          </Link>
+        </div>
 
-            {active.sub.length > 0 ? (
-              <ul className="flex-1 py-2">
-                {active.sub.map((sub) => (
-                  <li key={sub.href}>
-                    <Link
-                      href={sub.href}
-                      onClick={onNavigate}
-                      className="flex items-center gap-2.5 px-5 py-2 text-sm text-muted transition hover:bg-brand/[0.06] hover:text-brand"
-                    >
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand/50" />
-                      {sub.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="flex flex-1 items-center justify-center px-5 py-6 text-center">
+        {active.sub.length > 0 ? (
+          <ul className="flex-1 py-2">
+            {active.sub.map((sub) => (
+              <li key={sub.href}>
                 <Link
-                  href={active.href}
+                  href={sub.href}
                   onClick={onNavigate}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand/20"
+                  className="flex items-center gap-2.5 px-5 py-2 text-sm text-muted transition hover:bg-brand/[0.06] hover:text-brand"
                 >
-                  View {active.label}
-                  <ChevronRight className="h-3.5 w-3.5" />
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand/50" />
+                  {sub.label}
                 </Link>
-              </div>
-            )}
-          </>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <div className="flex flex-1 items-center justify-center px-6 py-8 text-center">
-            <p className="text-sm text-muted">Select a service to see details</p>
+          <div className="flex flex-1 items-center justify-center px-5 py-6 text-center">
+            <Link
+              href={active.href}
+              onClick={onNavigate}
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand/20"
+            >
+              View {active.label}
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
         )}
       </div>

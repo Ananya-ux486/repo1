@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, CreditCard } from "lucide-react";
-import { navLinks, siteConfig } from "@/data/siteData";
+import { navLinks, siteConfig, catalogueNavLinks } from "@/data/siteData";
 import { images } from "@/data/images";
 import ChatbotTrigger from "@/components/ChatbotTrigger";
 import ServicesNavDropdown from "@/components/ServicesNavDropdown";
@@ -16,7 +16,9 @@ export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [catalogueOpen, setCatalogueOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [mobileCatalogueOpen, setMobileCatalogueOpen] = useState(false);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -93,6 +95,53 @@ export default function Header() {
                         className="absolute top-full left-0 z-50 pt-1"
                       >
                         <ServicesNavDropdown onNavigate={() => setServicesOpen(false)} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+
+            if (link.label === "Catalogue") {
+              return (
+                <div
+                  key={link.href}
+                  className="relative"
+                  onMouseEnter={() => setCatalogueOpen(true)}
+                  onMouseLeave={() => setCatalogueOpen(false)}
+                >
+                  <Link href={link.href} className={`flex items-center gap-1 ${linkClass(isActive)}`}>
+                    {link.label}
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform duration-300 ${
+                        catalogueOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Link>
+                  <AnimatePresence>
+                    {catalogueOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-0 z-50 pt-1"
+                      >
+                        <div className="min-w-[180px] overflow-hidden rounded-2xl border border-border/60 bg-white py-2 shadow-2xl shadow-black/10">
+                          {catalogueNavLinks.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={() => setCatalogueOpen(false)}
+                              className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold transition-all hover:bg-brand/[0.06] hover:text-brand ${
+                                pathname === item.href ? "bg-brand/10 text-brand" : "text-foreground/80"
+                              }`}
+                            >
+                              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand/50" />
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -191,6 +240,53 @@ export default function Header() {
                             className="overflow-hidden pl-2"
                           >
                             <ServicesNavDropdown mobile onNavigate={() => setMobileOpen(false)} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                }
+
+                if (link.label === "Catalogue") {
+                  return (
+                    <div key={link.href}>
+                      <button
+                        type="button"
+                        onClick={() => setMobileCatalogueOpen(!mobileCatalogueOpen)}
+                        className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition ${
+                          isActive
+                            ? "bg-brand/10 text-brand"
+                            : "text-muted hover:bg-surface hover:text-foreground"
+                        }`}
+                      >
+                        Catalogue
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform ${
+                            mobileCatalogueOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      <AnimatePresence>
+                        {mobileCatalogueOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden pl-2"
+                          >
+                            <div className="py-1">
+                              {catalogueNavLinks.map((item) => (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  onClick={() => setMobileOpen(false)}
+                                  className="flex items-center gap-2 py-2 pl-3 pr-4 text-xs text-muted hover:text-brand"
+                                >
+                                  <span className="h-1 w-1 shrink-0 rounded-full bg-brand/60" />
+                                  {item.label}
+                                </Link>
+                              ))}
+                            </div>
                           </motion.div>
                         )}
                       </AnimatePresence>

@@ -5,8 +5,6 @@ import { motion } from "framer-motion";
 import {
   Globe,
   Cloud,
-  Shield,
-  BarChart3,
   ArrowRight,
   ArrowLeft,
   Layout,
@@ -29,6 +27,8 @@ import {
   UserCog,
   Mail,
   BarChart2,
+  Server,
+  Building2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -36,6 +36,7 @@ import {
   webDevelopmentServices,
   digitalMarketingServices,
   crmServices,
+  cloudSolutionsServices,
   siteConfig,
 } from "@/data/siteData";
 import IridescentTitle from "@/components/IridescentTitle";
@@ -46,8 +47,6 @@ const mainIcons: Record<string, LucideIcon> = {
   "Digital Marketing": Megaphone,
   "CRM Solutions": Users,
   "Cloud Solutions": Cloud,
-  "Cyber Security": Shield,
-  "Data Analytics": BarChart3,
 };
 
 const webDevIcons: Record<string, LucideIcon> = {
@@ -150,9 +149,6 @@ function ServiceDetailBlock({
 }
 
 export function ServicesOverview() {
-  const specialSlugs = ["web-development", "digital-marketing", "crm"];
-  const detailServices = services.filter((s) => !specialSlugs.includes(s.slug));
-
   // Helper to render a special highlighted card
   function SpecialCard({
     id,
@@ -272,25 +268,25 @@ export function ServicesOverview() {
         linkLabel="View all CRM modules"
       />
 
-      {/* 4+ remaining services */}
-      {detailServices.map((service, i) => (
-        <ServiceDetailBlock
-          key={service.slug}
-          id={service.slug}
-          icon={mainIcons[service.title] || Cloud}
-          title={service.title}
-          description={service.description}
-          features={service.features}
-          details={
-            service.slug === "cloud-solutions"
-              ? "Migrate, host, and manage your apps on reliable cloud infrastructure — with monitoring, backups, and scale when traffic grows."
-              : service.slug === "cyber-security"
-                ? "Protect websites and business data with hardening, SSL, access controls, and practical threat-prevention suited to growing brands."
-                : "Turn raw numbers into clear reports and dashboards so your team can track performance and make faster decisions."
-          }
-          index={i}
-        />
-      ))}
+      {/* 4. Cloud Solutions */}
+      <SpecialCard
+        index={3}
+        id="cloud-solutions"
+        icon={Cloud}
+        title="Cloud Solutions"
+        description="Secure, scalable, and cost-effective cloud solutions to store, manage, and access data seamlessly from anywhere."
+        detail="Choose from AWS Solutions and Azure Solutions — enterprise-grade cloud infrastructure tailored to your application needs, with full setup, migration, and ongoing management support."
+        features={[
+          "AWS cloud setup & management",
+          "Azure enterprise cloud services",
+          "Cloud migration & deployment",
+          "Auto-scaling & load balancing",
+          "Cloud storage & database hosting",
+          "Security, monitoring & cost optimisation",
+        ]}
+        linkHref="/services/cloud-solutions"
+        linkLabel="View all cloud solutions"
+      />
     </div>
   );
 }
@@ -884,6 +880,165 @@ export function CrmDetail() {
 
       {crmServices.map((service, i) => (
         <CrmCard key={service.slug} service={service} index={i} />
+      ))}
+    </div>
+  );
+}
+
+// ─── Cloud Solutions ──────────────────────────────────────────────────────────
+
+const cloudIcons: Record<string, LucideIcon> = {
+  "aws-solutions": Server,
+  "azure-solutions": Building2,
+};
+
+const cloudAccentStyles: Record<
+  string,
+  { panel: string; badge: string; icon: string }
+> = {
+  sky: {
+    panel: "bg-[#9FD4F0] border-[#7BC0E4]",
+    badge: "bg-slate-900 text-white",
+    icon: "bg-slate-900 text-[#9FD4F0]",
+  },
+  mint: {
+    panel: "bg-[#A8E0C8] border-[#86CFAF]",
+    badge: "bg-slate-900 text-white",
+    icon: "bg-slate-900 text-[#A8E0C8]",
+  },
+};
+
+type CloudService = (typeof cloudSolutionsServices)[number];
+
+function CloudCard({
+  service,
+  index,
+}: {
+  service: CloudService;
+  index: number;
+}) {
+  const Icon = cloudIcons[service.slug] ?? Cloud;
+  const accent = cloudAccentStyles[service.accent] ?? cloudAccentStyles.sky;
+  const fromLeft = index % 2 === 0;
+
+  return (
+    <motion.article
+      id={service.slug}
+      initial={{ opacity: 0, x: fromLeft ? -56 : 56, y: 24 }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
+      viewport={{ once: false, amount: 0.2 }}
+      transition={{ duration: 0.7, delay: 0.05, ease: floatEase }}
+      className={`scroll-mt-28 overflow-hidden rounded-3xl border ${accent.panel} shadow-sm`}
+    >
+      <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
+        {/* ── Left panel ── */}
+        <div className="flex flex-col justify-between p-5 sm:p-7 lg:p-8">
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${accent.icon}`}>
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${accent.badge}`}>
+                Platform 0{index + 1}
+              </span>
+            </div>
+
+            <h2 className="mt-5 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-[2.75rem]">
+              {service.title}
+            </h2>
+            <p className="mt-3 max-w-xl text-base font-medium leading-relaxed text-slate-800/85 sm:text-lg">
+              {service.tagline}
+            </p>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-700/80 sm:text-[15px]">
+              {service.details}
+            </p>
+
+            <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
+              {service.features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm font-medium text-slate-800">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900/10">
+                    <Check className="h-3 w-3 text-slate-900" />
+                  </span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/contact"
+              className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border border-slate-900/20 bg-white/50 px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white"
+            >
+              Ask a question
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+
+        {/* ── Right panel — pricing ── */}
+        <div className="border-t border-black/10 bg-white/35 p-5 sm:p-7 lg:border-l lg:border-t-0 lg:p-8">
+          <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-700">
+            Flexible pricing
+          </p>
+
+          <div className="mt-5 rounded-2xl border border-slate-900/10 bg-white/70 p-5 sm:p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900/8">
+              <Wallet className="h-5 w-5 text-slate-700" />
+            </div>
+            <p className="mt-4 text-2xl font-black text-slate-900 sm:text-3xl">
+              Pricing as per
+              <br />
+              requirements / scope
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-slate-700">
+              Cloud infrastructure costs depend on your application size, traffic, and uptime requirements. We provide a transparent cost breakdown before any work begins.
+            </p>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            <div className="flex items-start gap-2 text-sm text-slate-700">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-slate-900" />
+              No hidden charges — clear scope agreed upfront
+            </div>
+            <div className="flex items-start gap-2 text-sm text-slate-700">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-slate-900" />
+              Monthly management or one-time setup available
+            </div>
+          </div>
+
+          <p className="mt-5 text-xs leading-relaxed text-slate-600">
+            Reach out and we will share a custom infrastructure proposal within 24 hours.
+          </p>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+export function CloudSolutionsDetail() {
+  return (
+    <div className="space-y-6 lg:space-y-7">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.5 }}
+        transition={{ duration: 0.5, ease: floatEase }}
+        className="mx-auto max-w-3xl text-center"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">
+          Cloud Solutions
+        </p>
+        <h2 className="mt-1.5 text-xl font-bold text-foreground sm:text-2xl">
+          Enterprise cloud infrastructure on AWS & Azure.
+        </h2>
+        <p className="mt-1.5 text-sm text-muted sm:text-base">
+          From simple hosting to complex microservices — we set up, migrate, and manage your cloud infrastructure so you can focus on your business.
+        </p>
+      </motion.div>
+
+      {cloudSolutionsServices.map((service, i) => (
+        <CloudCard key={service.slug} service={service} index={i} />
       ))}
     </div>
   );

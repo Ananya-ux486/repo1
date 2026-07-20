@@ -35,6 +35,11 @@ export const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
+export const catalogueNavLinks = [
+  { label: "Catalogue", href: "/catalogue" },
+  { label: "FAQs", href: "/catalogue/faqs" },
+];
+
 export const heroSlides = [
   {
     id: 1,
@@ -433,6 +438,49 @@ export const crmServices = [
   },
 ];
 
+export const cloudSolutionsServices = [
+  {
+    slug: "aws-solutions",
+    title: "AWS Solutions",
+    tagline: "Scalable, reliable, and secure cloud infrastructure on Amazon Web Services.",
+    description:
+      "Deploy, manage, and scale your applications on AWS — the world's most comprehensive cloud platform.",
+    features: [
+      "EC2 & Auto Scaling setup",
+      "S3 storage & CDN configuration",
+      "RDS & DynamoDB database hosting",
+      "Lambda serverless functions",
+      "CloudFront & Route 53 DNS",
+      "IAM roles & security policies",
+    ],
+    details:
+      "From simple static hosting to complex microservices architecture — we set up, configure, and manage your AWS infrastructure. Whether you need a cost-optimised EC2 instance for your web app, S3 buckets for media storage, or a full VPC setup with auto-scaling, our team handles the complexity so you focus on your business.",
+    priceNote: "Pricing as per requirements / infrastructure scope",
+    accent: "sky",
+    href: "/services/cloud-solutions#aws-solutions",
+  },
+  {
+    slug: "azure-solutions",
+    title: "Azure Solutions",
+    tagline: "Enterprise-grade cloud services and integrations on Microsoft Azure.",
+    description:
+      "Build, host, and manage enterprise applications and services on Microsoft Azure with full lifecycle support.",
+    features: [
+      "Azure App Service & VMs",
+      "Azure SQL & Cosmos DB",
+      "Azure Blob & File Storage",
+      "Azure Active Directory (AAD)",
+      "Azure DevOps CI/CD pipelines",
+      "Azure Monitor & security alerts",
+    ],
+    details:
+      "Microsoft Azure is the preferred cloud for enterprises requiring deep integration with Microsoft products, compliance-ready infrastructure, and hybrid cloud capabilities. We help you migrate existing workloads, set up CI/CD pipelines with Azure DevOps, configure identity management via AAD, and monitor everything through Azure Monitor — all tuned for performance and cost efficiency.",
+    priceNote: "Pricing as per requirements / infrastructure scope",
+    accent: "mint",
+    href: "/services/cloud-solutions#azure-solutions",
+  },
+];
+
 export const services = [
   {
     slug: "web-development",
@@ -464,23 +512,7 @@ export const services = [
     description:
       "Secure, scalable, and cost-effective cloud solutions to store, manage, and access data seamlessly from anywhere.",
     features: ["Cloud Migration & Deployment", "Cloud Infrastructure Management"],
-    href: "/services#cloud-solutions",
-  },
-  {
-    slug: "cyber-security",
-    title: "Cyber Security",
-    description:
-      "Advanced cybersecurity solutions to protect your business from threats, ensuring complete data security.",
-    features: ["Website Security & Protection", "Data Encryption & Privacy"],
-    href: "/services#cyber-security",
-  },
-  {
-    slug: "data-analytics",
-    title: "Data Analytics",
-    description:
-      "Turn your data into valuable insights that help you make smarter decisions and grow your business.",
-    features: ["Data Analysis & Reporting", "Data Visualization & Insights"],
-    href: "/services#data-analytics",
+    href: "/services/cloud-solutions",
   },
 ];
 

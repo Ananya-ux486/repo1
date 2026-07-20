@@ -6,8 +6,6 @@ import Link from "next/link";
 import {
   Globe,
   Cloud,
-  Shield,
-  BarChart3,
   Megaphone,
   Users,
   Code2,
@@ -27,13 +25,11 @@ const iconMap: Record<string, LucideIcon> = {
   "Digital Marketing": Megaphone,
   "CRM Solutions": Users,
   "Cloud Solutions": Cloud,
-  "Cyber Security": Shield,
-  "Data Analytics": BarChart3,
 };
 
 // How many cards visible per "page"
 const VISIBLE = 4;
-const TOTAL = services.length; // 5
+const TOTAL = services.length; // 4
 const AUTO_INTERVAL = 3500;
 
 function TiltCard({
