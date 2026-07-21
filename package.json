@@ -3,10 +3,11 @@
   "private": true,
   "scripts": {
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:backend": "cargo run --manifest-path backend/Cargo.toml",
+    "dev:server": "npm --prefix server run dev",
+    "dev:admin": "npm --prefix ../admin run dev",
+    "install:server": "npm --prefix server install",
     "build:frontend": "npm --prefix frontend run build",
-    "build:backend": "cargo build --release --manifest-path backend/Cargo.toml",
-    "check:backend": "cargo check --manifest-path backend/Cargo.toml",
+    "build:admin": "npm --prefix ../admin run build",
     "lint:frontend": "npm --prefix frontend run lint"
   }
 }

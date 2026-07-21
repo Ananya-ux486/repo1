@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "image.thum.io",
       },
+      {
+        protocol: "https",
+        hostname: "**",
+      },
     ],
   },
   experimental: {
@@ -50,12 +54,10 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    // Proxy API calls to the Rust Axum server. Set RUST_BACKEND_URL in production
-    // if the backend is hosted separately. Set USE_RUST_BACKEND=0 to disable.
-    if (process.env.USE_RUST_BACKEND === "0") return [];
+    // Proxy /api/* to Node/Express (MongoDB) server. Set USE_API_PROXY=0 to disable.
+    if (process.env.USE_API_PROXY === "0") return [];
     const backend =
-      process.env.RUST_BACKEND_URL?.replace(/\/$/, "") ||
-      "http://localhost:8080";
+      process.env.API_BACKEND_URL?.replace(/\/$/, "") || "http://localhost:8080";
     return [
       {
         source: "/api/:path*",

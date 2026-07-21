@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ExternalLink,
@@ -13,6 +13,7 @@ import {
 import { liveProjects } from "@/data/liveProjects";
 import { floatEase, floatStagger } from "@/lib/floatMotion";
 import { IMAGE_BLUR } from "@/lib/motion";
+import { mergeProjects, useCmsContent } from "@/lib/cms";
 
 const ProjectsAuthModal = dynamic(
   () => import("@/components/ProjectsAuthModal"),
@@ -44,6 +45,11 @@ export default function ProjectsPageContent({ initialSession }: Props) {
   const [user, setUser] = useState<AuthUser | null>(initialSession.user);
   const [showModal, setShowModal] = useState(!initialSession.hasAccess);
   const [isAdmin, setIsAdmin] = useState(initialSession.isAdmin);
+  const { projects: cmsProjects } = useCmsContent();
+  const projects = useMemo(
+    () => mergeProjects(liveProjects, cmsProjects),
+    [cmsProjects],
+  );
 
   const handleUnlocked = (nextUser: AuthUser) => {
     setUser(nextUser);
@@ -96,7 +102,7 @@ export default function ProjectsPageContent({ initialSession }: Props) {
           <>
             {isAdmin && <AdminActivityPanel />}
             <div className="grid gap-5 sm:grid-cols-2 lg:gap-6">
-              {liveProjects.map((project, i) => (
+              {projects.map((project, i) => (
                 <motion.article
                   key={project.id}
                   initial={{ opacity: 0, y: 40 }}
@@ -164,7 +170,7 @@ export default function ProjectsPageContent({ initialSession }: Props) {
           <div className="relative overflow-hidden rounded-3xl border border-border bg-white/70 shadow-sm">
             <div className="pointer-events-none select-none blur-[6px] opacity-60">
               <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-6">
-                {liveProjects.map((project) => (
+                {projects.map((project) => (
                   <div
                     key={project.id}
                     className="h-48 rounded-2xl bg-gradient-to-br from-slate-100 via-orange-50 to-sky-50"

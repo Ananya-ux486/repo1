@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -41,6 +42,7 @@ import {
 } from "@/data/siteData";
 import IridescentTitle from "@/components/IridescentTitle";
 import { floatEase, floatStagger } from "@/lib/floatMotion";
+import { useCmsContent, type CmsService } from "@/lib/cms";
 
 const mainIcons: Record<string, LucideIcon> = {
   "Web Development": Globe,
@@ -48,6 +50,43 @@ const mainIcons: Record<string, LucideIcon> = {
   "CRM Solutions": Users,
   "Cloud Solutions": Cloud,
 };
+
+function mergeManagedServices<T extends { slug: string }>(
+  defaults: readonly T[],
+  cmsServices: CmsService[],
+  section: CmsService["section"],
+): T[] {
+  const overrides = new Map(
+    cmsServices
+      .filter((item) => item.section === section)
+      .map((item) => [item.slug, item]),
+  );
+  const merged = defaults.map((item) => {
+    const override = overrides.get(item.slug);
+    if (!override) return item;
+    overrides.delete(item.slug);
+    const compactOverride = Object.fromEntries(
+      Object.entries(override).filter(([, value]) => {
+        if (typeof value === "string") return value.trim().length > 0;
+        if (Array.isArray(value)) return value.length > 0;
+        return value !== undefined && value !== null;
+      }),
+    );
+    return {
+      ...item,
+      ...compactOverride,
+      href: `/services/${section}#${override.slug}`,
+    } as unknown as T;
+  });
+  for (const item of overrides.values()) {
+    merged.push({
+      ...item,
+      href: `/services/${section}#${item.slug}`,
+      priceNote: "Pricing as per requirements / budget",
+    } as unknown as T);
+  }
+  return merged;
+}
 
 const webDevIcons: Record<string, LucideIcon> = {
   "Static Websites": Layout,
@@ -149,6 +188,11 @@ function ServiceDetailBlock({
 }
 
 export function ServicesOverview() {
+  const { services: cmsServices } = useCmsContent();
+  const extraServices = useMemo(
+    () => cmsServices.filter((item) => item.section === "other"),
+    [cmsServices],
+  );
   // Helper to render a special highlighted card
   function SpecialCard({
     id,
@@ -287,6 +331,58 @@ export function ServicesOverview() {
         linkHref="/services/cloud-solutions"
         linkLabel="View all cloud solutions"
       />
+
+      {extraServices.map((service, index) => (
+        <motion.section
+          key={service._id}
+          id={service.slug}
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{
+            duration: 0.55,
+            delay: floatStagger(index, 0.05),
+            ease: floatEase,
+          }}
+          className="scroll-mt-28 overflow-hidden rounded-3xl border border-brand/20 bg-gradient-to-br from-white via-orange-50/40 to-sky-50/50 p-5 shadow-sm lg:p-7"
+        >
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-md">
+              <Layers className="h-7 w-7" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-2xl font-bold text-foreground">
+                {service.title}
+              </h2>
+              <p className="mt-3 leading-relaxed text-muted">
+                {service.description}
+              </p>
+              {service.details && (
+                <p className="mt-3 text-sm leading-relaxed text-muted/90">
+                  {service.details}
+                </p>
+              )}
+              <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+                {service.features.map((feature) => (
+                  <li
+                    key={feature}
+                    className="flex items-center gap-2 text-sm text-muted"
+                  >
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/contact"
+                className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand transition hover:gap-2"
+              >
+                Get a Quote <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </motion.section>
+      ))}
     </div>
   );
 }
@@ -422,6 +518,16 @@ function WebDevPackageCard({
 }
 
 export function WebDevelopmentDetail() {
+  const { services: cmsServices } = useCmsContent();
+  const managedServices = useMemo(
+    () =>
+      mergeManagedServices(
+        webDevelopmentServices,
+        cmsServices,
+        "web-development",
+      ),
+    [cmsServices],
+  );
   return (
     <div className="space-y-6 lg:space-y-7">
       <motion.div
@@ -443,7 +549,7 @@ export function WebDevelopmentDetail() {
         </p>
       </motion.div>
 
-      {webDevelopmentServices.map((service, i) => (
+      {managedServices.map((service, i) => (
         <WebDevPackageCard key={service.slug} service={service} index={i} />
       ))}
     </div>
@@ -684,6 +790,16 @@ function DigitalMarketingCard({
 }
 
 export function DigitalMarketingDetail() {
+  const { services: cmsServices } = useCmsContent();
+  const managedServices = useMemo(
+    () =>
+      mergeManagedServices(
+        digitalMarketingServices,
+        cmsServices,
+        "digital-marketing",
+      ),
+    [cmsServices],
+  );
   return (
     <div className="space-y-6 lg:space-y-7">
       <motion.div
@@ -705,7 +821,7 @@ export function DigitalMarketingDetail() {
         </p>
       </motion.div>
 
-      {digitalMarketingServices.map((service, i) => (
+      {managedServices.map((service, i) => (
         <DigitalMarketingCard key={service.slug} service={service} index={i} />
       ))}
     </div>
@@ -858,6 +974,11 @@ function CrmCard({
 }
 
 export function CrmDetail() {
+  const { services: cmsServices } = useCmsContent();
+  const managedServices = useMemo(
+    () => mergeManagedServices(crmServices, cmsServices, "crm"),
+    [cmsServices],
+  );
   return (
     <div className="space-y-6 lg:space-y-7">
       <motion.div
@@ -878,7 +999,7 @@ export function CrmDetail() {
         </p>
       </motion.div>
 
-      {crmServices.map((service, i) => (
+      {managedServices.map((service, i) => (
         <CrmCard key={service.slug} service={service} index={i} />
       ))}
     </div>
@@ -1017,6 +1138,16 @@ function CloudCard({
 }
 
 export function CloudSolutionsDetail() {
+  const { services: cmsServices } = useCmsContent();
+  const managedServices = useMemo(
+    () =>
+      mergeManagedServices(
+        cloudSolutionsServices,
+        cmsServices,
+        "cloud-solutions",
+      ),
+    [cmsServices],
+  );
   return (
     <div className="space-y-6 lg:space-y-7">
       <motion.div
@@ -1037,7 +1168,7 @@ export function CloudSolutionsDetail() {
         </p>
       </motion.div>
 
-      {cloudSolutionsServices.map((service, i) => (
+      {managedServices.map((service, i) => (
         <CloudCard key={service.slug} service={service} index={i} />
       ))}
     </div>

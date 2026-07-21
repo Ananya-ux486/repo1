@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, ChevronDown } from "lucide-react";
+import { useCmsContent, type CmsService } from "@/lib/cms";
 
 const SERVICE_MENU = [
   {
@@ -52,16 +53,54 @@ const SERVICE_MENU = [
   },
 ] as const;
 
+type MenuItem = {
+  label: string;
+  href: string;
+  color: string;
+  sub: { label: string; href: string }[];
+};
+
+const SECTION_ROUTES: Record<CmsService["section"], string> = {
+  "web-development": "/services/web-development",
+  "digital-marketing": "/services/digital-marketing",
+  crm: "/services/crm",
+  "cloud-solutions": "/services/cloud-solutions",
+  other: "/services",
+};
+
+function buildMenu(cmsServices: CmsService[]): MenuItem[] {
+  const menu: MenuItem[] = SERVICE_MENU.map((item) => ({
+    ...item,
+    sub: item.sub.map((sub) => ({ ...sub })),
+  }));
+  for (const service of cmsServices) {
+    const href = `${SECTION_ROUTES[service.section]}#${service.slug}`;
+    const target = menu.find((item) => item.href === SECTION_ROUTES[service.section]);
+    if (!target) continue;
+    const existing = target.sub.findIndex((item) => item.href.endsWith(`#${service.slug}`));
+    const next = { label: service.title, href };
+    if (existing >= 0) target.sub[existing] = next;
+    else target.sub.push(next);
+  }
+  return menu;
+}
+
 // ── Desktop flyout (two-column) ───────────────────────────────────────────────
-function DesktopDropdown({ onNavigate }: { onNavigate?: () => void }) {
+function DesktopDropdown({
+  onNavigate,
+  menu,
+}: {
+  onNavigate?: () => void;
+  menu: MenuItem[];
+}) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const active = SERVICE_MENU[activeIndex];
+  const active = menu[activeIndex] ?? menu[0];
 
   return (
     <div className="flex overflow-hidden rounded-2xl border border-border/60 bg-white shadow-2xl shadow-black/10" style={{ minWidth: 480 }}>
       {/* Left — main headings */}
       <div className="w-52 shrink-0 border-r border-border/40 bg-gradient-to-b from-orange-50/60 to-white py-2">
-        {SERVICE_MENU.map((item, i) => (
+        {menu.map((item, i) => (
           <div
             key={item.label}
             className={`group flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-semibold transition-all cursor-pointer ${
@@ -141,12 +180,18 @@ function DesktopDropdown({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 // ── Mobile accordion ──────────────────────────────────────────────────────────
-function MobileDropdown({ onNavigate }: { onNavigate?: () => void }) {
+function MobileDropdown({
+  onNavigate,
+  menu,
+}: {
+  onNavigate?: () => void;
+  menu: MenuItem[];
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <div className="py-1">
-      {SERVICE_MENU.map((item, i) => (
+      {menu.map((item, i) => (
         <div key={item.label}>
           <div className="flex items-center">
             <Link
@@ -199,6 +244,8 @@ export default function ServicesNavDropdown({
   onNavigate?: () => void;
   mobile?: boolean;
 }) {
-  if (mobile) return <MobileDropdown onNavigate={onNavigate} />;
-  return <DesktopDropdown onNavigate={onNavigate} />;
+  const { services } = useCmsContent();
+  const menu = useMemo(() => buildMenu(services), [services]);
+  if (mobile) return <MobileDropdown onNavigate={onNavigate} menu={menu} />;
+  return <DesktopDropdown onNavigate={onNavigate} menu={menu} />;
 }

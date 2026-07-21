@@ -1,17 +1,22 @@
-# TasmaFive — Frontend (Next.js) + Backend (Rust)
+# TasmaFive — Frontend (Next.js) + Backend (Node/Express + MongoDB)
 
 ```
 tasmafive-website/
-├── frontend/   # Next.js UI (animations, layout, pages — unchanged)
-└── backend/    # Rust Axum API on port 8080
+├── frontend/   # Next.js UI (animations / layout unchanged)
+└── server/     # Express API + MongoDB Atlas
+
+../admin/        # Separate Next.js admin application
 ```
 
-## Run locally (2 terminals)
+AI chatbot = **tawk.to** (frontend script only — koi custom chat backend nahi).
 
-**Terminal 1 — Rust API**
+## Run locally (3 terminals)
+
+**Terminal 1 — Express + MongoDB**
 ```bash
-cd backend
-cargo run
+cd server
+npm install
+npm run dev
 ```
 
 **Terminal 2 — Next.js**
@@ -21,17 +26,36 @@ npm run dev
 ```
 
 Open http://localhost:3000  
-API calls to `/api/*` are proxied to `http://localhost:8080`.
+`/api/*` → `http://localhost:8080` (Express).
 
-## tawk.to chatbot
+**Terminal 3 — Admin**
+```bash
+cd ../admin
+npm run dev
+```
 
-- Custom “Need help?” bubble is unchanged.
-- Conversations open in tawk.to (IDs in `frontend/.env.local`).
-- Dashboard setup steps: see `docs/TAWK_SETUP.md`
-- AI training text: see `docs/tawk-training-data.txt`
+Open http://localhost:3001
 
-## Important
+## MongoDB (`tasmafiveDB`)
 
-- Keep `AUTH_SECRET` the same in `frontend/.env.local` and `backend/.env`
-- Data files live in `frontend/.data/`
-- Do **not** re-add `frontend/src/app/api` — that would block the Rust proxy
+| Collection | Data |
+|------------|------|
+| `users` | Signup / login |
+| `otps` | OTP hashes |
+| `activities` | Login / signup / admin events |
+| `contactmessages` | Contact form |
+| `quoterequests` | Quote form |
+| `auditrequests` | Audit form |
+| `services` | CMS service overrides and additions |
+| `projects` | CMS projects |
+
+UI / animations / layout: **unchanged**.
+
+## Private admin database (`tasmafiveAdminDB`)
+
+Admin identities and admin audit logs use a separate MongoDB database while
+the dashboard reads customer/content data from the shared `tasmafiveDB`.
+
+Local fallback credentials are `admin@gmail.com` / `admin`. Production startup
+rejects these defaults: set strong `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and
+`ADMIN_SESSION_SECRET` values in `server/.env`.

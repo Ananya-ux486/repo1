@@ -9,6 +9,7 @@ declare global {
       showWidget?: () => void;
       maximize: () => void;
       minimize?: () => void;
+      endChat?: (callback?: () => void) => void;
       onLoad?: () => void;
       onChatMinimized?: () => void;
       onChatEnded?: () => void;
@@ -20,6 +21,27 @@ declare global {
 
 const DEFAULT_PROPERTY_ID = "6a5e3e8f1a1df41d5c178534";
 const DEFAULT_WIDGET_ID = "1ju028oi0";
+
+function clearTawkBrowserState() {
+  const matchesTawk = (key: string) => /tawk|twk_/i.test(key);
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i -= 1) {
+      const key = localStorage.key(i);
+      if (key && matchesTawk(key)) localStorage.removeItem(key);
+    }
+    for (let i = sessionStorage.length - 1; i >= 0; i -= 1) {
+      const key = sessionStorage.key(i);
+      if (key && matchesTawk(key)) sessionStorage.removeItem(key);
+    }
+    document.cookie.split(";").forEach((entry) => {
+      const name = entry.split("=")[0]?.trim();
+      if (!name || !matchesTawk(name)) return;
+      document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`;
+    });
+  } catch {
+    // Storage can be unavailable in strict privacy modes.
+  }
+}
 
 /**
  * Loads tawk.to once, hides the default green bubble, and opens the widget
@@ -36,6 +58,7 @@ export default function TawkChat() {
 
   useEffect(() => {
     if (!propertyId || !widgetId) return;
+    clearTawkBrowserState();
 
     const api = (window.Tawk_API = window.Tawk_API || {
       hideWidget: () => {},
@@ -66,7 +89,11 @@ export default function TawkChat() {
 
     api.onLoad = () => {
       readyRef.current = true;
-      hideDefaultLauncher();
+      try {
+        api.endChat?.(hideDefaultLauncher);
+      } catch {
+        hideDefaultLauncher();
+      }
       if (pendingOpenRef.current) {
         pendingOpenRef.current = false;
         openChat();
