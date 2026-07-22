@@ -1,61 +1,49 @@
-# TasmaFive — Frontend (Next.js) + Backend (Node/Express + MongoDB)
+# TasmaFive public application
 
-```
-tasmafive-website/
-├── frontend/   # Next.js UI (animations / layout unchanged)
-└── server/     # Express API + MongoDB Atlas
+This repository is one single-root full-stack Node application. Next.js uses
+root `src/`, `public/` and configuration files. The Express API is an internal
+module under `src/server-api/`. `unified-server.mjs` sends `/api` requests to
+Express and everything else to Next.js through one process and one public port.
+The separate `admin` repository owns `/api/admin/*`.
 
-../admin/        # Separate Next.js admin application
-```
+## Local development
 
-AI chatbot = **tawk.to** (frontend script only — koi custom chat backend nahi).
+Use Node.js `20.19+` or `22.13+`. Copy `.env.example` to `.env`, place optional
+browser-only overrides in `.env.local`, then run:
 
-## Run locally (3 terminals)
-
-**Terminal 1 — Express + MongoDB**
 ```bash
-cd server
-npm install
+npm ci
 npm run dev
 ```
 
-**Terminal 2 — Next.js**
-```bash
-cd frontend
-npm run dev
-```
+Open `http://localhost:3000`. Useful root commands are `npm run lint`,
+`npm test`, `npm run build`, and `npm run start`. Host environment variables
+take precedence over `.env`.
 
-Open http://localhost:3000  
-`/api/*` → `http://localhost:8080` (Express).
+## Data ownership
 
-**Terminal 3 — Admin**
-```bash
-cd ../admin
-npm run dev
-```
+The public API and admin API use the same shared Mongo database for users,
+leads, CMS content, payment records and payment links. Only the admin API
+connects to the private admin database.
 
-Open http://localhost:3001
+## Hostinger production deployment
 
-## MongoDB (`tasmafiveDB`)
+Create one Hostinger Node.js application with the repository root
+(`tasmafive-website`) as its application root:
 
-| Collection | Data |
-|------------|------|
-| `users` | Signup / login |
-| `otps` | OTP hashes |
-| `activities` | Login / signup / admin events |
-| `contactmessages` | Contact form |
-| `quoterequests` | Quote form |
-| `auditrequests` | Audit form |
-| `services` | CMS service overrides and additions |
-| `projects` | CMS projects |
+- Node.js: `20.19+` or `22.13+`
+- Install: `npm ci`
+- Build: `npm run build`
+- Start: `npm run start`
+- Domain: the public HTTPS origin
 
-UI / animations / layout: **unchanged**.
+Configure the variables listed in root `.env.example` in Hostinger. Do not set
+a fixed `PORT`; Hostinger injects it. Set `PUBLIC_SITE_URL`, `API_PUBLIC_URL`
+and `ALLOWED_ORIGINS` to the intended HTTPS origin(s), and configure provider
+callbacks/webhooks on that same domain. `NEXT_PUBLIC_*` values must be present
+at build time.
 
-## Private admin database (`tasmafiveAdminDB`)
-
-Admin identities and admin audit logs use a separate MongoDB database while
-the dashboard reads customer/content data from the shared `tasmafiveDB`.
-
-Local fallback credentials are `admin@gmail.com` / `admin`. Production startup
-rejects these defaults: set strong `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and
-`ADMIN_SESSION_SECRET` values in `server/.env`.
+TLS terminates at Hostinger and the application trusts one proxy hop. The host
+must support a long-running custom Node start command; static-only or
+Next-managed hosting is insufficient. Never run `npm run dev` in production or
+commit real `.env` files.

@@ -2,7 +2,7 @@
 
 Aapka Property ID: `6a5e3e8f1a1df41d5c178534`  
 Aapka Widget ID: `1ju028oi0`  
-(Ye pehle se `frontend/.env.local` mein set hai.)
+(Ye root `.env.local` mein set hai.)
 
 ---
 
@@ -59,7 +59,7 @@ Iske baad bot web development prices aur contact details sahi batayega.
 
 ## Step 6 — Site pe test
 
-1. Backend + frontend dono chalao (`README.md`)
+1. Root se unified application chalao: `npm run dev` (`README.md`)
 2. Chrome → http://localhost:3000
 3. Hard refresh: `Ctrl + Shift + R`
 4. Orange chatbot / “Need help?” click karo

@@ -1,13 +1,58 @@
 {
-  "name": "tasmafive-monorepo",
+  "name": "tasmafive-website",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.13.0"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
   "scripts": {
-    "dev:frontend": "npm --prefix frontend run dev",
-    "dev:server": "npm --prefix server run dev",
-    "dev:admin": "npm --prefix ../admin run dev",
-    "install:server": "npm --prefix server install",
-    "build:frontend": "npm --prefix frontend run build",
-    "build:admin": "npm --prefix ../admin run build",
-    "lint:frontend": "npm --prefix frontend run lint"
+    "dev": "node unified-server.mjs --development",
+    "build": "next build && npm run check:api",
+    "start": "node unified-server.mjs --production",
+    "lint": "eslint && npm run check:api",
+    "test": "npm run test:dispatcher",
+    "test:dispatcher": "node --test test/unified-dispatcher.test.mjs",
+    "check:api": "node --check src/server-api/index.js && node --check src/server-api/app.js && node --check src/server-api/load-env.js && node --check src/server-api/db.js && node --check src/server-api/seed.js && node --check src/server-api/models/index.js && node --check src/server-api/routes/auth.js && node --check src/server-api/routes/contact.js && node --check src/server-api/routes/quote.js && node --check src/server-api/routes/audit.js && node --check src/server-api/routes/instagram.js && node --check src/server-api/routes/content.js && node --check src/server-api/routes/payments.js && node --check src/server-api/utils/auth.js && node --check src/server-api/utils/mail.js && node --check src/server-api/utils/security.js",
+    "dev:api": "node --watch src/server-api/index.js",
+    "start:api": "node src/server-api/index.js",
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "clean:cache": "node scripts/clean-image-cache.mjs",
+    "favicon": "python scripts/generate-favicon.py",
+    "assets:flags": "powershell -ExecutionPolicy Bypass -File scripts/download-language-flags.ps1"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.6.0",
+    "framer-motion": "^12.42.2",
+    "helmet": "^8.3.0",
+    "lucide-react": "^1.25.0",
+    "mongoose": "^8.12.1",
+    "morgan": "^1.10.0",
+    "next": "16.2.10",
+    "pdfjs-dist": "^4.10.38",
+    "pdfkit": "^0.19.1",
+    "razorpay": "^2.9.8",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "sharp": "^0.34.2",
+    "stripe": "^22.3.2",
+    "swiper": "^14.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
