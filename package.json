@@ -25,6 +25,10 @@
     "assets:flags": "powershell -ExecutionPolicy Bypass -File scripts/download-language-flags.ps1"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -43,17 +47,13 @@
     "react-dom": "19.2.4",
     "sharp": "^0.34.2",
     "stripe": "^22.3.2",
-    "swiper": "^14.0.1"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.10",
+    "swiper": "^14.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10"
   },
   "browserslist": [
     "last 2 Chrome versions",
