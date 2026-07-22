@@ -42,7 +42,9 @@ async function postJson<T>(url: string, body: Record<string, string>) {
   const raw = await res.text();
   let data: (T & { error?: string }) | null = null;
   try {
-    data = raw ? (JSON.parse(raw) as T & { error?: string }) : ({} as T);
+    data = raw
+      ? (JSON.parse(raw) as T & { error?: string })
+      : ({} as T & { error?: string });
   } catch {
     throw new Error(
       "Server did not return a valid response. Please confirm the site API is running and try again.",
