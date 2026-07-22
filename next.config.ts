@@ -52,19 +52,6 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/pdf.worker.min.mjs",
-        headers: [
-          {
-            key: "Content-Type",
-            value: "text/javascript; charset=utf-8",
-          },
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
         source: "/certificates/:path*.pdf",
         headers: [
           {
@@ -78,6 +65,27 @@ const nextConfig: NextConfig = {
           {
             key: "X-Content-Type-Options",
             value: "nosniff",
+          },
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
+          },
+        ],
+      },
+      {
+        source: "/pdf.worker.min.mjs",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "text/javascript; charset=utf-8",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
           },
         ],
       },

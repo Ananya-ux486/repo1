@@ -239,13 +239,26 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
     const load = async () => {
       try {
         const pdfjsLib = await import("pdfjs-dist");
-        // Hostinger/CDN often serves public/*.mjs as text/plain, which breaks
-        // module workers. Prefer the matching jsDelivr worker (correct MIME).
+        // Hostinger often serves /pdf.worker.min.mjs as text/plain (breaks workers).
+        // Use CDN worker, but fetch the PDF on the page origin first and pass bytes
+        // so the cross-origin worker never has to fetch the file (CORS).
         const version = pdfjsLib.version || "4.10.38";
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
 
+        const pdfResponse = await fetch(file, {
+          cache: "force-cache",
+          credentials: "same-origin",
+        });
+        if (!pdfResponse.ok) {
+          throw new Error(`Certificate file HTTP ${pdfResponse.status}`);
+        }
+        const pdfBytes = new Uint8Array(await pdfResponse.arrayBuffer());
+        if (pdfBytes.byteLength < 100) {
+          throw new Error("Certificate file is empty or missing.");
+        }
+
         const loadingTask = pdfjsLib.getDocument({
-          url: file,
+          data: pdfBytes,
           withCredentials: false,
           isEvalSupported: false,
           useSystemFonts: true,
@@ -255,7 +268,8 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
         pdfDocRef.current = pdf;
         setTotalPages(pdf.numPages);
         await renderPage(1);
-      } catch {
+      } catch (err) {
+        console.error("[certificates] load failed:", err);
         if (!cancelled) {
           setError(true);
           setLoading(false);
