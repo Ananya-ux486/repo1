@@ -21,14 +21,18 @@ export function createUnifiedRequestHandler(apiHandler, nextHandler) {
   };
 }
 
-async function start() {
+export async function start() {
   const productionFlag = process.argv.includes("--production");
   const developmentFlag = process.argv.includes("--development");
   if (productionFlag && developmentFlag) {
     throw new Error("Choose either --production or --development.");
   }
-  if (productionFlag) process.env.NODE_ENV = "production";
-  if (developmentFlag) process.env.NODE_ENV = "development";
+  // npm start / Hostinger entry must not stay in "development" even if env is wrong
+  if (productionFlag || process.env.TF_FORCE_PRODUCTION === "1") {
+    process.env.NODE_ENV = "production";
+  } else if (developmentFlag) {
+    process.env.NODE_ENV = "development";
+  }
 
   const dev = process.env.NODE_ENV !== "production";
   const port = Number(process.env.PORT || 3000);

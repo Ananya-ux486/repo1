@@ -47,14 +47,16 @@ Create one Hostinger Node.js application with the repository root
 - Node.js: `20.19+` or `22.13+`
 - Install: `npm ci`
 - Build: `npm run build`
-- Start: `npm run start`
+- Start: `npm run start`  (**required** — runs unified API + Next)
+- Entry file (if Hostinger asks): `server.js`
+- Do **not** use default `next start` only — `/api/*` will return HTML and login fails
 - Domain: the public HTTPS origin
 
-Configure the variables listed in root `.env.example` in Hostinger. Do not set
-a fixed `PORT`; Hostinger injects it. Set `PUBLIC_SITE_URL`, `API_PUBLIC_URL`
-and `ALLOWED_ORIGINS` to the intended HTTPS origin(s), and configure provider
-callbacks/webhooks on that same domain. `NEXT_PUBLIC_*` values must be present
-at build time.
+Configure the variables listed in root `.env.example` in Hostinger. Prefer
+leaving `PORT` unset so Hostinger injects it. Set `NODE_ENV=production`.
+Set `PUBLIC_SITE_URL`, `API_PUBLIC_URL` and `ALLOWED_ORIGINS` to the intended
+HTTPS origin(s), and configure provider callbacks/webhooks on that same domain.
+`NEXT_PUBLIC_*` values must be present at build time.
 
 TLS terminates at Hostinger and the application trusts one proxy hop. The host
 must support a long-running custom Node start command; static-only or

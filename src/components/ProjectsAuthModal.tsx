@@ -42,10 +42,20 @@ async function postJson<T>(url: string, body: Record<string, string>) {
   const raw = await res.text();
   let data: (T & { error?: string }) | null = null;
   try {
-    data = raw
-      ? (JSON.parse(raw) as T & { error?: string })
-      : ({} as T & { error?: string });
-  } catch {
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      data = {} as T & { error?: string };
+    } else if (trimmed.startsWith("<") || trimmed.startsWith("<!")) {
+      throw new Error("HTML_NOT_JSON");
+    } else {
+      data = JSON.parse(trimmed) as T & { error?: string };
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message === "HTML_NOT_JSON") {
+      throw new Error(
+        "Login API is not running on this host. In Hostinger set Start command to npm run start (unified server), not next start — then redeploy.",
+      );
+    }
     throw new Error(
       "Server did not return a valid response. Please confirm the site API is running and try again.",
     );
