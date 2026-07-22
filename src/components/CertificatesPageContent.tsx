@@ -239,7 +239,10 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
     const load = async () => {
       try {
         const pdfjsLib = await import("pdfjs-dist");
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+        // Hostinger/CDN often serves public/*.mjs as text/plain, which breaks
+        // module workers. Prefer the matching jsDelivr worker (correct MIME).
+        const version = pdfjsLib.version || "4.10.38";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
 
         const loadingTask = pdfjsLib.getDocument({
           url: file,
@@ -670,7 +673,9 @@ export default function CertificatesPageContent() {
   useEffect(() => {
     if (!postLoaderReady) return;
     const warm = () => {
-      prefetchAsset("/pdf.worker.min.mjs");
+      prefetchAsset(
+        "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs",
+      );
       CERTIFICATES.forEach((c) => prefetchAsset(c.file));
     };
     if (typeof window.requestIdleCallback === "function") {

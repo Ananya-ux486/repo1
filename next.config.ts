@@ -51,6 +51,36 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/pdf.worker.min.mjs",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "text/javascript; charset=utf-8",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/certificates/:path*.pdf",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/pdf",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+        ],
+      },
     ];
   },
 };
