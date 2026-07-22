@@ -6,19 +6,32 @@ module under `src/server-api/`. `unified-server.mjs` sends `/api` requests to
 Express and everything else to Next.js through one process and one public port.
 The separate `admin` repository owns `/api/admin/*`.
 
-## Local development
+## Local development (clone → run)
 
-Use Node.js `20.19+` or `22.13+`. Copy `.env.example` to `.env`, place optional
-browser-only overrides in `.env.local`, then run:
+Use Node.js `20.19+` or `22.13+` (Node 21 is not supported).
+
+```bash
+git clone https://github.com/Ananya-ux486/repo1.git
+cd repo1
+copy .env.example .env
+```
+
+Edit `.env` and set at least:
+
+- `MONGODB_URI` — real Atlas URI for `tasmafiveDB` (ask the project owner; never commit `.env`)
+- `AUTH_SECRET` — any random string ≥ 32 characters for local
+- Keep `ALLOW_DEMO_OTP=true` for local OTP without Resend
+
+Then:
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`. Useful root commands are `npm run lint`,
-`npm test`, `npm run build`, and `npm run start`. Host environment variables
-take precedence over `.env`.
+Open `http://localhost:3000`. Payments need Razorpay test keys in `.env` if you
+test checkout. Useful commands: `npm run lint`, `npm test`, `npm run build`,
+`npm run start`. Host environment variables take precedence over `.env`.
 
 ## Data ownership
 
