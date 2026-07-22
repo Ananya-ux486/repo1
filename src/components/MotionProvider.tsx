@@ -1,17 +1,15 @@
 "use client";
 
-import { LazyMotion, MotionConfig } from "framer-motion";
+import { LazyMotion, MotionConfig, domAnimation } from "framer-motion";
 
-const loadFeatures = () =>
-  import("@/lib/motionFeatures").then((module) => module.default);
-
+/** Sync features — avoids waiting on async chunk before first float animations. */
 export default function MotionProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <LazyMotion features={loadFeatures}>
+    <LazyMotion features={domAnimation}>
       <MotionConfig
         reducedMotion="user"
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}

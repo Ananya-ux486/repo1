@@ -80,7 +80,7 @@ function HeroSlideImage({
             ? { scale: 1, opacity: 1 }
             : { scale: 1.02, opacity: 0.65 }
         }
-        transition={{ duration: 0.7, ease: floatEase }}
+        transition={{ duration: 0.5, ease: floatEase }}
       >
         <Image
           src={src}
@@ -191,7 +191,7 @@ export default function HeroCarousel() {
               replayKey={animKey}
               scroll={false}
               index={1}
-              duration={0.7}
+              duration={0.5}
               clip={false}
             >
               <p className="hero-subtext mt-3 max-w-xl text-sm leading-relaxed md:text-base">
@@ -203,7 +203,7 @@ export default function HeroCarousel() {
               replayKey={animKey}
               scroll={false}
               index={2}
-              duration={0.65}
+              duration={0.5}
               clip={false}
             >
               <div

@@ -2,7 +2,8 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 
 const COOKIE_NAME = "tf_projects_auth";
-const MAX_AGE_SEC = 60 * 60 * 24 * 7; // 7 days
+/** Signed-in session lifetime — 1 hour */
+const MAX_AGE_SEC = 60 * 60;
 
 export type SessionPayload = {
   userId: string;

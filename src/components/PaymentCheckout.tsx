@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, CreditCard, LockKeyhole, ShieldCheck } from "lucide-react";
+import { CheckCircle2, CreditCard, LockKeyhole, LogOut, ShieldCheck } from "lucide-react";
 import ProjectsAuthModal from "@/components/ProjectsAuthModal";
 
 type Provider = "razorpay" | "ccavenue" | "stripe" | "paypal";
@@ -108,7 +108,13 @@ export default function PaymentCheckout() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const [authUser, setAuthUser] = useState<{
+    id: string;
+    name: string;
+    email: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -157,13 +163,34 @@ export default function PaymentCheckout() {
           session.user?.id !== "team-admin";
         setAuthenticated(canPay);
         if (canPay && session.user) {
+          setAuthUser(session.user);
           setName(session.user.name);
           setEmail(session.user.email);
+        } else {
+          setAuthUser(null);
         }
       })
       .catch((reason) => setError(reason.message))
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    setError("");
+    try {
+      await json("/api/auth/logout", { method: "POST", body: "{}" });
+    } catch {
+      // Still clear local auth UI if cookie clear fails after network blip.
+    } finally {
+      setAuthenticated(false);
+      setAuthUser(null);
+      setName("");
+      setEmail("");
+      setPhone("");
+      setLoggingOut(false);
+      window.dispatchEvent(new Event("tf-auth-changed"));
+    }
+  }
 
   const selectedPackage = packages.find((item) => item.slug === serviceSlug);
   const isCustomPayment = !paymentLink && serviceSlug === CUSTOM_SERVICE_SLUG;
@@ -303,10 +330,12 @@ export default function PaymentCheckout() {
           purpose="payment"
           onUnlocked={(user) => {
             setAuthenticated(true);
+            setAuthUser({ id: user.id, name: user.name, email: user.email });
             setName(user.name);
             setEmail(user.email);
             setPhone(user.phone || "");
             setError("");
+            window.dispatchEvent(new Event("tf-auth-changed"));
           }}
         />
       </section>
@@ -317,6 +346,30 @@ export default function PaymentCheckout() {
 
   return (
     <section className="bg-slate-50 px-4 py-12 sm:py-16">
+      <div className="mx-auto mb-5 flex max-w-5xl flex-col gap-3 rounded-2xl border border-emerald-200/80 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="min-w-0">
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-emerald-700">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Signed in
+          </p>
+          <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">
+            {authUser?.name || name || "Account"}
+          </p>
+          <p className="truncate text-xs text-slate-500">
+            {authUser?.email || email}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-brand/40 hover:text-brand disabled:opacity-60"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+          {loggingOut ? "Signing out…" : "Logout"}
+        </button>
+      </div>
+
       <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1fr_380px]">
         <form
           onSubmit={submit}

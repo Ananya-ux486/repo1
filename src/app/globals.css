@@ -508,6 +508,10 @@ th {
 .creative-orb-inner {
   width: 100%;
   height: 100%;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   filter: drop-shadow(0 10px 32px rgba(15, 23, 42, 0.35))
     drop-shadow(0 4px 16px rgba(154, 52, 18, 0.25));
 }
@@ -517,6 +521,9 @@ th {
   inset: 8%;
   border-radius: 50%;
   pointer-events: none;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 .creative-orb-glow-orange {
@@ -741,7 +748,8 @@ html.lenis body {
 [data-tf-active="0"] .instagram-feed-row,
 [data-tf-active="0"] .instagram-feed-glow,
 [data-tf-active="0"] .iridescent-text,
-[data-tf-active="0"] .outline-iridescent {
+[data-tf-active="0"] .outline-iridescent,
+[data-tf-active="0"] .creative-word-solutions {
   -webkit-animation-play-state: paused !important;
   animation-play-state: paused !important;
 }
@@ -1103,31 +1111,24 @@ html.gt-switching body {
   cursor: wait;
 }
 
-/* Testimonial carousel — center clear, sides faded (no CSS blur — GPU killer) */
+/* Testimonial carousel — equal-width slides, soft active emphasis */
+.testimonial-swiper {
+  overflow: hidden !important;
+}
+
 .testimonial-swiper .swiper-slide {
-  opacity: 0.45;
-  transform: scale(0.92) translateZ(0);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  will-change: transform, opacity;
-}
-
-.testimonial-swiper .swiper-slide-active {
+  height: auto;
   opacity: 1;
-  transform: scale(1);
-  z-index: 3;
+  transform: none;
 }
 
-.testimonial-swiper .swiper-slide-prev,
-.testimonial-swiper .swiper-slide-next {
-  opacity: 0.7;
-  transform: scale(0.95);
-  z-index: 2;
-  cursor: pointer;
+.testimonial-swiper .swiper-slide .google-review-card {
+  height: 100%;
 }
 
-.testimonial-swiper .swiper-slide-prev:hover,
-.testimonial-swiper .swiper-slide-next:hover {
-  opacity: 0.9;
+.testimonial-swiper .swiper-slide-active .google-review-card {
+  border-color: rgba(26, 115, 232, 0.35);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
 }
 
 .google-review-swiper .swiper-slide-active .google-review-card {
@@ -1262,11 +1263,6 @@ html.gt-switching body {
 
   .testimonial-swiper {
     overflow: hidden !important;
-  }
-
-  .testimonial-swiper .swiper-slide:not(.swiper-slide-active) {
-    opacity: 0.6;
-    transform: scale(0.96);
   }
 
   /* Instagram — horizontal auto-slide on phone & tablet (desktop stays grid) */

@@ -25,13 +25,15 @@ export function useScrollReplay(amountOrOpts: number | Options = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, {
     amount,
-    margin: "0px 0px -8% 0px",
+    // Start a bit earlier so enter motion feels ready as the section arrives
+    margin: "80px 0px -6% 0px",
     once: false,
   });
   const wasInView = useRef(false);
   const [replayKey, setReplayKey] = useState(0);
   const [play, setPlay] = useState(false);
   const cooldown = useRef(0);
+  const seenOnce = useRef(false);
 
   useEffect(() => {
     if (!enabled) return;
@@ -39,12 +41,22 @@ export function useScrollReplay(amountOrOpts: number | Options = 0.15) {
     const now = performance.now();
 
     if (isInView && !wasInView.current) {
-      if (now - cooldown.current < 140) {
+      if (now - cooldown.current < 100) {
         wasInView.current = isInView;
         return;
       }
       cooldown.current = now;
+      const firstShow = !seenOnce.current;
+      seenOnce.current = true;
       setReplayKey((k) => k + 1);
+
+      if (firstShow) {
+        // First appearance: play immediately (no hide→show flash delay)
+        setPlay(true);
+        wasInView.current = true;
+        return;
+      }
+
       setPlay(false);
       const id = requestAnimationFrame(() => {
         requestAnimationFrame(() => setPlay(true));
@@ -68,25 +80,25 @@ export function useScrollReplay(amountOrOpts: number | Options = 0.15) {
 }
 
 export const replayEnter = {
-  initial: { opacity: 0, y: 16 },
+  initial: { opacity: 0, y: 14 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
+  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const },
 };
 
 export const replayEnterX = {
-  initial: { opacity: 0, x: -16 },
+  initial: { opacity: 0, x: -14 },
   animate: { opacity: 1, x: 0 },
-  transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
+  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const },
 };
 
 export const replayEnterScale = {
   initial: { opacity: 0, scale: 0.98 },
   animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const },
+  transition: { duration: 0.26, ease: [0.22, 1, 0.36, 1] as const },
 };
 
 export const replayEnterRight = {
-  initial: { opacity: 0, x: 20 },
+  initial: { opacity: 0, x: 16 },
   animate: { opacity: 1, x: 0 },
-  transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
+  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const },
 };

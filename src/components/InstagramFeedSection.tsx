@@ -39,7 +39,7 @@ const VISIBLE_COUNT = 6;
 const containerVariants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.11, delayChildren: 0.05 },
+    transition: { staggerChildren: 0.07, delayChildren: 0.03 },
   },
 };
 
@@ -49,7 +49,7 @@ const tileVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: floatEase },
+    transition: { duration: 0.5, ease: floatEase },
   },
 };
 

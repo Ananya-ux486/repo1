@@ -149,8 +149,8 @@ function ServiceDetailBlock({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{
-        duration: 0.6,
-        delay: floatStagger(index, 0.05),
+        duration: 0.45,
+        delay: floatStagger(index, 0.04),
         ease: floatEase,
       }}
       className="scroll-mt-28 glass-card rounded-2xl p-5 lg:p-7"
@@ -405,8 +405,8 @@ function WebDevPackageCard({
       whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: false, amount: 0.28 }}
       transition={{
-        duration: 0.7,
-        delay: 0.05,
+        duration: 0.5,
+        delay: 0.04,
         ease: floatEase,
       }}
       className={`scroll-mt-28 overflow-hidden rounded-3xl border ${accent.panel} shadow-sm`}
@@ -660,7 +660,7 @@ function DigitalMarketingCard({
       initial={{ opacity: 0, x: fromLeft ? -56 : 56, y: 24 }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
-      transition={{ duration: 0.7, delay: 0.05, ease: floatEase }}
+      transition={{ duration: 0.5, delay: 0.04, ease: floatEase }}
       className={`scroll-mt-28 overflow-hidden rounded-3xl border ${accent.panel} shadow-sm`}
     >
       <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
@@ -884,7 +884,7 @@ function CrmCard({
       initial={{ opacity: 0, x: fromLeft ? -56 : 56, y: 24 }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
-      transition={{ duration: 0.7, delay: 0.05, ease: floatEase }}
+      transition={{ duration: 0.5, delay: 0.04, ease: floatEase }}
       className={`scroll-mt-28 overflow-hidden rounded-3xl border ${accent.panel} shadow-sm`}
     >
       <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
@@ -1048,7 +1048,7 @@ function CloudCard({
       initial={{ opacity: 0, x: fromLeft ? -56 : 56, y: 24 }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
-      transition={{ duration: 0.7, delay: 0.05, ease: floatEase }}
+      transition={{ duration: 0.5, delay: 0.04, ease: floatEase }}
       className={`scroll-mt-28 overflow-hidden rounded-3xl border ${accent.panel} shadow-sm`}
     >
       <div className="grid lg:grid-cols-[1.15fr_0.85fr]">

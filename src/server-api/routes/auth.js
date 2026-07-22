@@ -14,11 +14,17 @@ import {
   setSessionCookie,
   clearSessionCookie,
   clientMeta,
+  MAX_AGE_SEC,
 } from "../utils/auth.js";
 import { sendOtpEmail, notifyAdminLogin } from "../utils/mail.js";
 import { demoOtpEnabled, safeLogError } from "../utils/security.js";
 
 const router = Router();
+
+/** When true, signup/login require email OTP. Default off until email is configured. */
+function authRequireOtp() {
+  return process.env.AUTH_REQUIRE_OTP === "true";
+}
 
 function limiter(windowMs, limit, message) {
   return rateLimit({
@@ -75,6 +81,29 @@ async function logActivity(fields) {
     await Activity.deleteMany({ _id: { $in: old.map((d) => d._id) } });
   }
   return event;
+}
+
+async function issueAccessSession(res, user, message) {
+  const token = createSessionToken({
+    userId: String(user._id),
+    email: user.email,
+    name: user.name,
+    projectsAccess: true,
+  });
+  setSessionCookie(res, token);
+  return res.json({
+    ok: true,
+    otpRequired: false,
+    access: true,
+    sessionExpiresInSec: MAX_AGE_SEC,
+    user: {
+      id: String(user._id),
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+    },
+    message,
+  });
 }
 
 async function issueOtpAndRespond(res, user, messageDelivered, messageDemo) {
@@ -136,17 +165,17 @@ router.post("/signup", signupLimiter, requireTrustedOrigin, async (req, res) => 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: "Please enter a valid email address." });
     }
-    if (!/^[+\d][\d\s\-]{8,15}$/.test(phone)) {
+    if (!/^[+\d][\d\s\-]{8,20}$/.test(phone)) {
       return res.status(400).json({ error: "Please enter a valid phone number." });
     }
-    if (password.length < 10) {
-      return res.status(400).json({ error: "Password must be at least 10 characters." });
+    if (password.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters." });
     }
 
     const exists = await User.findOne({ email });
     if (exists) {
-      return res.status(400).json({
-        error: "An account with this email already exists. Please log in.",
+      return res.status(409).json({
+        error: "User already exists. Please log in.",
       });
     }
 
@@ -179,11 +208,19 @@ router.post("/signup", signupLimiter, requireTrustedOrigin, async (req, res) => 
       await Activity.findByIdAndUpdate(event._id, { notifiedAdmin: true });
     }
 
-    return issueOtpAndRespond(
+    if (authRequireOtp()) {
+      return issueOtpAndRespond(
+        res,
+        user,
+        "Account created. OTP sent to your email.",
+        "Account created. Enter the OTP to unlock projects.",
+      );
+    }
+
+    return issueAccessSession(
       res,
       user,
-      "Account created. OTP sent to your email.",
-      "Account created. Enter the OTP to unlock projects.",
+      "Account created successfully. You are signed in for 1 hour.",
     );
   } catch (err) {
     safeLogError("signup", err);
@@ -201,8 +238,15 @@ router.post("/login", loginLimiter, requireTrustedOrigin, async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    if (!user || !verifyPassword(password, user.passwordHash, user.passwordSalt)) {
-      return res.status(401).json({ error: "Invalid email or password." });
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found. Please sign up first.",
+      });
+    }
+    if (!verifyPassword(password, user.passwordHash, user.passwordSalt)) {
+      return res.status(401).json({
+        error: "Incorrect password. Please try again.",
+      });
     }
 
     const meta = clientMeta(req);
@@ -225,11 +269,19 @@ router.post("/login", loginLimiter, requireTrustedOrigin, async (req, res) => {
       await Activity.findByIdAndUpdate(event._id, { notifiedAdmin: true });
     }
 
-    return issueOtpAndRespond(
+    if (authRequireOtp()) {
+      return issueOtpAndRespond(
+        res,
+        user,
+        "OTP sent to your email.",
+        "Enter the OTP to unlock projects.",
+      );
+    }
+
+    return issueAccessSession(
       res,
       user,
-      "OTP sent to your email.",
-      "Enter the OTP to unlock projects.",
+      "Login successful. Your session stays active for 1 hour.",
     );
   } catch (err) {
     safeLogError("login", err);

@@ -109,7 +109,7 @@ export default function ServicesSection() {
               What We Do
             </span>
           </FloatLine>
-          <FloatLine replayKey={replayKey} delay={0.1} duration={0.85} className="mt-4">
+          <FloatLine replayKey={replayKey} delay={0.1} duration={0.55} className="mt-4">
             <IridescentTitle size="lg">Our IT Services</IridescentTitle>
           </FloatLine>
           <FloatBlock replayKey={replayKey} scroll={false} index={2} className="mx-auto mt-4 max-w-2xl">

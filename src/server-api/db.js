@@ -4,7 +4,9 @@ export async function connectDb(uri) {
   mongoose.set("strictQuery", true);
   await mongoose.connect(uri, {
     maxPoolSize: 10,
-    serverSelectionTimeoutMS: 10000,
+    serverSelectionTimeoutMS: 5_000,
+    socketTimeoutMS: 20_000,
+    maxIdleTimeMS: 30_000,
   });
   console.log(`[db] shared database connected → ${mongoose.connection.name}`);
 }

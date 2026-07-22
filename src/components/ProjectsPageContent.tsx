@@ -56,14 +56,21 @@ export default function ProjectsPageContent({ initialSession }: Props) {
     setHasAccess(true);
     setIsAdmin(nextUser.id === "team-admin");
     setShowModal(false);
+    window.dispatchEvent(new Event("tf-auth-changed"));
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    });
     setHasAccess(false);
     setUser(null);
     setIsAdmin(false);
     setShowModal(true);
+    window.dispatchEvent(new Event("tf-auth-changed"));
   };
 
   return (

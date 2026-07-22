@@ -3,14 +3,20 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { m, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, CreditCard } from "lucide-react";
+import { Menu, X, ChevronDown, CreditCard, LogOut } from "lucide-react";
 import { navLinks, siteConfig, catalogueNavLinks } from "@/data/siteData";
 import { images } from "@/data/images";
 import ChatbotTrigger from "@/components/ChatbotTrigger";
 import ServicesNavDropdown from "@/components/ServicesNavDropdown";
 import { lockPageScroll, unlockPageScroll, releaseDocumentScroll } from "@/lib/scrollLock";
+
+type HeaderUser = {
+  id: string;
+  name: string;
+  email: string;
+};
 
 export default function Header() {
   const pathname = usePathname();
@@ -19,6 +25,72 @@ export default function Header() {
   const [catalogueOpen, setCatalogueOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [mobileCatalogueOpen, setMobileCatalogueOpen] = useState(false);
+  const [authUser, setAuthUser] = useState<HeaderUser | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const refreshSession = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/session", {
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      const data = (await res.json()) as {
+        authenticated?: boolean;
+        user?: HeaderUser;
+      };
+      if (data.authenticated && data.user) {
+        setAuthUser(data.user);
+      } else {
+        setAuthUser(null);
+      }
+    } catch {
+      setAuthUser(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshSession();
+  }, [pathname, refreshSession]);
+
+  useEffect(() => {
+    let lastFocusCheck = 0;
+    const onFocus = () => {
+      const now = Date.now();
+      // Avoid session spam on tab flicker — same UX, less main-thread work
+      if (now - lastFocusCheck < 12_000) return;
+      lastFocusCheck = now;
+      void refreshSession();
+    };
+    const onAuthChanged = () => {
+      void refreshSession();
+    };
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("tf-auth-changed", onAuthChanged);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("tf-auth-changed", onAuthChanged);
+    };
+  }, [refreshSession]);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+    } catch {
+      // Clear UI regardless.
+    } finally {
+      setAuthUser(null);
+      setLoggingOut(false);
+      if (pathname.startsWith("/payment") || pathname.startsWith("/projects")) {
+        window.location.assign(pathname);
+      }
+    }
+  };
 
   useEffect(() => {
     releaseDocumentScroll();
@@ -183,6 +255,27 @@ export default function Header() {
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:ml-1 lg:gap-2.5 xl:ml-2 xl:gap-3">
           <ChatbotTrigger className="shrink-0" />
 
+          {authUser ? (
+            <div className="hidden items-center gap-1.5 sm:flex">
+              <span
+                className="max-w-[9rem] truncate rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[10px] font-semibold text-emerald-800 xl:max-w-[12rem] xl:text-xs"
+                title={authUser.email}
+              >
+                {authUser.name.split(" ")[0]}
+              </span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground transition hover:border-brand/40 hover:text-brand disabled:opacity-60 xl:px-3 xl:text-xs"
+                aria-label="Logout"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                {loggingOut ? "…" : "Logout"}
+              </button>
+            </div>
+          ) : null}
+
           <Link
             href={siteConfig.payNowUrl}
             className="hidden items-center gap-1.5 rounded-full bg-brand px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-brand-dark sm:flex lg:px-4 xl:px-5 xl:text-xs"
@@ -343,6 +436,27 @@ export default function Header() {
               >
                 Let&apos;s Talk
               </Link>
+
+              {authUser ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                  <p className="text-sm font-semibold text-emerald-900">
+                    {authUser.name}
+                  </p>
+                  <p className="truncate text-xs text-emerald-800/80">{authUser.email}</p>
+                  <button
+                    type="button"
+                    disabled={loggingOut}
+                    onClick={async () => {
+                      setMobileOpen(false);
+                      await handleLogout();
+                    }}
+                    className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-emerald-300 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-emerald-900 disabled:opacity-60"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    {loggingOut ? "Signing out…" : "Logout"}
+                  </button>
+                </div>
+              ) : null}
 
               <Link
                 href={siteConfig.payNowUrl}

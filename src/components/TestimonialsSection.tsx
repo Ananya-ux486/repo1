@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { m } from "framer-motion";
 import { useScrollReplay } from "@/lib/useScrollReplay";
 import { FloatLine } from "@/components/FloatReveal";
@@ -94,7 +94,7 @@ function TestimonialCard({
           else if (isLong) setExpanded((v) => !v);
         }
       }}
-      className={`google-review-card group relative mx-auto block h-full max-w-md cursor-pointer rounded-2xl border bg-white p-5 shadow-sm transition-all duration-300 sm:p-6 lg:max-w-none ${
+      className={`google-review-card group relative mx-auto block h-full w-full cursor-pointer rounded-2xl border bg-white p-5 shadow-sm transition-all duration-300 sm:p-6 ${
         isActive
           ? "border-[#1a73e8]/40 shadow-lg ring-1 ring-[#1a73e8]/15"
           : "border-border hover:-translate-y-1 hover:border-[#1a73e8]/35 hover:shadow-lg"
@@ -221,16 +221,17 @@ export default function TestimonialsSection() {
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   const autoplayResumeRef = useRef<number | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
 
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
+  // Duplicate slides so Swiper loop + autoplay stay reliable with only 3 reviews.
+  const slides = useMemo(
+    () => [...testimonials, ...testimonials].map((item, index) => ({
+      ...item,
+      key: `${item.name}-${index}`,
+      originalIndex: index % testimonials.length,
+    })),
+    [],
+  );
 
   useEffect(() => {
     const swiper = swiperRef.current;
@@ -242,9 +243,8 @@ export default function TestimonialsSection() {
     swiper.navigation.destroy();
     swiper.navigation.init();
     swiper.navigation.update();
-    // Re-bind can pause autoplay — keep cyclic rotation running.
     swiper.autoplay?.start();
-  }, [isMobile]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -254,19 +254,14 @@ export default function TestimonialsSection() {
     };
   }, []);
 
-  const focusReview = (slideIndex: number) => {
+  const focusReview = (originalIndex: number) => {
     const swiper = swiperRef.current;
     if (!swiper) return;
     swiper.autoplay?.stop();
     if (autoplayResumeRef.current !== null) {
       window.clearTimeout(autoplayResumeRef.current);
     }
-    // Prefer loop jump when enabled; fall back for rewind/few-slide mode.
-    if (swiper.params.loop) {
-      swiper.slideToLoop(slideIndex, 500);
-    } else {
-      swiper.slideTo(slideIndex, 500);
-    }
+    swiper.slideToLoop(originalIndex, 500);
     autoplayResumeRef.current = window.setTimeout(() => {
       swiper.autoplay?.start();
       autoplayResumeRef.current = null;
@@ -278,18 +273,17 @@ export default function TestimonialsSection() {
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <GoogleReviewsHeader />
 
-        <div className="relative">
+        <div className="relative px-0 lg:px-12">
           <Swiper
             modules={[Navigation, Pagination, Autoplay]}
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
-              setActiveSlide(swiper.realIndex);
-              // Ensure autoplay actually starts after mount (loop/nav re-init safe).
-              requestAnimationFrame(() => {
-                swiper.autoplay?.start();
-              });
+              setActiveSlide(swiper.realIndex % testimonials.length);
+              requestAnimationFrame(() => swiper.autoplay?.start());
             }}
-            onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
+            onSlideChange={(swiper) =>
+              setActiveSlide(swiper.realIndex % testimonials.length)
+            }
             onBeforeInit={(swiper) => {
               if (typeof swiper.params.navigation !== "boolean") {
                 swiper.params.navigation!.prevEl = prevRef.current;
@@ -297,35 +291,32 @@ export default function TestimonialsSection() {
               }
             }}
             autoplay={{
-              delay: 3500,
+              delay: 3200,
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
-            centeredSlides
-            /* 3 reviews + slidesPerView:3 breaks Swiper loop/autoplay — use rewind for reliable cycle. */
-            loop={false}
-            rewind
+            loop
+            loopAdditionalSlides={testimonials.length}
             watchSlidesProgress
             slidesPerView={1}
             spaceBetween={16}
-            speed={800}
-            allowTouchMove={isMobile}
-            simulateTouch={isMobile}
+            speed={700}
+            grabCursor
+            allowTouchMove
+            simulateTouch
             touchStartPreventDefault={false}
-            touchMoveStopPropagation={false}
             pagination={{
               clickable: true,
               el: ".google-review-pagination",
             }}
             breakpoints={{
-              640: { slidesPerView: 1.15, spaceBetween: 18 },
-              /* Peek side cards like live site; keep < slide count so motion is visible */
-              1024: { slidesPerView: 2.2, spaceBetween: 24 },
+              768: { slidesPerView: 2, spaceBetween: 20 },
+              1024: { slidesPerView: 3, spaceBetween: 24 },
             }}
-            className={`testimonial-swiper google-review-swiper tf-swiper-allow-page-scroll !pb-2 !pt-2 ${isMobile ? "!overflow-hidden" : "!overflow-visible"}`}
+            className="testimonial-swiper google-review-swiper tf-swiper-allow-page-scroll !overflow-hidden !pb-2 !pt-1"
           >
-            {testimonials.map((t, i) => (
-              <SwiperSlide key={t.name}>
+            {slides.map((t) => (
+              <SwiperSlide key={t.key} className="!h-auto">
                 <TestimonialCard
                   name={t.name}
                   role={t.role}
@@ -333,8 +324,8 @@ export default function TestimonialsSection() {
                   quote={t.quote}
                   avatarColor={t.avatarColor}
                   reviewUrl={t.reviewUrl}
-                  isActive={activeSlide === i}
-                  onSelect={() => focusReview(i)}
+                  isActive={activeSlide === t.originalIndex}
+                  onSelect={() => focusReview(t.originalIndex)}
                 />
               </SwiperSlide>
             ))}

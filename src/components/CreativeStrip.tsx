@@ -13,7 +13,7 @@ import {
  * Keeps orb animations + float reveal; layout is denser and more professional.
  */
 export default function CreativeStrip() {
-  const { ref, replayKey, isInView } = useScrollReplay(0.2);
+  const { ref, replayKey, play, isInView } = useScrollReplay(0.12);
 
   return (
     <section
@@ -33,7 +33,7 @@ export default function CreativeStrip() {
 
           {/* Headline block — single composition */}
           <div className="relative z-[2] order-2 min-w-0 flex-1 lg:order-none">
-            <FloatLine replayKey={replayKey} delay={0} duration={0.7}>
+            <FloatLine replayKey={replayKey} play={play} delay={0} duration={0.55}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-brand sm:text-xs">
                 What we craft
               </p>
@@ -41,8 +41,9 @@ export default function CreativeStrip() {
 
             <FloatLine
               replayKey={replayKey}
-              delay={0.08}
-              duration={0.8}
+              play={play}
+              delay={0.05}
+              duration={0.55}
               className="mt-2 !overflow-visible sm:mt-3"
             >
               <h2 className="creative-strip-heading text-[clamp(1.85rem,5.5vw,3.75rem)] font-black uppercase leading-[1.08] text-foreground">
@@ -62,8 +63,10 @@ export default function CreativeStrip() {
 
             <FloatBlock
               replayKey={replayKey}
+              play={play}
               scroll={false}
               index={2}
+              duration={0.5}
               className="mx-auto mt-3 max-w-xl lg:mx-0 lg:mt-4"
             >
               <p className="text-sm leading-relaxed text-muted sm:text-[15px]">

@@ -13,6 +13,13 @@ export function useReplayPlay(replayKey: number | undefined, startPlaying = fals
 
   useEffect(() => {
     if (replayKey === undefined || replayKey <= 0) return;
+
+    // First trigger: start immediately (avoids blank hang before first float)
+    if (replayKey === 1) {
+      setPlay(true);
+      return;
+    }
+
     let playFrame = 0;
     const resetFrame = requestAnimationFrame(() => {
       setPlay(false);
@@ -32,16 +39,20 @@ export function FloatLine({
   children,
   className = "",
   delay = 0,
-  duration = 0.75,
+  duration = 0.55,
   replayKey,
+  play: playProp,
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
   duration?: number;
   replayKey?: number;
+  /** Optional external play flag (from useScrollReplay) for zero-lag sync */
+  play?: boolean;
 }) {
-  const play = useReplayPlay(replayKey, false);
+  const playFromKey = useReplayPlay(replayKey, false);
+  const play = playProp ?? playFromKey;
 
   return (
     <div className={`overflow-hidden ${className}`}>
@@ -65,8 +76,8 @@ export function FloatWords({
   wordClass = "",
   highlightClass = "",
   replayKey = 0,
-  stagger = 0.07,
-  baseDelay = 0.06,
+  stagger = 0.05,
+  baseDelay = 0.04,
   as: Tag = "span",
 }: {
   text: string;
@@ -98,7 +109,7 @@ export function FloatWords({
               initial={{ y: "120%", opacity: 0 }}
               animate={play ? { y: "0%", opacity: 1 } : { y: "120%", opacity: 0 }}
               transition={{
-                duration: 0.8,
+                duration: 0.55,
                 delay: play ? floatStagger(i, stagger, baseDelay) : 0,
                 ease: floatEase,
               }}
@@ -122,8 +133,9 @@ export function FloatBlock({
   replayKey: externalKey,
   scroll = true,
   amount = 0.15,
-  duration = 0.7,
+  duration = 0.55,
   clip = true,
+  play: playProp,
 }: {
   children: ReactNode;
   className?: string;
@@ -133,6 +145,7 @@ export function FloatBlock({
   amount?: number;
   duration?: number;
   clip?: boolean;
+  play?: boolean;
 }) {
   const needsObserver = scroll && externalKey === undefined;
   const scrollReplay = useScrollReplay({ amount, enabled: needsObserver });
@@ -141,7 +154,12 @@ export function FloatBlock({
     needsObserver || externalKey !== undefined ? key : undefined,
     !needsObserver && externalKey === undefined,
   );
-  const play = needsObserver ? scrollReplay.play : playFromKey;
+  const play =
+    playProp !== undefined
+      ? playProp
+      : needsObserver
+        ? scrollReplay.play
+        : playFromKey;
 
   const hidden = clip ? { y: "110%", opacity: 0 } : { y: 18, opacity: 0 };
   const shown = clip ? { y: "0%", opacity: 1 } : { y: 0, opacity: 1 };

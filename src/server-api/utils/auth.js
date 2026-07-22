@@ -1,7 +1,8 @@
 import { createHmac, randomBytes, randomInt, scryptSync, timingSafeEqual } from "crypto";
 
 const COOKIE_NAME = "tf_projects_auth";
-const MAX_AGE_SEC = 60 * 60 * 24 * 7;
+/** Signed-in session lifetime — 1 hour */
+const MAX_AGE_SEC = 60 * 60;
 
 function secret() {
   return (

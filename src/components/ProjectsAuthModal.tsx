@@ -36,11 +36,20 @@ async function postJson<T>(url: string, body: Record<string, string>) {
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
     body: JSON.stringify(body),
   });
-  const data = (await res.json()) as T & { error?: string };
-  if (!res.ok) throw new Error(data.error || "Something went wrong.");
-  return data;
+  const raw = await res.text();
+  let data: (T & { error?: string }) | null = null;
+  try {
+    data = raw ? (JSON.parse(raw) as T & { error?: string }) : ({} as T);
+  } catch {
+    throw new Error(
+      "Server did not return a valid response. Please confirm the site API is running and try again.",
+    );
+  }
+  if (!res.ok) throw new Error(data?.error || "Something went wrong.");
+  return data as T;
 }
 
 export default function ProjectsAuthModal({
@@ -78,6 +87,19 @@ export default function ProjectsAuthModal({
     setInfo("");
   };
 
+  const finishAuth = (
+    data: { user: AuthUser; message?: string; otpRequired?: boolean; demoOtp?: string },
+  ) => {
+    if (data.otpRequired) {
+      setDemoOtp(data.demoOtp);
+      setInfo(data.message || "OTP sent.");
+      setMode("otp");
+      return;
+    }
+    setInfo(data.message || "Signed in successfully.");
+    onUnlocked(data.user);
+  };
+
   const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
     resetMessages();
@@ -86,6 +108,7 @@ export default function ProjectsAuthModal({
       const data = await postJson<{
         message?: string;
         demoOtp?: string;
+        otpRequired?: boolean;
         user: AuthUser;
       }>("/api/auth/signup", {
         name,
@@ -93,9 +116,7 @@ export default function ProjectsAuthModal({
         phone: `${phoneDial} ${phone}`.trim(),
         password,
       });
-      setDemoOtp(data.demoOtp);
-      setInfo(data.message || "OTP sent.");
-      setMode("otp");
+      finishAuth(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed.");
     } finally {
@@ -111,11 +132,10 @@ export default function ProjectsAuthModal({
       const data = await postJson<{
         message?: string;
         demoOtp?: string;
+        otpRequired?: boolean;
         user: AuthUser;
       }>("/api/auth/login", { email, password });
-      setDemoOtp(data.demoOtp);
-      setInfo(data.message || "OTP sent.");
-      setMode("otp");
+      finishAuth(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed.");
     } finally {
@@ -440,10 +460,10 @@ export default function ProjectsAuthModal({
                     : mode === "admin"
                       ? "Admin unlock"
                       : mode === "login"
-                        ? "Login & send OTP"
+                        ? "Login & continue"
                         : isPayment
                           ? "Create account & continue"
-                          : "Create account & get OTP"}
+                          : "Create account & continue"}
                   <ArrowRight className="h-3.5 w-3.5" />
                 </SubmitButton>
               </div>
@@ -545,7 +565,7 @@ function PasswordField({
           onChange={(e) => onChange(e.target.value)}
           autoComplete="current-password"
           required
-          minLength={6}
+          minLength={8}
           className="w-full rounded-lg border border-border bg-white py-1.5 pl-7 pr-8 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
         />
         <button

@@ -81,8 +81,8 @@ export default function ApproachSection() {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: false, amount: 0.25, margin: "0px 0px -40px 0px" }}
                 transition={{
-                  duration: 0.75,
-                  delay: floatStagger(i, 0.08),
+                  duration: 0.5,
+                  delay: floatStagger(i, 0.05),
                   ease: floatEase,
                 }}
               >

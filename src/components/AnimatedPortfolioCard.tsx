@@ -189,7 +189,7 @@ export function PortfolioSectionHeader({
             </span>
           </div>
         </FloatLine>
-        <FloatLine replayKey={replayKey} delay={0.08} duration={0.85}>
+        <FloatLine replayKey={replayKey} delay={0.08} duration={0.55}>
           <h2 className="text-[clamp(2rem,7vw,5rem)] font-black uppercase leading-[0.95] tracking-tighter text-foreground lg:text-[clamp(2.5rem,8vw,5rem)]">
             {title}
             {titleAccent ? (
