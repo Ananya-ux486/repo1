@@ -363,7 +363,14 @@ export default function ContactPageContent() {
                   </label>
                 </div>
 
-                <PhoneWithCountryField name="phone" />
+                {/* <PhoneWithCountryField name="phone" /> */}
+                <input
+  name="phone"
+  type="tel"
+  placeholder="Phone"
+  className={fieldClass}
+/>
+
 
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">
