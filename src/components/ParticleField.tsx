@@ -25,7 +25,7 @@ export default function ParticleField() {
     if (!ctx) return;
 
     const resize = () => {
-      const dpr = window.devicePixelRatio;
+      const dpr = Math.min(window.devicePixelRatio, 1.5); // cap DPR to reduce paint cost
       canvas.width = canvas.offsetWidth * dpr;
       canvas.height = canvas.offsetHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -34,7 +34,8 @@ export default function ParticleField() {
     const initParticles = () => {
       const w = canvas.offsetWidth;
       const h = canvas.offsetHeight;
-      const count = Math.min(180, Math.floor((w * h) / 8000));
+      // Fewer particles = much less O(n²) work per frame
+      const count = Math.min(60, Math.floor((w * h) / 20000));
       particlesRef.current = Array.from({ length: count }, () => {
         const angle = Math.random() * Math.PI * 2;
         const dist = Math.random() * Math.min(w, h) * 0.35;
@@ -61,12 +62,17 @@ export default function ParticleField() {
 
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
+      const particles = particlesRef.current;
+      const len = particles.length;
 
-      particlesRef.current.forEach((p, i) => {
+      for (let i = 0; i < len; i++) {
+        const p = particles[i];
+
         const dx = mx - p.x;
         const dy = my - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
+        const distSq = dx * dx + dy * dy;
+        if (distSq < 14400) { // 120² — avoid sqrt until needed
+          const dist = Math.sqrt(distSq);
           p.vx -= (dx / dist) * 0.08;
           p.vy -= (dy / dist) * 0.08;
         }
@@ -86,12 +92,15 @@ export default function ParticleField() {
         ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
         ctx.fill();
 
-        for (let j = i + 1; j < particlesRef.current.length; j++) {
-          const p2 = particlesRef.current[j];
+        // Only connect to next 8 neighbours instead of all remaining particles (O(n) per particle)
+        const maxJ = Math.min(i + 9, len);
+        for (let j = i + 1; j < maxJ; j++) {
+          const p2 = particles[j];
           const ddx = p.x - p2.x;
           const ddy = p.y - p2.y;
-          const d = Math.sqrt(ddx * ddx + ddy * ddy);
-          if (d < 60) {
+          const dSq = ddx * ddx + ddy * ddy;
+          if (dSq < 3600) { // 60²
+            const d = Math.sqrt(dSq);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
@@ -100,24 +109,26 @@ export default function ParticleField() {
             ctx.stroke();
           }
         }
-      });
+      }
 
       frameRef.current = requestAnimationFrame(animate);
+    };
+
+    const onResize = () => {
+      resize();
+      initParticles();
     };
 
     resize();
     initParticles();
     animate();
 
-    window.addEventListener("resize", () => {
-      resize();
-      initParticles();
-    });
+    window.addEventListener("resize", onResize);
     window.addEventListener("mousemove", onMouseMove);
 
     return () => {
       cancelAnimationFrame(frameRef.current);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMouseMove);
     };
   }, []);

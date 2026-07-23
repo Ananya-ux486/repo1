@@ -94,10 +94,10 @@ function TestimonialCard({
           else if (isLong) setExpanded((v) => !v);
         }
       }}
-      className={`google-review-card group relative mx-auto block h-full w-full cursor-pointer rounded-2xl border bg-white p-5 shadow-sm transition-all duration-300 sm:p-6 ${
+      className={`google-review-card group relative mx-auto block h-full w-full cursor-pointer rounded-[1.5rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-5 shadow-[0_12px_32px_-18px_rgba(15,23,42,0.32)] transition-all duration-300 sm:p-6 lg:max-w-[21rem] ${
         isActive
-          ? "border-[#1a73e8]/40 shadow-lg ring-1 ring-[#1a73e8]/15"
-          : "border-border hover:-translate-y-1 hover:border-[#1a73e8]/35 hover:shadow-lg"
+          ? "border-[#1a73e8]/40 shadow-[0_18px_50px_-20px_rgba(26,115,232,0.38)] ring-1 ring-[#1a73e8]/15"
+          : "border-border hover:-translate-y-1 hover:border-[#1a73e8]/35 hover:shadow-[0_20px_48px_-20px_rgba(15,23,42,0.45)]"
       }`}
     >
       <div className="mb-4 flex items-start gap-3">
@@ -223,7 +223,6 @@ export default function TestimonialsSection() {
   const autoplayResumeRef = useRef<number | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // Duplicate slides so Swiper loop + autoplay stay reliable with only 3 reviews.
   const slides = useMemo(
     () => [...testimonials, ...testimonials].map((item, index) => ({
       ...item,
@@ -232,6 +231,18 @@ export default function TestimonialsSection() {
     })),
     [],
   );
+
+  useEffect(() => {
+    const swiper = swiperRef.current;
+    if (!swiper) return;
+
+    const startAutoplay = () => {
+      swiper.autoplay?.start();
+    };
+
+    const frameId = window.requestAnimationFrame(startAutoplay);
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
 
   useEffect(() => {
     const swiper = swiperRef.current;
@@ -270,7 +281,7 @@ export default function TestimonialsSection() {
 
   return (
     <section className="google-reviews-section relative py-8 lg:py-11">
-      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+      <div className="mx-auto w-full">
         <GoogleReviewsHeader />
 
         <div className="relative px-0 lg:px-12">
@@ -294,9 +305,13 @@ export default function TestimonialsSection() {
               delay: 3200,
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
+              waitForTransition: true,
             }}
+            centeredSlides={false}
+            /* True 3-card desktop slider with the middle review emphasized and no side blank gap. */
             loop
             loopAdditionalSlides={testimonials.length}
+            rewind={false}
             watchSlidesProgress
             slidesPerView={1}
             spaceBetween={16}

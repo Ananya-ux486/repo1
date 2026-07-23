@@ -24,16 +24,6 @@ import { siteConfig } from "@/data/siteData";
 import MagneticButton from "@/components/MagneticButton";
 import PhoneWithCountryField from "@/components/PhoneWithCountryField";
 
-const contactReasons = [
-  "General inquiry",
-  "Website / project discussion",
-  "Support / maintenance",
-  "Partnership / collaboration",
-  "Careers / internship",
-  "Billing / payments",
-  "Other",
-];
-
 const highlights = [
   {
     icon: Headphones,
@@ -313,11 +303,37 @@ export default function ContactPageContent() {
                     <option value="" disabled>
                       Select a reason
                     </option>
-                    {contactReasons.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
+                    <option value="General inquiry">General inquiry</option>
+                    <optgroup label="── Web Development ──">
+                      <option value="Web Development — Static Website">Static Website</option>
+                      <option value="Web Development — Landing Page">Landing Page</option>
+                      <option value="Web Development — Dynamic Website">Dynamic Website</option>
+                      <option value="Web Development — E-Commerce">E-Commerce</option>
+                    </optgroup>
+                    <optgroup label="── Digital Marketing ──">
+                      <option value="Digital Marketing — SEO Services">SEO Services</option>
+                      <option value="Digital Marketing — Graphic Designing">Graphic Designing</option>
+                      <option value="Digital Marketing — Social Media Promotion">Social Media Promotion</option>
+                      <option value="Digital Marketing — Verified GNB Creation">Verified GNB Creation</option>
+                      <option value="Digital Marketing — Google My Business Ranking">GMB Profile Ranking</option>
+                    </optgroup>
+                    <optgroup label="── CRM Solutions ──">
+                      <option value="CRM — Lead Management">Lead Management</option>
+                      <option value="CRM — Service Desk">Service Desk</option>
+                      <option value="CRM — Client Management">Client Management</option>
+                      <option value="CRM — HR Management">HR Management</option>
+                      <option value="CRM — Email Management">Email Management</option>
+                      <option value="CRM — Finance & Advanced Dashboard">Finance &amp; Advanced Dashboard</option>
+                    </optgroup>
+                    <optgroup label="── Cloud Solutions ──">
+                      <option value="Cloud Solutions — AWS">AWS Solutions</option>
+                      <option value="Cloud Solutions — Azure">Azure Solutions</option>
+                    </optgroup>
+                    <optgroup label="── Other ──">
+                      <option value="Support / maintenance">Support / maintenance</option>
+                      <option value="Billing / payments">Billing / payments</option>
+                      <option value="Other">Other</option>
+                    </optgroup>
                   </select>
                 </label>
 

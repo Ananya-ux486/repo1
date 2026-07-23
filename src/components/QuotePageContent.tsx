@@ -14,17 +14,6 @@ import { floatEase } from "@/lib/floatMotion";
 import { siteConfig } from "@/data/siteData";
 import PhoneWithCountryField from "@/components/PhoneWithCountryField";
 
-const projectTypes = [
-  "Website",
-  "E-Commerce",
-  "Mobile App",
-  "Custom Software",
-  "Cloud / DevOps",
-  "UI/UX Design",
-  "Digital Marketing",
-  "Other",
-];
-
 const budgets = [
   "Under ₹25,000",
   "₹25,000 – ₹75,000",
@@ -159,11 +148,34 @@ export default function QuotePageContent() {
                   <option value="" disabled>
                     Select type
                   </option>
-                  {projectTypes.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
+                  <optgroup label="── Web Development ──">
+                    <option value="Web Development — Static Website">Static Website</option>
+                    <option value="Web Development — Landing Page">Landing Page</option>
+                    <option value="Web Development — Dynamic Website">Dynamic Website</option>
+                    <option value="Web Development — E-Commerce">E-Commerce</option>
+                  </optgroup>
+                  <optgroup label="── Digital Marketing ──">
+                    <option value="Digital Marketing — SEO Services">SEO Services</option>
+                    <option value="Digital Marketing — Graphic Designing">Graphic Designing</option>
+                    <option value="Digital Marketing — Social Media Promotion">Social Media Promotion</option>
+                    <option value="Digital Marketing — Verified GNB Creation">Verified GNB Creation</option>
+                    <option value="Digital Marketing — GMB Profile Ranking">GMB Profile Ranking</option>
+                  </optgroup>
+                  <optgroup label="── CRM Solutions ──">
+                    <option value="CRM — Lead Management">Lead Management</option>
+                    <option value="CRM — Service Desk">Service Desk</option>
+                    <option value="CRM — Client Management">Client Management</option>
+                    <option value="CRM — HR Management">HR Management</option>
+                    <option value="CRM — Email Management">Email Management</option>
+                    <option value="CRM — Finance & Advanced Dashboard">Finance &amp; Advanced Dashboard</option>
+                  </optgroup>
+                  <optgroup label="── Cloud Solutions ──">
+                    <option value="Cloud Solutions — AWS">AWS Solutions</option>
+                    <option value="Cloud Solutions — Azure">Azure Solutions</option>
+                  </optgroup>
+                  <optgroup label="── Other ──">
+                    <option value="Other">Other</option>
+                  </optgroup>
                 </select>
               </label>
               <label className="block">

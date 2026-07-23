@@ -151,7 +151,9 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
   const hasRenderedRef = useRef(false);
   const lastLayoutWidthRef = useRef(0);
 
-  const renderPage = useCallback(async (pageNum: number, showOverlay = true) => {
+  const lastRenderedPageRef = useRef(0);
+
+  const renderPage = useCallback(async (pageNum: number, showOverlay = true, forceRender = false) => {
     if (!pdfDocRef.current || !canvasRef.current) return;
     if (showOverlay) setLoading(true);
     try {
@@ -175,14 +177,20 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
       // On phones render wider than the screen so text stays readable;
       // horizontal pan + outer vertical scroll let the whole page move.
       const layoutWidth = pdfLayoutWidth(viewportW, containerWidth);
+      // Skip re-render only when: same page, same width, not forced (resize dedup).
+      // Never skip when the page number actually changed.
       if (
+        !forceRender &&
         hasRenderedRef.current &&
         lastLayoutWidthRef.current > 0 &&
+        lastRenderedPageRef.current === pageNum &&
         Math.abs(layoutWidth - lastLayoutWidthRef.current) < 48
       ) {
+        setLoading(false);
         return;
       }
       lastLayoutWidthRef.current = layoutWidth;
+      lastRenderedPageRef.current = pageNum;
       const base = page.getViewport({ scale: 1 });
       const scale = Math.min(pdfMaxScale(viewportW), layoutWidth / base.width);
       const viewport = page.getViewport({ scale });
@@ -235,6 +243,7 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
     pdfDocRef.current = null;
     hasRenderedRef.current = false;
     lastLayoutWidthRef.current = 0;
+    lastRenderedPageRef.current = 0;
 
     const load = async () => {
       try {
@@ -267,7 +276,7 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
         if (cancelled) return;
         pdfDocRef.current = pdf;
         setTotalPages(pdf.numPages);
-        await renderPage(1);
+        await renderPage(1, true, true);
       } catch (err) {
         console.error("[certificates] load failed:", err);
         if (!cancelled) {
@@ -292,7 +301,7 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
 
   useEffect(() => {
     if (!pdfDocRef.current || currentPage < 1) return;
-    void renderPage(currentPage, true);
+    void renderPage(currentPage, true, true);
   }, [currentPage, renderPage]);
 
   useEffect(() => {
@@ -312,7 +321,7 @@ function CanvasPdfViewer({ file, label }: { file: string; label: string }) {
       lastW = w;
       window.clearTimeout(t);
       t = window.setTimeout(() => {
-        if (pdfDocRef.current) void renderPage(currentPage, false);
+        if (pdfDocRef.current) void renderPage(currentPage, false, false);
       }, 180);
     });
     ro.observe(el);
